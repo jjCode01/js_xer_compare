@@ -1,0 +1,535 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="title">Schedule Comparison</title>
+    <link rel="stylesheet" type="text/css" href="./static/css/style.css">
+</head>
+<body style="max-width: 860px;">
+    <div id="content">
+        <table style="width: 100%;">
+            <thead>
+                <tr>
+                    <th>
+                        <header id="pageHeader"><h1>Schedule Comparison Report</h1></header>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="width-max">
+                        <section id="upload" class="cat width-max">
+                            <div class="margin-top-20px tbl-border box-shadow">
+                                <label for="current-file-selector" class="">Select Current XER</label>
+                                <div class="pad-10px">
+                                    <input type="file" name="current" id="current-file-selector" accept=".xer" class="xer margin-top-5px" required>
+                                    <select name="current" id="current-project-selector" class="width-100 margin-top-10px hidden">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="margin-top-20px tbl-border box-shadow">
+                                <label for="previous-file-selector" class="">Select Previous XER</label>
+                                <div class="pad-10px">
+                                    <input type="file" name="previous" id="previous-file-selector" accept=".xer" class="xer margin-top-5px" required>
+                                    <select name="previous" id="previous-project-selector" class="width-100 margin-top-10px hidden">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="width-100 margin-top-20px margin-hor">
+                                <button id="analyze-btn" disabled=true>Analyze</button>
+                            </div>
+                        </section>
+                        <section id="general" class="cat hidden">
+                            <div class="">
+                                <div class="flex" style="justify-content: space-evenly;">
+                                    <div class="card"> <!-- Current Project -->
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th class="btm-border" style="font-size: 1rem;">Current Project</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td id="current-project-id" class="text-center"></td>
+                                                </tr>
+                                                <tr>
+                                                    <td class="width-max text-center" id="current-project-name"></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div style="width: 20px; text-align: center; font-size: 1.5rem; padding: 0.5em 1.0em;">VS</div>
+                                    <div class="card"> <!-- Previous Project -->
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th class=" btm-border" style="font-size: 1rem;">Previous Project</th>
+                                                </tr>
+                                            </thead>
+                                            <tr>
+                                                <td id="previous-project-id" class="text-center"></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="width-max text-center" id="previous-project-name"></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex">
+                                <div>
+                            <div class="card"> <!-- Project Dates -->
+                                <table style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th class="caption btm-border" colspan="4">Project Dates</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left btm-border">Date</th>
+                                            <th class="btm-border width-8em">Current</th>
+                                            <th class="btm-border width-8em ">Previous</th>
+                                            <th class="btm-border text-right ">Diff</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="no-wrap">Start Date:</td>
+                                            <td id="current-start" class="text-center no-wrap"></td>
+                                            <td id="previous-start" class="text-center no-wrap "></td>
+                                            <td id="start-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">Data Date:</td>
+                                            <td id="current-data-date" class="text-center no-wrap"></td>
+                                            <td id="previous-data-date" class="text-center no-wrap "></td>
+                                            <td id="dd-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">End Date:</td>
+                                            <td id="current-end" class="text-center no-wrap"></td>
+                                            <td id="previous-end" class="text-center no-wrap "></td>
+                                            <td id="end-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">Must Finish:</td>
+                                            <td id="current-mfb" class="text-center no-wrap"></td>
+                                            <td id="previous-mfb" class="text-center no-wrap "></td>
+                                            <td id="mfb-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="card"> <!-- Activity Status -->
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="caption btm-border" colspan="6">Activity Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-left btm-border">Status</th>
+                                            <th class="text-right btm-border">Count</th>
+                                            <th class="text-right btm-border">%</th>
+                                            <th class="text-right btm-border">Prev</th>
+                                            <th class="text-right btm-border">Diff</th>
+                                            <td class="chart no-wrap" rowspan="5"><canvas id="activityStatusChart"></canvas></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-red">Not Started:</td>
+                                            <td id="current-not-started" class="text-right no-wrap"></td>
+                                            <td id="current-not-started-per" class="text-right no-wrap"></td>
+                                            <td id="previous-not-started" class="text-right no-wrap "></td>
+                                            <td id="not-started-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-green">In Progress:</td>
+                                            <td id="current-in-progress" class="text-right no-wrap"></td>
+                                            <td id="current-in-progress-per" class="text-right no-wrap"></td>
+                                            <td id="previous-in-progress" class="text-right no-wrap "></td>
+                                            <td id="in-progress-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-blue">Completed:</td>
+                                            <td id="current-complete" class="text-right no-wrap"></td>
+                                            <td id="current-complete-per" class="text-right no-wrap"></td>
+                                            <td id="previous-complete" class="text-right no-wrap "></td>
+                                            <td id="complete-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap border-top">Total:</td>
+                                            <td id="current-tasks" class="text-right no-wrap border-top"></td>
+                                            <td class="text-right no-wrap border-top"></td>
+                                            <td id="previous-tasks" class="text-right no-wrap border-top "></td>
+                                            <td id="tasks-var" class="text-right no-wrap border-top "></td>
+                                        </tr>
+                                        <!-- <tr><td></td></tr>
+                                        <tr><td></td></tr> -->
+                                    <tbody></tbody>
+                                </table>
+                            </div>
+                                </div>
+                                <div class="card" style="margin-left: 30px;" >
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th class="caption btm-border">Planned vs Actual Date Counts</th>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-left">For Period <span id="start-period"></span> thru <span id="end-period"></span></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td class="bar-chart no-wrap" rowspan="5"><canvas id="startFinishChart"></canvas></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card"> <!-- Progress -->
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="caption btm-border" colspan="5">Progress</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left btm-border">Progress:</th>
+                                            <th class="text-right btm-border width-8em">Current</th>
+                                            <th class="text-right btm-border width-8em ">Previous</th>
+                                            <th class="text-right btm-border width-8em ">Diff</th>
+                                            <th class="btm-border no-wrap"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody> 
+                                        <tr>
+                                            <td class="no-wrap">Schedule:</td>
+                                            <td id="current-schedule-per" class="text-right no-wrap"></td>
+                                            <td id="previous-schedule-per" class="text-right no-wrap "></td>
+                                            <td id="schedule-per-var" class="text-right no-wrap "></td>
+                                            <td class="outer-progress"><div id="sched-progress" class="inner-progress"></div></td>
+                                        </tr>
+                                        <!-- <tr>
+                                            <td class="no-wrap">Contract Duration:</td>
+                                            <td id="current-contract-per" class="text-right no-wrap"></td>
+                                            <td id="previous-contract-per" class="text-right no-wrap"></td>
+                                            <td id="contract-per-var" class="text-right no-wrap"></td>
+                                        </tr> -->
+                                        <tr>
+                                            <td class="no-wrap">Physical:</td>
+                                            <td id="current-physical-per" class="text-right no-wrap"></td>
+                                            <td id="previous-physical-per" class="text-right no-wrap "></td>
+                                            <td id="physical-per-var" class="text-right no-wrap "></td>
+                                            <td class="outer-progress"><div id="phys-progress" class="inner-progress"></div></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">Cost:</td>
+                                            <td id="current-cost-per" class="text-right no-wrap"></td>
+                                            <td id="previous-cost-per" class="text-right no-wrap "></td>
+                                            <td id="cost-per-var" class="text-right no-wrap "></td>
+                                            <td class="outer-progress"><div id="cost-progress" class="inner-progress"></div></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div> 
+                            <!-- <div class="card">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="caption btm-border" colspan="6">Activity Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-left btm-border col-6-5em">Status</th>
+                                            <th class="text-right btm-border col-5em">Count</th>
+                                            <th class="text-right btm-border col-3em">%</th>
+                                            <th class="text-right btm-border col-5em ">Prev</th>
+                                            <th class="text-right btm-border col-3em ">Diff</th>
+                                            <td class="chart no-wrap" rowspan="7"><canvas id="activityStatusChart"></canvas></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-red">Not Started:</td>
+                                            <td id="current-not-started" class="text-right no-wrap"></td>
+                                            <td id="current-not-started-per" class="text-right no-wrap"></td>
+                                            <td id="previous-not-started" class="text-right no-wrap "></td>
+                                            <td id="not-started-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-green">In Progress:</td>
+                                            <td id="current-in-progress" class="text-right no-wrap"></td>
+                                            <td id="current-in-progress-per" class="text-right no-wrap"></td>
+                                            <td id="previous-in-progress" class="text-right no-wrap "></td>
+                                            <td id="in-progress-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-blue">Completed:</td>
+                                            <td id="current-complete" class="text-right no-wrap"></td>
+                                            <td id="current-complete-per" class="text-right no-wrap"></td>
+                                            <td id="previous-complete" class="text-right no-wrap "></td>
+                                            <td id="complete-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap border-top">Total:</td>
+                                            <td id="current-tasks" class="text-right no-wrap border-top"></td>
+                                            <td class="text-right no-wrap border-top"></td>
+                                            <td id="previous-tasks" class="text-right no-wrap border-top "></td>
+                                            <td id="tasks-var" class="text-right no-wrap border-top "></td>
+                                        </tr>
+                                        <tr><td></td></tr>
+                                        <tr><td></td></tr>
+                                    <tbody></tbody>
+                                </table>
+                            </div> -->
+                            <!-- <div class="card">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="caption btm-border" colspan="6">Activity Float</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-left btm-border col-6-5em">Activity Float</th>
+                                            <th class="text-right btm-border col-5em">Count</th>
+                                            <th class="text-right btm-border col-3em">%</th>
+                                            <th class="text-right btm-border col-5em ">Prev</th>
+                                            <th class="text-right btm-border col-3em ">Diff</th>
+                                            <td class="chart no-wrap" rowspan="7"><canvas id="activityFloatChart"></canvas></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-red">Critical:</td>
+                                            <td id="current-critical" class="text-right no-wrap"></td>
+                                            <td id="current-critical-per" class="text-right no-wrap"></td>
+                                            <td id="previous-critical" class="text-right no-wrap "></td>
+                                            <td id="critical-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-yellow">Near Critical:</td>
+                                            <td id="current-near-critical" class="text-right no-wrap"></td>
+                                            <td id="current-near-critical-per" class="text-right no-wrap"></td>
+                                            <td id="previous-near-critical" class="text-right no-wrap "></td>
+                                            <td id="near-critical-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-green">Normal Float:</td>
+                                            <td id="current-normal-tf" class="text-right no-wrap"></td>
+                                            <td id="current-normal-tf-per" class="text-right no-wrap"></td>
+                                            <td id="previous-normal-tf" class="text-right no-wrap "></td>
+                                            <td id="normal-tf-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-blue">High Float:</td>
+                                            <td id="current-high-tf" class="text-right no-wrap"></td>
+                                            <td id="current-high-tf-per" class="text-right no-wrap"></td>
+                                            <td id="previous-high-tf" class="text-right no-wrap "></td>
+                                            <td id="high-tf-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">Longest Path:</td>
+                                            <td id="current-longest-path" class="text-right no-wrap"></td>
+                                            <td id="current-longest-path-per" class="text-right no-wrap"></td>
+                                            <td id="previous-longest-path" class="text-right no-wrap "></td>
+                                            <td id="longest-path-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr><td></td></tr>
+                                    </tbody>
+                                </table>
+                            </div> -->
+                            
+                            <section id='constraint-variance'></section>
+                            <div id="cost-loading" class="card"> <!-- Cost Loading -->
+                                <table class="no-break" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th class="caption btm-border" colspan="5">Cost Loading</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-left btm-border width-10em">Cost</th>
+                                            <th class="text-right btm-border width-10em">Current</th>
+                                            <th class="text-right btm-border width-10em ">Previous</th>
+                                            <th class="text-right btm-border width-10em ">Diff</th>
+                                            <td class="chart no-wrap" rowspan="5"><canvas id="costLoadingChart"></canvas></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-blue">Actual To Date:</td>
+                                            <td id="current-actual-cost" class="text-right no-wrap"></td>
+                                            <td id="previous-actual-cost" class="text-right no-wrap "></td>
+                                            <td id="actual-cost-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-red">Remaining Cost:</td>
+                                            <td id="current-remaining-cost" class="text-right no-wrap"></td>
+                                            <td id="previous-remaining-cost" class="text-right no-wrap "></td>
+                                            <td id="remaining-cost-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">Budgeted Cost:</td>
+                                            <td id="current-budget" class="text-right no-wrap"></td>
+                                            <td id="previous-budget" class="text-right no-wrap "></td>
+                                            <td id="budget-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">This Period Cost:</td>
+                                            <td id="current-this-period" class="text-right no-wrap"></td>
+                                            <td id="previous-this-period" class="text-right no-wrap "></td>
+                                            <td id="this-period-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="resource-loading" class="card"> <!-- Resource Loading -->
+                                <table class="no-break" style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th class="caption btm-border" colspan="5">Resource Loading</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-left btm-border width-10em">Units</th>
+                                            <th class="text-right btm-border width-10em">Current</th>
+                                            <th class="text-right btm-border width-10em ">Previous</th>
+                                            <th class="text-right btm-border width-10em ">Diff</th>
+                                            <td class="chart no-wrap" rowspan="5"><canvas id="resourceLoadingChart"></canvas></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-blue">Actual To Date:</td>
+                                            <td id="current-actual-qty" class="text-right no-wrap"></td>
+                                            <td id="previous-actual-qty" class="text-right no-wrap "></td>
+                                            <td id="actual-qty-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-red">Remaining Qty:</td>
+                                            <td id="current-remaining-qty" class="text-right no-wrap"></td>
+                                            <td id="previous-remaining-qty" class="text-right no-wrap "></td>
+                                            <td style="max-width: min-content;" id="remaining-qty-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">Budgeted Qty:</td>
+                                            <td id="current-qty" class="text-right no-wrap"></td>
+                                            <td id="previous-qty" class="text-right no-wrap "></td>
+                                            <td id="qty-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">Qty This Period:</td>
+                                            <td id="current-this-period-qty" class="text-right no-wrap"></td>
+                                            <td id="previous-this-period-qty" class="text-right no-wrap "></td>
+                                            <td id="this-period-qty-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                    </tbody>
+                                </table>          
+                            </div>
+                            <div class="card no-break"> <!-- Schedule revisions -->
+                                <table style="width: 100%;">
+                                    <thead>
+                                        <tr>
+                                            <th class="caption btm-border" colspan="8">Schedule Revisions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-left">Added Activities:</td>
+                                            <td class="text-right" id="tk-added"></td>
+                                            <td></td>
+                                            <td class="text-left">Added Relationships:</td>
+                                            <td class="text-right" id="rl-added"></td>
+                                            <td></td>
+                                            <td class="text-left">Added Resources:</td>
+                                            <td class="text-right" id="rs-added"></td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left">Deleted Activities:</td>
+                                            <td class="text-right" id="tk-deleted"></td>
+                                            <td></td>
+                                            <td class="text-left">Deleted Relationships:</td>
+                                            <td class="text-right" id="rl-deleted"></td>
+                                            <td></td>
+                                            <td class="text-left">Deleted Resources:</td>
+                                            <td class="text-right" id="rs-deleted"></td>
+                            
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left">Name Changes:</td>
+                                            <td class="text-right" id="tk-name"></td>
+                                            <td></td>
+                                            <td class="text-left">Revised Relationships:</td>
+                                            <td class="text-right" id="rl-revised"></td>
+                                            <td></td>
+                                            <td class="text-left">Budgeted Cost Changes:</td>
+                                            <td class="text-right" id="rs-cost"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left">Duration Changes:</td>
+                                            <td class="text-right" id="tk-duration"></td>
+                                            <td></td>
+                                            <td class="text-left">Actual Start Changes:</td>
+                                            <td class="text-right" id="tk-start"></td>
+                                            <td></td>
+                                            <td class="text-left">Budgeted Qty Changes:</td>
+                                            <td class="text-right" id="rs-units"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left">Calendar Changes:</td>
+                                            <td class="text-right" id="tk-calendar"></td>
+                                            <td></td>
+                                            <td class="text-left">Actual Finish Changes:</td>
+                                            <td class="text-right" id="tk-finish"></td>
+                                            <td></td>
+                                            <td class="text-left">WBS Changes:</td>
+                                            <td class="text-right" id="tk-wbs"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left">Added Prime Constraints:</td>
+                                            <td class="text-right" id="cs-added-prim"></td>
+                                            <td></td>
+                                            <td class="text-left">Deleted Prime Constraints:</td>
+                                            <td class="text-right" id="cs-deleted-prim"></td>
+                                            <td></td>
+                                            <td class="text-left">Revised Prime Constraints:</td>
+                                            <td class="text-right" id="cs-revised-prim"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left btm-border">Added Second Constraints:</td>
+                                            <td class="text-right btm-border" id="cs-added-sec"></td>
+                                            <td class=" btm-border"></td>
+                                            <td class="text-left btm-border">Deleted Second Constraints:</td>
+                                            <td class="text-right btm-border" id="cs-deleted-sec"></td>
+                                            <td class=" btm-border"></td>
+                                            <td class="text-left btm-border">Revised Second Constraints:</td>
+                                            <td class="text-right btm-border" id="cs-revised-sec"></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="8">
+                                                <img src="./static/img/open.png" width="20px" height="10px" alt="open task"><span>: Remaining Work</span>
+                                                <img src="./static/img/complete.png" width="20px" height="10px" alt="open task"><span>: Actual Work</span>
+                                                <img src="./static/img/open-lp.png" width="20px" height="10px" alt="open task"><span>: Longest Path</span>
+                                                <img src="./static/img/ms-open.png" width="20px" height="10px" alt="open task"><span>: Milestone</span>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+                        <section id="revisions-sec" style="display: none;"></section>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+
+<!-- <script src="./static/js/menuCollapse.js"></script> -->
+<script src="./static/js/parse.js"></script>
+<script src="./static/js/data.js"></script>
+<script src="./static/js/utilities.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="./static/js/main.js"></script>
+</html>
