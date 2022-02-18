@@ -176,22 +176,28 @@ let taskChanges = {
         align: ['left', 'left', 'left', 'center', 'center', 'center'],
         wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
         columns: ['Act ID', '', 'Act Name', 'New Dur', 'Old Dur', 'Var'],
+        footer: '* Change to Remaining Duration',
         data: [],
         getRows: function() {
             return this.data.map(task => {
-		let prevTask = getTask(task, projects.previous)
-		let currDur = task.origDur
-		let prevDur = prevTask.origDur
-		if (task.notStarted && task.origDur !== task.remDur) {
-			currDur = task.remDur
-			prevDur = prevTask.remDur
-		}
-		return [
-                	task.task_code, statusImg(task), task.task_name, formatNumber(currDur), 
-                	formatNumber(prevDur), 
-                	formatVariance(currDur - prevDur)
-            	]
-	    })
+                let prevTask = getTask(task, projects.previous)
+                let currDur = task.origDur
+                let prevDur = prevTask.origDur
+                let remDurChange = false
+                if (task.notStarted && task.origDur !== task.remDur) {
+                    currDur = task.remDur
+                    prevDur = prevTask.remDur
+                    remDurChange = true
+                }
+                return [
+                    task.task_code,
+                    statusImg(task),
+                    task.task_name,
+                    `${formatNumber(currDur)}${remDurChange ? '*' : ''}`, 
+                    formatNumber(prevDur), 
+                    formatVariance(currDur - prevDur)
+                ]
+	        })
         }
     },
     calendar: {

@@ -213,7 +213,7 @@ function updateProjCard(name, value){
         Object.values(obj).forEach(update => {
             document.getElementById(update.id).textContent = (update.data.length).toLocaleString()
             if (update.data.length) {
-                const table = createTable(update.title, update.align, update.columns, update.getRows(), update.wrap);
+                const table = createTable(update.title, update.align, update.columns, update.getRows(), update.wrap, update.footer ?? "");
                 document.getElementById('revisions-sec').append(table)
             }
         })
@@ -221,23 +221,24 @@ function updateProjCard(name, value){
 
     const changeCount = obj => Object.values(obj).reduce((total, change) => total += change.data.length, 0)
 
-    function createTable(title, align, labels, vals, wrap){
+    function createTable(title, align, labels, vals, wrap, foot){
         let div = document.createElement("div")
         // div.style.display = 'table';
         div.style.width = '100%';
         div.classList.add("card")
         let caption = document.createElement("h2")
-	caption.style.width = '100%';
+	    caption.style.width = '100%';
         caption.innerText = `${title}: ${vals.length}`
         caption.classList.add('caption', 'no-break')
         div.append(caption)
         let table = document.createElement("table");
-        // table.style.width = '100%'
         let head = document.createElement("thead")
         head.classList.add('no-break')
         table.append(head)
         let body = document.createElement("tbody")
         table.append(body)
+        let footer = document.createElement("tfoot")
+        table.append(footer)
 
         // let row = head.insertRow(), cell;
         // cell = document.createElement("th");
@@ -272,6 +273,14 @@ function updateProjCard(name, value){
                 row.append(cell);
             })
         })
+
+        row = footer.insertRow()
+        cell = document.createElement("td")
+        cell.colSpan = `${labels.length}`
+        cell.innerText = foot
+        cell.style.color = '#5f5f5f'
+        row.append(cell)
+
         div.append(table)
         return div  
     }
