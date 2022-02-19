@@ -213,19 +213,29 @@ function updateProjCard(name, value){
         Object.values(obj).forEach(update => {
             document.getElementById(update.id).textContent = (update.data.length).toLocaleString()
             if (update.data.length) {
-                const table = createTable(update.title, update.align, update.columns, update.getRows(), update.wrap, update.footer ?? "");
+                const table = createTable(update.title, update.align, update.columns, update.getRows(), update.wrap, true, update.footer ?? "");
                 document.getElementById('revisions-sec').append(table)
             }
         })
     }
+    function getMaxChangeCount(obj, cnt) {
+        let arr = Object.values(obj).map(chg => chg.data.length)
+        console.log(arr)
+        let max = Math.max(...arr)
+        console.log('GetMax: ', max)
+        // var max = Object.values(obj).reduce(function(a, b) {
+        //     return Math.max(a.data.length, b.data.length);
+        // }, 0);
+        return (max > cnt) ? max : cnt
+    }
 
     const changeCount = obj => Object.values(obj).reduce((total, change) => total += change.data.length, 0)
 
-    function createTable(title, align, labels, vals, wrap, foot){
+    function createTable(title, align, labels, vals, wrap, pageBreak=false, foot=""){
         let div = document.createElement("div")
-        // div.style.display = 'table';
         div.style.width = '100%';
         div.classList.add("card")
+        if (pageBreak) div.classList.add("break")
         let caption = document.createElement("h2")
 	    caption.style.width = '100%';
         caption.innerText = `${title}: ${vals.length}`
@@ -239,14 +249,6 @@ function updateProjCard(name, value){
         table.append(body)
         let footer = document.createElement("tfoot")
         table.append(footer)
-
-        // let row = head.insertRow(), cell;
-        // cell = document.createElement("th");
-        // cell.colSpan = `${labels.length}`
-        // cell.innerText = `${title}: ${vals.length}`
-        // cell.textAlign = 'left';
-        // cell.classList.add('caption')
-        // row.append(cell);
 
         let row = head.insertRow(), cell;
         row.classList.add('no-break')
@@ -525,19 +527,19 @@ function updateProjCard(name, value){
             data: [],
             getRows: function() {
                 return this.data.map(task => {
-			if (hasTask(task, projects.previous)) {
-				return [
-                        		task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
-                        		formatDate(task.finish, false), formatVariance(task.totalFloat), formatDate(getTask(task, projects.previous).finish, false),
-                        		formatVariance(dateVariance(getTask(task, projects.previous).finish, task.finish))
-                		]
-			}
-			return [
-                        	task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
-                        	formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A",
-                        	"N/A"
-                	]
-		})
+                    if (hasTask(task, projects.previous)) {
+                        return [
+                            task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
+                            formatDate(task.finish, false), formatVariance(task.totalFloat), formatDate(getTask(task, projects.previous).finish, false),
+                            formatVariance(dateVariance(getTask(task, projects.previous).finish, task.finish))
+                        ]
+                    }
+                    return [
+                        task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
+                        formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A",
+                        "N/A"
+                    ]
+		        })
             }
         }
         constraintVariance.data = currTasks.filter(task => task.primeConstraint === "Finish on or Before")
@@ -563,39 +565,42 @@ function updateProjCard(name, value){
         // })
         // document.getElementById("ud").innerText = changeCount(updates).toLocaleString()
         // updateElements(updates)
+        
 
         taskChanges.added.data = currTasks.filter(task => !hasTask(task, projects.previous))
         taskChanges.deleted.data = prevTasks.filter(task => !projects.current.tasksByCode.has(task.task_code))
         taskChanges.name.data = currTasks.filter(task => hasTask(task, projects.previous) && task.task_name !== getTask(task, projects.previous).task_name)
         taskChanges.duration.data = currTasks.filter(task => {
-		return (
-			hasTask(task, projects.previous) && 
-			!task.isLOE && 
-			((task.origDur !== getTask(task, projects.previous).origDur) || 
-			(task.notStarted && task.origDur !== task.remDur && task.remDur !== getTask(task, projects.previous).remDur))
-		)
-	})
+            return (
+                hasTask(task, projects.previous) && 
+                !task.isLOE && 
+                ((task.origDur !== getTask(task, projects.previous).origDur) || 
+                (task.notStarted && task.origDur !== task.remDur && task.remDur !== getTask(task, projects.previous).remDur))
+            )
+        })
         taskChanges.calendar.data = currTasks.filter(task => {
-		console.log(task.project.proj_short_name, task.task_id, task.task_code)
-		return hasTask(task, projects.previous) && task.calendar.clndr_name !== getTask(task, projects.previous).calendar.clndr_name
-	})
+            console.log(task.project.proj_short_name, task.task_id, task.task_code)
+            return hasTask(task, projects.previous) && task.calendar.clndr_name !== getTask(task, projects.previous).calendar.clndr_name
+        })
         taskChanges.start.data = currTasks.filter(task => {
-		return (
-			hasTask(task, projects.previous) && 
-			!task.notStarted && 
-			!getTask(task, projects.previous).notStarted && 
-			formatDate(task.start) !== formatDate(getTask(task, projects.previous).start)
-		)
-	}).sort(sortByStart)
+            return (
+                hasTask(task, projects.previous) && 
+                !task.notStarted && 
+                !getTask(task, projects.previous).notStarted && 
+                formatDate(task.start) !== formatDate(getTask(task, projects.previous).start)
+            )
+        }).sort(sortByStart)
         taskChanges.finish.data = currTasks.filter(task => {
-		return (
-			hasTask(task, projects.previous) && 
-			task.completed && 
-			getTask(task, projects.previous).completed && 
-			formatDate(task.finish) !== formatDate(getTask(task, projects.previous).finish)
-		)
-	}).sort(sortByFinish)
+            return (
+                hasTask(task, projects.previous) && 
+                task.completed && 
+                getTask(task, projects.previous).completed && 
+                formatDate(task.finish) !== formatDate(getTask(task, projects.previous).finish)
+            )
+        }).sort(sortByFinish)
         taskChanges.wbs.data = currTasks.filter(task => hasTask(task, projects.previous) && task.wbs.wbsID !== getTask(task, projects.previous).wbs.wbsID)
+        let maxChangeCount = getMaxChangeCount(taskChanges, 0)
+        console.log(maxChangeCount)
         updateElements(taskChanges)
 
         logicChanges.added.data = projects.current.rels.filter(rel => !prevHasLogic(rel))
@@ -614,12 +619,16 @@ function updateProjCard(name, value){
                 }
             }
         }
+        maxChangeCount = getMaxChangeCount(logicChanges, maxChangeCount)
+        console.log(maxChangeCount)
         updateElements(logicChanges)
 
         resourceChanges.added.data = currResources.filter(res => !prevHasRes(res))
         resourceChanges.deleted.data = prevResources.filter(res => !currHasRes(res))
         resourceChanges.revisedCost.data = currResources.filter(res => prevHasRes(res) && res.target_cost !== getPrevRes(res).target_cost)
         resourceChanges.revisedUnits.data = currResources.filter(res => prevHasRes(res) && res.target_qty !== getPrevRes(res).target_qty)
+        maxChangeCount = getMaxChangeCount(resourceChanges, maxChangeCount)
+        console.log(maxChangeCount)
         updateElements(resourceChanges)
 
         constraintChanges.addedPrim.data = currTasks.filter(task => hasTask(task, projects.previous) && task.primeConstraint && task.primeConstraint !== getTask(task, projects.previous).primeConstraint)
@@ -644,6 +653,8 @@ function updateProjCard(name, value){
                 task.cstr_date2.getTime() !== getTask(task, projects.previous).cstr_date2.getTime()
             )
         })
+        maxChangeCount = getMaxChangeCount(constraintChanges, maxChangeCount)
+        console.log(maxChangeCount)
         updateElements(constraintChanges)
 
         document.getElementById("start-var").textContent = formatAbsNum(dateVariance(projects.current.plan_start_date, projects.previous.plan_start_date))
@@ -690,6 +701,28 @@ function updateProjCard(name, value){
         document.getElementById("this-period-qty-var").textContent = formatVariance(projects.current.thisPeriodQty - projects.previous.thisPeriodQty)
         document.getElementById("remaining-qty-var").textContent = formatVariance(projects.current.remainingQty - projects.previous.remainingQty)
 
+        document.getElementById("added-act-bar").style.width = `${formatPercent(taskChanges.added.data.length / maxChangeCount)}`
+        document.getElementById("deleted-act-bar").style.width = `${formatPercent(taskChanges.deleted.data.length / maxChangeCount)}`
+        document.getElementById("act-name-bar").style.width = `${formatPercent(taskChanges.name.data.length / maxChangeCount)}`
+        document.getElementById("act-dur-bar").style.width = `${formatPercent(taskChanges.duration.data.length / maxChangeCount)}`
+        document.getElementById("act-cal-bar").style.width = `${formatPercent(taskChanges.calendar.data.length / maxChangeCount)}`
+        document.getElementById("act-wbs-bar").style.width = `${formatPercent(taskChanges.wbs.data.length / maxChangeCount)}`
+        document.getElementById("added-rel-bar").style.width = `${formatPercent(logicChanges.added.data.length / maxChangeCount)}`
+        document.getElementById("deleted-rel-bar").style.width = `${formatPercent(logicChanges.deleted.data.length / maxChangeCount)}`
+        document.getElementById("revised-rel-bar").style.width = `${formatPercent(logicChanges.revised.data.length / maxChangeCount)}`
+        document.getElementById("added-res-bar").style.width = `${formatPercent(resourceChanges.added.data.length / maxChangeCount)}`
+        document.getElementById("deleted-res-bar").style.width = `${formatPercent(resourceChanges.deleted.data.length / maxChangeCount)}`
+        document.getElementById("revised-cost-bar").style.width = `${formatPercent(resourceChanges.revisedCost.data.length / maxChangeCount)}`
+        document.getElementById("revised-qty-bar").style.width = `${formatPercent(resourceChanges.revisedUnits.data.length / maxChangeCount)}`
+        document.getElementById("act-start-bar").style.width = `${formatPercent(taskChanges.start.data.length / maxChangeCount)}`
+        document.getElementById("act-finish-bar").style.width = `${formatPercent(taskChanges.finish.data.length / maxChangeCount)}`
+        document.getElementById("added-pr-cnst-bar").style.width = `${formatPercent(constraintChanges.addedPrim.data.length / maxChangeCount)}`
+        document.getElementById("deleted-pr-cnst-bar").style.width = `${formatPercent(constraintChanges.deletedPrim.data.length / maxChangeCount)}`
+        document.getElementById("revised-pr-cnst-bar").style.width = `${formatPercent(constraintChanges.revisedPrim.data.length / maxChangeCount)}`
+        document.getElementById("added-sec-cnst-bar").style.width = `${formatPercent(constraintChanges.addedSec.data.length / maxChangeCount)}`
+        document.getElementById("deleted-sec-cnst-bar").style.width = `${formatPercent(constraintChanges.deletedSec.data.length / maxChangeCount)}`
+        document.getElementById("revised-sec-cnst-bar").style.width = `${formatPercent(constraintChanges.revisedSec.data.length / maxChangeCount)}`
+        
         const currDD = projects.current.last_recalc_date.getTime()
         const prevPlannedTasks = [...projects.previous.tasks.values()].filter(task => !task.completed && task.start.getTime() < currDD)
         

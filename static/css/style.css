@@ -136,6 +136,17 @@ li {
     border-radius: 3px;
 }
 
+.outer-progress-white{
+    min-width: 120px;
+    width: 100%;
+    /* background-color: #ebebeb; */
+    /* box-shadow: var(--shadow-small); */
+    padding: 0.2em 0.5em;
+    border-radius: 3px;
+}
+
+
+
 .inner-progress{
     width: 1px;
     height: 1.7em;
@@ -143,6 +154,16 @@ li {
     /* color: white; */
     border-radius: 3px;
     box-shadow: var(--shadow-small);
+}
+.inner-progress-change{
+    width: 1px;
+    height: 1.3em;
+    background-color: orangered;
+    /* color: white; */
+    /* border-radius: 3px; */
+    border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;
+    /* box-shadow: var(--shadow-small); */
 }
 
 .sub{

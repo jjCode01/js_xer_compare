@@ -426,7 +426,7 @@
                                     </tbody>
                                 </table>          
                             </div>
-                            <div class="card no-break"> <!-- Schedule revisions -->
+                            <div class="card break"> <!-- Schedule revisions -->
                                 <table style="width: 100%;">
                                     <thead>
                                         <tr>
@@ -435,77 +435,129 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td class="text-left">Added Activities:</td>
-                                            <td class="text-right" id="tk-added"></td>
-                                            <td></td>
-                                            <td class="text-left">Added Relationships:</td>
-                                            <td class="text-right" id="rl-added"></td>
-                                            <td></td>
-                                            <td class="text-left">Added Resources:</td>
-                                            <td class="text-right" id="rs-added"></td>
-                                            
+                                            <td class="text-left no-wrap">Added Activities:</td>
+                                            <td class="text-right no-wrap" id="tk-added"></td>
+                                            <td class="outer-progress-white"><div id="added-act-bar" class="inner-progress-change"></div></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Deleted Activities:</td>
-                                            <td class="text-right" id="tk-deleted"></td>
-                                            <td></td>
-                                            <td class="text-left">Deleted Relationships:</td>
-                                            <td class="text-right" id="rl-deleted"></td>
-                                            <td></td>
-                                            <td class="text-left">Deleted Resources:</td>
-                                            <td class="text-right" id="rs-deleted"></td>
-                            
+                                            <td class="text-left no-wrap">Deleted Activities:</td>
+                                            <td class="text-right no-wrap" id="tk-deleted"></td>
+                                            <td class="outer-progress-white"><div id="deleted-act-bar" class="inner-progress-change"></div></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Name Changes:</td>
-                                            <td class="text-right" id="tk-name"></td>
-                                            <td></td>
-                                            <td class="text-left">Revised Relationships:</td>
-                                            <td class="text-right" id="rl-revised"></td>
-                                            <td></td>
-                                            <td class="text-left">Budgeted Cost Changes:</td>
-                                            <td class="text-right" id="rs-cost"></td>
+                                            <td class="text-left no-wrap">Name Changes:</td>
+                                            <td class="text-right no-wrap" id="tk-name"></td>
+                                            <td class="outer-progress-white"><div id="act-name-bar" class="inner-progress-change"></div></td>
+
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Duration Changes:</td>
-                                            <td class="text-right" id="tk-duration"></td>
-                                            <td></td>
-                                            <td class="text-left">Actual Start Changes:</td>
-                                            <td class="text-right" id="tk-start"></td>
-                                            <td></td>
-                                            <td class="text-left">Budgeted Qty Changes:</td>
-                                            <td class="text-right" id="rs-units"></td>
+                                            <td class="text-left no-wrap">Duration Changes:</td>
+                                            <td class="text-right no-wrap" id="tk-duration"></td>
+                                            <td class="outer-progress-white"><div id="act-dur-bar" class="inner-progress-change"></div></td>
+
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Calendar Changes:</td>
-                                            <td class="text-right" id="tk-calendar"></td>
-                                            <td></td>
-                                            <td class="text-left">Actual Finish Changes:</td>
-                                            <td class="text-right" id="tk-finish"></td>
-                                            <td></td>
-                                            <td class="text-left">WBS Changes:</td>
-                                            <td class="text-right" id="tk-wbs"></td>
+                                            <td class="text-left no-wrap">Calendar Changes:</td>
+                                            <td class="text-right no-wrap" id="tk-calendar"></td>
+                                            <td class="outer-progress-white"><div id="act-cal-bar" class="inner-progress-change"></div></td>
+
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Added Prime Constraints:</td>
-                                            <td class="text-right" id="cs-added-prim"></td>
-                                            <td></td>
-                                            <td class="text-left">Deleted Prime Constraints:</td>
-                                            <td class="text-right" id="cs-deleted-prim"></td>
-                                            <td></td>
-                                            <td class="text-left">Revised Prime Constraints:</td>
-                                            <td class="text-right" id="cs-revised-prim"></td>
+                                            <td class="text-left no-wrap">WBS Changes:</td>
+                                            <td class="text-right no-wrap" id="tk-wbs"></td>
+                                            <td class="outer-progress-white"><div id="act-wbs-bar" class="inner-progress-change"></div></td>
+
                                         </tr>
                                         <tr>
-                                            <td class="text-left btm-border">Added Second Constraints:</td>
-                                            <td class="text-right btm-border" id="cs-added-sec"></td>
-                                            <td class=" btm-border"></td>
-                                            <td class="text-left btm-border">Deleted Second Constraints:</td>
-                                            <td class="text-right btm-border" id="cs-deleted-sec"></td>
-                                            <td class=" btm-border"></td>
-                                            <td class="text-left btm-border">Revised Second Constraints:</td>
-                                            <td class="text-right btm-border" id="cs-revised-sec"></td>
+                                            <td class="text-left no-wrap">Added Relationships:</td>
+                                            <td class="text-right no-wrap" id="rl-added"></td>
+                                            <td class="outer-progress-white"><div id="added-rel-bar" class="inner-progress-change"></div></td>
+
                                         </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Deleted Relationships:</td>
+                                            <td class="text-right no-wrap" id="rl-deleted"></td>
+                                            <td class="outer-progress-white"><div id="deleted-rel-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Revised Relationships:</td>
+                                            <td class="text-right no-wrap" id="rl-revised"></td>
+                                            <td class="outer-progress-white"><div id="revised-rel-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Added Resources:</td>
+                                            <td class="text-right no-wrap" id="rs-added"></td>
+                                            <td class="outer-progress-white"><div id="added-res-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Deleted Resources:</td>
+                                            <td class="text-right no-wrap" id="rs-deleted"></td>
+                                            <td class="outer-progress-white"><div id="deleted-res-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Budgeted Cost Changes:</td>
+                                            <td class="text-right no-wrap" id="rs-cost"></td>
+                                            <td class="outer-progress-white"><div id="revised-cost-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Budgeted Qty Changes:</td>
+                                            <td class="text-right no-wrap" id="rs-units"></td>
+                                            <td class="outer-progress-white"><div id="revised-qty-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Actual Start Changes:</td>
+                                            <td class="text-right no-wrap" id="tk-start"></td>
+                                            <td class="outer-progress-white"><div id="act-start-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Actual Finish Changes:</td>
+                                            <td class="text-right no-wrap" id="tk-finish"></td>   
+                                            <td class="outer-progress-white"><div id="act-finish-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Added Prime Constraints:</td>
+                                            <td class="text-right no-wrap" id="cs-added-prim"></td>
+                                            <td class="outer-progress-white"><div id="added-pr-cnst-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Deleted Prime Constraints:</td>
+                                            <td class="text-right no-wrap" id="cs-deleted-prim"></td>
+                                            <td class="outer-progress-white"><div id="deleted-pr-cnst-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>    
+                                            <td class="text-left no-wrap">Revised Prime Constraints:</td>
+                                            <td class="text-right no-wrap" id="cs-revised-prim"></td>
+                                            <td class="outer-progress-white"><div id="revised-pr-cnst-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Added Second Constraints:</td>
+                                            <td class="text-right no-wrap" id="cs-added-sec"></td>
+                                            <td class="outer-progress-white"><div id="added-sec-cnst-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap">Deleted Second Constraints:</td>
+                                            <td class="text-right no-wrap" id="cs-deleted-sec"></td>
+                                            <td class="outer-progress-white"><div id="deleted-sec-cnst-bar" class="inner-progress-change"></div></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left no-wrap btm-border">Revised Second Constraints:</td>
+                                            <td class="text-right no-wrap btm-border" id="cs-revised-sec"></td>
+                                            <td class="outer-progress-white"><div id="revised-sec-cnst-bar" class="inner-progress-change"></div></td>
+                                        </tr>
+
                                         <tr>
                                             <td colspan="8">
                                                 <img src="./static/img/open.png" width="20px" height="10px" alt="open task"><span>: Remaining Work</span>
