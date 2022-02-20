@@ -149,7 +149,6 @@ const parseExceptions = cal => {
 }
 
 const newCalendar = cal => {
-    // console.log(cal.clndr_name)
     cal.default = cal.default_flag === 'Y';
     cal.week = parseWorkWeek(cal);
     cal.holidays = parseHolidays(cal);

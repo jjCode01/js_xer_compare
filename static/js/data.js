@@ -202,7 +202,7 @@ let taskChanges = {
     },
     calendar: {
         id: "tk-calendar",
-        title: "Revised Activity Calendars",
+        title: "Revised Calendar Assignments",
         align: ['left', 'left', 'left', 'left', 'left'],
         wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'normal'],
         columns: ['Act ID', '', 'Act Name', 'New Cal', 'Old Cal'],
