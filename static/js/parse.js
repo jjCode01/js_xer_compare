@@ -10,6 +10,11 @@ const PERCENTTYPES = {
     CP_Units: 'Unit'
 }
 
+const CALENDARTYPES= {
+    CA_Base: 'Global',
+    CA_Project: 'Project',
+}
+
 const TASKTYPES = {
     TT_Mile: 'Start Milestone',
     TT_FinMile: 'Finish Milestone',
@@ -150,9 +155,13 @@ const parseExceptions = cal => {
 
 const newCalendar = cal => {
     cal.default = cal.default_flag === 'Y';
+    cal.type = CALENDARTYPES[cal.clndr_type]
+    cal.isGlobal = cal.clndr_type === 'CA_base'
+    cal.id = cal.isGlobal ? cal.clndr_id : cal.clndr_name
     cal.week = parseWorkWeek(cal);
     cal.holidays = parseHolidays(cal);
     cal.exceptions = parseExceptions(cal);
+    cal.assignments = 0
     return cal;
 }
 
@@ -257,8 +266,9 @@ const parseFile = (file, name) => {
                         break;
                     case 'TASK':
                         task = newTask(row);
-                        task.project = tables.PROJECT[task.proj_id]
+                        task.project = tables.PROJECT[task.proj_id];
                         task.calendar = tables.CALENDAR[task.clndr_id];
+                        task.calendar.assignments += 1;
                         task.wbs = task.project.wbs.get(task.wbs_id);
                         task.wbsStruct = [task.wbs];
                         let wbs = task.wbs

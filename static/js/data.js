@@ -266,6 +266,45 @@ let taskChanges = {
     },
 }
 
+let calendarChanges = {
+    added: {
+        id: "cal-added",
+        title: "Added Calendars",
+        align: ['left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
+        wrap: ['nowrap', 'nowrap', 'nowrap', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal'],
+        columns: [
+            'Calendar Name', 'Type', 'Tasks', 'Non-Work Days', 'Sun (Hrs)', 'Mon (Hrs)', 'Tue (Hrs)',
+            'Wed (Hrs)', 'Thu (Hrs)', 'Fri (Hrs)', 'Sat (Hrs)'
+        ],
+        data: [],
+        getRows: function() {
+            return this.data.map(cal => [
+                cal.clndr_name, cal.type, cal.assignments, Object.keys(cal.holidays).length,
+                cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, 
+                cal.week[4].hours, cal.week[5].hours, cal.week[6].hours
+            ])
+        }
+    },
+    deleted: {
+        id: "cal-deleted",
+        title: "Deleted Calendars",
+        align: ['left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
+        wrap: ['nowrap', 'nowrap', 'nowrap', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal'],
+        columns: [
+            'Calendar Name', 'Type', 'Tasks', 'Non-Work Days', 'Sun (Hrs)', 'Mon (Hrs)', 'Tue (Hrs)',
+            'Wed (Hrs)', 'Thu (Hrs)', 'Fri (Hrs)', 'Sat (Hrs)'
+        ],
+        data: [],
+        getRows: function() {
+            return this.data.map(cal => [
+                cal.clndr_name, cal.type, cal.assignments, Object.keys(cal.holidays).length,
+                cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, 
+                cal.week[4].hours, cal.week[5].hours, cal.week[6].hours
+            ])
+        }
+    },
+}
+
 let logicChanges = {
     added: {
         id: "rl-added",

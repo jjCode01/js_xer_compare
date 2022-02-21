@@ -271,7 +271,7 @@ function updateProjCard(name, value){
                 cell.style.textAlign = align[i]
                 cell.style.whiteSpace = wrap[i];
                 cell.style.verticalAlign = 'top';
-                if (r % 2 !== 0) { row.style.backgroundColor = '#e7e7e7' }
+                if (r % 2 !== 0) row.style.backgroundColor = '#e7e7e7'
                 row.append(cell);
             })
         })
@@ -509,6 +509,8 @@ function updateProjCard(name, value){
     if (name === "previous") {
         document.getElementById('title').innerText = `Schedule Comparison - ${projects.current.proj_short_name} vs ${projects.previous.proj_short_name}`
 
+        let maxChangeCount = 0
+
         const currTasks = [...projects.current.tasks.values()].sort(sortById)
         const prevTasks = [...projects.previous.tasks.values()].sort(sortById)
 
@@ -565,6 +567,21 @@ function updateProjCard(name, value){
         // })
         // document.getElementById("ud").innerText = changeCount(updates).toLocaleString()
         // updateElements(updates)
+
+        calendarChanges.added.data = Object.values(tables.current.CALENDAR).filter(cal => {
+            return (
+                cal.assignments.length &&
+                !Object.values(tables.previous.CALENDAR).find(prevCal => prevCal.id === cal.id)
+            )
+        })
+        calendarChanges.deleted.data = Object.values(tables.previous.CALENDAR).filter(prevCal => {
+            return (
+                prevCal.assignments.length &&
+                !Object.values(tables.current.CALENDAR).find(cal => prevCal.id === cal.id)
+            )
+        })
+        maxChangeCount = getMaxChangeCount(calendarChanges, maxChangeCount)
+        updateElements(calendarChanges)
         
 
         taskChanges.added.data = currTasks.filter(task => !hasTask(task, projects.previous))
@@ -599,7 +616,7 @@ function updateProjCard(name, value){
             )
         }).sort(sortByFinish)
         taskChanges.wbs.data = currTasks.filter(task => hasTask(task, projects.previous) && task.wbs.wbsID !== getTask(task, projects.previous).wbs.wbsID)
-        let maxChangeCount = getMaxChangeCount(taskChanges, 0)
+        maxChangeCount = getMaxChangeCount(taskChanges, maxChangeCount)
         console.log(maxChangeCount)
         updateElements(taskChanges)
 
@@ -705,6 +722,10 @@ function updateProjCard(name, value){
         document.getElementById("deleted-act-bar").style.width = `${formatPercent(taskChanges.deleted.data.length / maxChangeCount)}`
         document.getElementById("act-name-bar").style.width = `${formatPercent(taskChanges.name.data.length / maxChangeCount)}`
         document.getElementById("act-dur-bar").style.width = `${formatPercent(taskChanges.duration.data.length / maxChangeCount)}`
+        document.getElementById("added-cal-bar").style.width = `${formatPercent(calendarChanges.added.data.length / maxChangeCount)}`
+        document.getElementById("deleted-cal-bar").style.width = `${formatPercent(calendarChanges.deleted.data.length / maxChangeCount)}`
+
+
         document.getElementById("act-cal-bar").style.width = `${formatPercent(taskChanges.calendar.data.length / maxChangeCount)}`
         document.getElementById("act-wbs-bar").style.width = `${formatPercent(taskChanges.wbs.data.length / maxChangeCount)}`
         document.getElementById("added-rel-bar").style.width = `${formatPercent(logicChanges.added.data.length / maxChangeCount)}`

@@ -142,7 +142,7 @@ li {
     /* background-color: #ebebeb; */
     /* box-shadow: var(--shadow-small); */
     padding: 0.2em 0.5em;
-    border-radius: 3px;
+    /* border-radius: 3px; */
 }
 
 
@@ -157,12 +157,12 @@ li {
 }
 .inner-progress-change{
     width: 1px;
-    height: 1.3em;
+    height: 0.9em;
     background-color: orangered;
     /* color: white; */
     /* border-radius: 3px; */
-    border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;
+    border-radius: 1px;
+    /* border-bottom-right-radius: 1px; */
     /* box-shadow: var(--shadow-small); */
 }
 
