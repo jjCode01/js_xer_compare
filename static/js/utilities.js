@@ -14,11 +14,11 @@ const formatDate = (dt, fullYear=true) => {
         const Y = fullYear === true ? dt.getFullYear() : dt.getFullYear().toString().substring(2)
         return `${dt.getDate()}-${M[dt.getMonth()]}-${Y}`;
     }
-    return '';
+    return;
 }
 
-function excelDateToJSDate(date) {
-    let tempDate = new Date((date - 25568)*86400*1000);
+const excelDateToJSDate = (date) => {
+    const tempDate = new Date((date - 25568)*86400*1000);
     return new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), 0, 0, 0);
 }
 
@@ -33,7 +33,7 @@ const formatNumber = (num, min = 0, sign = 'never') => {
 }
 
 const formatAbsNum = num => {
-    if (isNaN(num)) {return "N/A"}
+    if (isNaN(num)) return "N/A"
     return Intl.NumberFormat('en-US', {
         maximumFractionDigits: 1,
         signDisplay: 'never',
@@ -41,7 +41,7 @@ const formatAbsNum = num => {
 }
 
 const formatVariance = (num) => {
-    if (isNaN(num)) {return "N/A"}
+    if (isNaN(num)) return "N/A"
     let sign = num === 0 ? "auto" : "always";
     return Intl.NumberFormat('en-US', {
         maximumFractionDigits: 1,
@@ -52,6 +52,7 @@ const formatVariance = (num) => {
 const formatCost = cost => formatNumber(cost, 2)
 
 const formatPercent = (value, sign="auto") => {
+    if (isNaN(value)) return "N/A"
     const returnString = Intl.NumberFormat('en-US', {
         style: 'percent',
         maximumFractionDigits: 1,
@@ -77,6 +78,17 @@ function sortByFinish(a, b){
 
 const sortById = (a, b) => (a.task_code > b.task_code) ? 1 : -1
 
-const isWorkDay = (date, calendar) => {
-    return calendar.week[date.getDay()].hours > 0
+const isWorkDay = (date, calendar) => calendar.week[date.getDay()].hours > 0
+
+const findClosingParentheses = (data, start=0) => {
+    let parenthesesCnt = 0;
+    for (let i = start; i < data.length; i++) {
+        if (data[i] === '(') { parenthesesCnt++; }
+        else if (data[i] === ')') {
+            if (parenthesesCnt === 0) return;
+            parenthesesCnt--;
+        }
+        if (parenthesesCnt === 0) return i;
+    }
+    return;
 }

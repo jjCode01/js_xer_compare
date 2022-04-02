@@ -176,33 +176,33 @@ let taskChanges = {
         align: ['left', 'left', 'left', 'center', 'center', 'center'],
         wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
         columns: ['Act ID', '', 'Act Name', 'New Dur', 'Old Dur', 'Var'],
-        footer: '* Change to Remaining Duration',
         data: [],
+	footer: '* Change to Remaining Duration',
         getRows: function() {
             return this.data.map(task => {
-                let prevTask = getTask(task, projects.previous)
-                let currDur = task.origDur
-                let prevDur = prevTask.origDur
-                let remDurChange = false
-                if (task.notStarted && task.origDur !== task.remDur) {
-                    currDur = task.remDur
-                    prevDur = prevTask.remDur
-                    remDurChange = true
-                }
-                return [
-                    task.task_code,
-                    statusImg(task),
-                    task.task_name,
-                    `${formatNumber(currDur)}${remDurChange ? '*' : ''}`, 
-                    formatNumber(prevDur), 
-                    formatVariance(currDur - prevDur)
-                ]
-	        })
+		let prevTask = getTask(task, projects.previous)
+		let currDur = task.origDur
+		let prevDur = prevTask.origDur
+		let remDurChange = false
+		if (task.notStarted && task.origDur !== task.remDur) {
+			currDur = task.remDur
+			prevDur = prevTask.remDur
+			remDurChange = true
+		}
+		return [
+                	task.task_code,
+			statusImg(task),
+			task.task_name,
+			`${formatNumber(currDur)}${remDurChange ? '*' : ""}`, 
+                	formatNumber(prevDur), 
+                	formatVariance(currDur - prevDur)
+            	]
+	    })
         }
     },
     calendar: {
         id: "tk-calendar",
-        title: "Revised Calendar Assignments",
+        title: "Revised Activity Calendars",
         align: ['left', 'left', 'left', 'left', 'left'],
         wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'normal'],
         columns: ['Act ID', '', 'Act Name', 'New Cal', 'Old Cal'],
@@ -261,45 +261,6 @@ let taskChanges = {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, task.wbs.wbsID, 
                 getTask(task, projects.previous).wbs.wbsID
-            ])
-        }
-    },
-}
-
-let calendarChanges = {
-    added: {
-        id: "cal-added",
-        title: "Added Calendars",
-        align: ['left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'nowrap', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal'],
-        columns: [
-            'Calendar Name', 'Type', 'Tasks', 'Non-Work Days', 'Sun (Hrs)', 'Mon (Hrs)', 'Tue (Hrs)',
-            'Wed (Hrs)', 'Thu (Hrs)', 'Fri (Hrs)', 'Sat (Hrs)'
-        ],
-        data: [],
-        getRows: function() {
-            return this.data.map(cal => [
-                cal.clndr_name, cal.type, cal.assignments, Object.keys(cal.holidays).length,
-                cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, 
-                cal.week[4].hours, cal.week[5].hours, cal.week[6].hours
-            ])
-        }
-    },
-    deleted: {
-        id: "cal-deleted",
-        title: "Deleted Calendars",
-        align: ['left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'nowrap', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal', 'normal'],
-        columns: [
-            'Calendar Name', 'Type', 'Tasks', 'Non-Work Days', 'Sun (Hrs)', 'Mon (Hrs)', 'Tue (Hrs)',
-            'Wed (Hrs)', 'Thu (Hrs)', 'Fri (Hrs)', 'Sat (Hrs)'
-        ],
-        data: [],
-        getRows: function() {
-            return this.data.map(cal => [
-                cal.clndr_name, cal.type, cal.assignments, Object.keys(cal.holidays).length,
-                cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, 
-                cal.week[4].hours, cal.week[5].hours, cal.week[6].hours
             ])
         }
     },
@@ -440,6 +401,73 @@ let resourceChanges = {
             })
         }
     },
+}
+
+let calendarChanges = {
+    added: {
+        id: "cal-added",
+        title: "Added Calendar",
+        align: ['left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
+        wrap: ['nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap'],
+        columns: [
+            'Calendar Name', 'Type', 'Assignments', 'Sun Hrs', 'Mon Hrs', 'Tue Hrs', 'Wed Hrs', 'Thu Hrs', 'Fri Hrs', 'Sat Hrs'
+        ],
+        data: [],
+        getRows: function() {
+            return this.data.map(cal => [
+                cal.clndr_name, cal.type, , cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, cal.week[4].hours, cal.week[5].hours, cal.week[6].hours 
+            ])
+        }
+    },
+    deleted: {
+        id: "cal-deleted",
+        title: "Deleted Calendar",
+        align: ['left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
+        wrap: ['nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap'],
+        columns: [
+            'Calendar Name', 'Type', 'Assignments', 'Sun Hrs', 'Mon Hrs', 'Tue Hrs', 'Wed Hrs', 'Thu Hrs', 'Fri Hrs', 'Sat Hrs'
+        ],
+        data: [],
+        getRows: function() {
+            return this.data.map(cal => [
+                cal.clndr_name, cal.type, , cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, cal.week[4].hours, cal.week[5].hours, cal.week[6].hours 
+            ])
+        }
+    },
+//    addedException: {
+//        id: "cal-added-exception",
+//        title: "Added Calendar Exceptions",
+//        align: ['left', 'left', 'left', 'center', 'center', 'center'],
+//        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap', 'nowrap', 'nowrap'],
+//        columns: [
+//            'Calendar', 'Type', 'Exception Date', 'Exception Hrs', 'Normal Hrs', 'Variance'
+//        ],
+//        data: [],
+//        getRows: function() {
+//            return this.data.map(cal => {
+//                return [
+//                    cal.clndr_name, cal.type, '', '', '', ''
+//                ]
+//            })
+//        }
+//    },
+//    deletedException: {
+//        id: "cal-deleted-exception",
+//        title: "Deleted Calendar Exceptions",
+//        align: ['left', 'left', 'left', 'center', 'center', 'center'],
+//        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap', 'nowrap', 'nowrap'],
+//        columns: [
+//            'Calendar', 'Type', 'Exception Date', 'Exception Hrs', 'Normal Hrs', 'Variance'
+//        ],
+//        data: [],
+//        getRows: function() {
+//            return this.data.map(cal => {
+//                return [
+//                    cal.clndr_name, cal.type, '', '', '', ''
+//                ]
+//            })
+//        }
+//    },
 }
 
 let constraintChanges = {

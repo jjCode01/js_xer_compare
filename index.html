@@ -49,7 +49,7 @@
                                         <table>
                                             <thead>
                                                 <tr>
-                                                    <th class="btm-border" style="font-size: 1rem;">Current Project</th>
+                                                    <th class="btm-border" style="font-size: 1.2rem;">Current Project</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -67,7 +67,7 @@
                                         <table>
                                             <thead>
                                                 <tr>
-                                                    <th class=" btm-border" style="font-size: 1rem;">Previous Project</th>
+                                                    <th class=" btm-border" style="font-size: 1.2rem;">Previous Project</th>
                                                 </tr>
                                             </thead>
                                             <tr>
@@ -80,125 +80,123 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="flex">
-                                <div>
-                            <div class="card"> <!-- Project Dates -->
-                                <table style="width: 100%;">
-                                    <thead>
-                                        <tr>
-                                            <th class="caption btm-border" colspan="4">Project Dates</th>
-                                        </tr>
-                                        <tr>
-                                            <th class="text-left btm-border">Date</th>
-                                            <th class="btm-border width-8em">Current</th>
-                                            <th class="btm-border width-8em ">Previous</th>
-                                            <th class="btm-border text-right ">Diff</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td class="no-wrap">Start Date:</td>
-                                            <td id="current-start" class="text-center no-wrap"></td>
-                                            <td id="previous-start" class="text-center no-wrap "></td>
-                                            <td id="start-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap">Data Date:</td>
-                                            <td id="current-data-date" class="text-center no-wrap"></td>
-                                            <td id="previous-data-date" class="text-center no-wrap "></td>
-                                            <td id="dd-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap">End Date:</td>
-                                            <td id="current-end" class="text-center no-wrap"></td>
-                                            <td id="previous-end" class="text-center no-wrap "></td>
-                                            <td id="end-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap">Must Finish:</td>
-                                            <td id="current-mfb" class="text-center no-wrap"></td>
-                                            <td id="previous-mfb" class="text-center no-wrap "></td>
-                                            <td id="mfb-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="card"> <!-- Activity Status -->
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th class="caption btm-border" colspan="6">Activity Status</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <th class="text-left btm-border">Status</th>
-                                            <th class="text-right btm-border">Count</th>
-                                            <th class="text-right btm-border">%</th>
-                                            <th class="text-right btm-border">Prev</th>
-                                            <th class="text-right btm-border">Diff</th>
-                                            <td class="chart no-wrap" rowspan="5"><canvas id="activityStatusChart"></canvas></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap chart-red">Not Started:</td>
-                                            <td id="current-not-started" class="text-right no-wrap"></td>
-                                            <td id="current-not-started-per" class="text-right no-wrap"></td>
-                                            <td id="previous-not-started" class="text-right no-wrap "></td>
-                                            <td id="not-started-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap chart-green">In Progress:</td>
-                                            <td id="current-in-progress" class="text-right no-wrap"></td>
-                                            <td id="current-in-progress-per" class="text-right no-wrap"></td>
-                                            <td id="previous-in-progress" class="text-right no-wrap "></td>
-                                            <td id="in-progress-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap chart-blue">Completed:</td>
-                                            <td id="current-complete" class="text-right no-wrap"></td>
-                                            <td id="current-complete-per" class="text-right no-wrap"></td>
-                                            <td id="previous-complete" class="text-right no-wrap "></td>
-                                            <td id="complete-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap border-top">Total:</td>
-                                            <td id="current-tasks" class="text-right no-wrap border-top"></td>
-                                            <td class="text-right no-wrap border-top"></td>
-                                            <td id="previous-tasks" class="text-right no-wrap border-top "></td>
-                                            <td id="tasks-var" class="text-right no-wrap border-top "></td>
-                                        </tr>
-                                        <!-- <tr><td></td></tr>
-                                        <tr><td></td></tr> -->
-                                    <tbody></tbody>
-                                </table>
-                            </div>
-                                </div>
-                                <div class="card" style="margin-left: 30px;" >
-                                    <table>
+                            <div class="flex" style="justify-content: space-between;">
+                            <div>
+                                <div class="card"> <!-- Project Dates -->
+                                    <table style="width: 100%;">
                                         <thead>
                                             <tr>
-                                                <th class="caption btm-border">Planned vs Actual Date Counts</th>
+                                                <th class="caption" colspan="4">Project Dates</th>
                                             </tr>
                                             <tr>
-                                                <th class="text-left">For Period <span id="start-period"></span> thru <span id="end-period"></span></th>
+                                                <th class="text-left btm-border">Date</th>
+                                                <th class="btm-border width-8em">Current</th>
+                                                <th class="btm-border width-8em ">Previous</th>
+                                                <th class="btm-border text-right ">Diff</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <tr>
-                                                <td class="bar-chart no-wrap" rowspan="5"><canvas id="startFinishChart"></canvas></td>
+                                                <td class="no-wrap">Start Date:</td>
+                                                <td id="current-start" class="text-center no-wrap"></td>
+                                                <td id="previous-start" class="text-center no-wrap "></td>
+                                                <td id="start-var" class="text-right no-wrap "></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="no-wrap">Data Date:</td>
+                                                <td id="current-data-date" class="text-center no-wrap"></td>
+                                                <td id="previous-data-date" class="text-center no-wrap "></td>
+                                                <td id="dd-var" class="text-right no-wrap "></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="no-wrap">End Date:</td>
+                                                <td id="current-end" class="text-center no-wrap"></td>
+                                                <td id="previous-end" class="text-center no-wrap "></td>
+                                                <td id="end-var" class="text-right no-wrap "></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="no-wrap">Must Finish:</td>
+                                                <td id="current-mfb" class="text-center no-wrap"></td>
+                                                <td id="previous-mfb" class="text-center no-wrap "></td>
+                                                <td id="mfb-var" class="text-right no-wrap "></td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
+                                <div class="card"> <!-- Activity Status -->
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th class="caption" colspan="6">Activity Status</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <th class="text-left btm-border">Status</th>
+                                                <th class="text-right btm-border">Count</th>
+                                                <th class="text-right btm-border">%</th>
+                                                <th class="text-right btm-border">Prev</th>
+                                                <th class="text-right btm-border">Diff</th>
+                                                <td class="chart no-wrap" rowspan="5"><canvas id="activityStatusChart"></canvas></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="no-wrap chart-red">Not Started:</td>
+                                                <td id="current-not-started" class="text-right no-wrap"></td>
+                                                <td id="current-not-started-per" class="text-right no-wrap"></td>
+                                                <td id="previous-not-started" class="text-right no-wrap "></td>
+                                                <td id="not-started-var" class="text-right no-wrap "></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="no-wrap chart-green">In Progress:</td>
+                                                <td id="current-in-progress" class="text-right no-wrap"></td>
+                                                <td id="current-in-progress-per" class="text-right no-wrap"></td>
+                                                <td id="previous-in-progress" class="text-right no-wrap "></td>
+                                                <td id="in-progress-var" class="text-right no-wrap "></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="no-wrap chart-blue">Completed:</td>
+                                                <td id="current-complete" class="text-right no-wrap"></td>
+                                                <td id="current-complete-per" class="text-right no-wrap"></td>
+                                                <td id="previous-complete" class="text-right no-wrap "></td>
+                                                <td id="complete-var" class="text-right no-wrap "></td>
+                                            </tr>
+                                            <tr>
+                                                <td class="no-wrap border-top">Total:</td>
+                                                <td id="current-tasks" class="text-right no-wrap border-top"></td>
+                                                <td class="text-right no-wrap border-top"></td>
+                                                <td id="previous-tasks" class="text-right no-wrap border-top "></td>
+                                                <td id="tasks-var" class="text-right no-wrap border-top "></td>
+                                            </tr>
+                                        <tbody></tbody>
+                                    </table>
+                                </div>
                             </div>
+                            <div class="card text-right" style="margin-left: 30px;" >
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th class="caption">Planned vs Actual Date Counts</th>
+                                        </tr>
+                                        <tr>
+                                            <th class="text-left">For Period <span id="start-period"></span> to <span id="end-period"></span></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td class="bar-chart no-wrap" rowspan="5"><canvas id="startFinishChart"></canvas></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                             <div class="card"> <!-- Progress -->
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th class="caption btm-border" colspan="5">Progress</th>
+                                            <th class="caption" colspan="5">Progress</th>
                                         </tr>
                                         <tr>
-                                            <th class="text-left btm-border">Progress:</th>
+                                            <th class="text-left btm-border">Progress</th>
                                             <th class="text-right btm-border width-8em">Current</th>
                                             <th class="text-right btm-border width-8em ">Previous</th>
                                             <th class="text-right btm-border width-8em ">Diff</th>
@@ -426,7 +424,7 @@
                                     </tbody>
                                 </table>          
                             </div>
-                            <div class="card break"> <!-- Schedule revisions -->
+                            <div class="card no-break"> <!-- Schedule revisions -->
                                 <table style="width: 100%;">
                                     <thead>
                                         <tr>
@@ -435,143 +433,91 @@
                                     </thead>
                                     <tbody>
                                         <tr>
-                                            <td class="text-left no-wrap">Added Activities:</td>
-                                            <td class="text-right no-wrap" id="tk-added"></td>
-                                            <td class="outer-progress-white"><div id="added-act-bar" class="inner-progress-change"></div></td>
+                                            <td class="text-left">Added Activities:</td>
+                                            <td class="text-right" id="tk-added"></td>
+                                            <td></td>
+                                            <td class="text-left">Added Relationships:</td>
+                                            <td class="text-right" id="rl-added"></td>
+                                            <td></td>
+                                            <td class="text-left">Added Resources:</td>
+                                            <td class="text-right" id="rs-added"></td>
+                                            
                                         </tr>
                                         <tr>
-                                            <td class="text-left no-wrap">Deleted Activities:</td>
-                                            <td class="text-right no-wrap" id="tk-deleted"></td>
-                                            <td class="outer-progress-white"><div id="deleted-act-bar" class="inner-progress-change"></div></td>
+                                            <td class="text-left">Deleted Activities:</td>
+                                            <td class="text-right" id="tk-deleted"></td>
+                                            <td></td>
+                                            <td class="text-left">Deleted Relationships:</td>
+                                            <td class="text-right" id="rl-deleted"></td>
+                                            <td></td>
+                                            <td class="text-left">Deleted Resources:</td>
+                                            <td class="text-right" id="rs-deleted"></td>
+                            
                                         </tr>
                                         <tr>
-                                            <td class="text-left no-wrap">Name Changes:</td>
-                                            <td class="text-right no-wrap" id="tk-name"></td>
-                                            <td class="outer-progress-white"><div id="act-name-bar" class="inner-progress-change"></div></td>
-
+                                            <td class="text-left">Name Changes:</td>
+                                            <td class="text-right" id="tk-name"></td>
+                                            <td></td>
+                                            <td class="text-left">Revised Relationships:</td>
+                                            <td class="text-right" id="rl-revised"></td>
+                                            <td></td>
+                                            <td class="text-left">Budgeted Cost Changes:</td>
+                                            <td class="text-right" id="rs-cost"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left no-wrap">Duration Changes:</td>
-                                            <td class="text-right no-wrap" id="tk-duration"></td>
-                                            <td class="outer-progress-white"><div id="act-dur-bar" class="inner-progress-change"></div></td>
-
+                                            <td class="text-left">Duration Changes:</td>
+                                            <td class="text-right" id="tk-duration"></td>
+                                            <td></td>
+                                            <td class="text-left">Actual Start Changes:</td>
+                                            <td class="text-right" id="tk-start"></td>
+                                            <td></td>
+                                            <td class="text-left">Budgeted Qty Changes:</td>
+                                            <td class="text-right" id="rs-units"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left no-wrap">Added Calendars:</td>
-                                            <td class="text-right no-wrap" id="cal-added"></td>
-                                            <td class="outer-progress-white"><div id="added-cal-bar" class="inner-progress-change"></div></td>
+                                            <td class="text-left">Calendar Changes:</td>
+                                            <td class="text-right" id="tk-calendar"></td>
+                                            <td></td>
+                                            <td class="text-left">Actual Finish Changes:</td>
+                                            <td class="text-right" id="tk-finish"></td>
+                                            <td></td>
+                                            <td class="text-left">WBS Changes:</td>
+                                            <td class="text-right" id="tk-wbs"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left no-wrap">Deleted Calendars:</td>
-                                            <td class="text-right no-wrap" id="cal-deleted"></td>
-                                            <td class="outer-progress-white"><div id="deleted-cal-bar" class="inner-progress-change"></div></td>
+                                            <td class="text-left">Added Prime Constraints:</td>
+                                            <td class="text-right" id="cs-added-prim"></td>
+                                            <td></td>
+                                            <td class="text-left">Deleted Prime Constraints:</td>
+                                            <td class="text-right" id="cs-deleted-prim"></td>
+                                            <td></td>
+                                            <td class="text-left">Revised Prime Constraints:</td>
+                                            <td class="text-right" id="cs-revised-prim"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left no-wrap">Calendar Assignment Changes:</td>
-                                            <td class="text-right no-wrap" id="tk-calendar"></td>
-                                            <td class="outer-progress-white"><div id="act-cal-bar" class="inner-progress-change"></div></td>
-
+                                            <td class="text-left">Added Second Constraints:</td>
+                                            <td class="text-right" id="cs-added-sec"></td>
+                                            <td></td>
+                                            <td class="text-left">Deleted Second Constraints:</td>
+                                            <td class="text-right" id="cs-deleted-sec"></td>
+                                            <td></td>
+                                            <td class="text-left">Revised Second Constraints:</td>
+                                            <td class="text-right" id="cs-revised-sec"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left no-wrap">WBS Assignment Changes:</td>
-                                            <td class="text-right no-wrap" id="tk-wbs"></td>
-                                            <td class="outer-progress-white"><div id="act-wbs-bar" class="inner-progress-change"></div></td>
-
+                                            <td class="text-left btm-border">Added Calendars:</td>
+                                            <td class="text-right btm-border" id="cal-added"></td>
+                                            <td class=" btm-border"></td>
+                                            <td class="text-left btm-border">Deleted Calendars:</td>
+                                            <td class="text-right btm-border" id="cal-deleted"></td>
+                                            <td class=" btm-border"></td>
+                                            <td class="text-left btm-border"></td>
+                                            <td class="text-right btm-border"></td>
                                         </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Added Relationships:</td>
-                                            <td class="text-right no-wrap" id="rl-added"></td>
-                                            <td class="outer-progress-white"><div id="added-rel-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Deleted Relationships:</td>
-                                            <td class="text-right no-wrap" id="rl-deleted"></td>
-                                            <td class="outer-progress-white"><div id="deleted-rel-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Revised Relationships:</td>
-                                            <td class="text-right no-wrap" id="rl-revised"></td>
-                                            <td class="outer-progress-white"><div id="revised-rel-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Added Resources:</td>
-                                            <td class="text-right no-wrap" id="rs-added"></td>
-                                            <td class="outer-progress-white"><div id="added-res-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Deleted Resources:</td>
-                                            <td class="text-right no-wrap" id="rs-deleted"></td>
-                                            <td class="outer-progress-white"><div id="deleted-res-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Budgeted Cost Changes:</td>
-                                            <td class="text-right no-wrap" id="rs-cost"></td>
-                                            <td class="outer-progress-white"><div id="revised-cost-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Budgeted Qty Changes:</td>
-                                            <td class="text-right no-wrap" id="rs-units"></td>
-                                            <td class="outer-progress-white"><div id="revised-qty-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Actual Start Changes:</td>
-                                            <td class="text-right no-wrap" id="tk-start"></td>
-                                            <td class="outer-progress-white"><div id="act-start-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Actual Finish Changes:</td>
-                                            <td class="text-right no-wrap" id="tk-finish"></td>   
-                                            <td class="outer-progress-white"><div id="act-finish-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Added Prime Constraints:</td>
-                                            <td class="text-right no-wrap" id="cs-added-prim"></td>
-                                            <td class="outer-progress-white"><div id="added-pr-cnst-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Deleted Prime Constraints:</td>
-                                            <td class="text-right no-wrap" id="cs-deleted-prim"></td>
-                                            <td class="outer-progress-white"><div id="deleted-pr-cnst-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>    
-                                            <td class="text-left no-wrap">Revised Prime Constraints:</td>
-                                            <td class="text-right no-wrap" id="cs-revised-prim"></td>
-                                            <td class="outer-progress-white"><div id="revised-pr-cnst-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Added Second Constraints:</td>
-                                            <td class="text-right no-wrap" id="cs-added-sec"></td>
-                                            <td class="outer-progress-white"><div id="added-sec-cnst-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap">Deleted Second Constraints:</td>
-                                            <td class="text-right no-wrap" id="cs-deleted-sec"></td>
-                                            <td class="outer-progress-white"><div id="deleted-sec-cnst-bar" class="inner-progress-change"></div></td>
-
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left no-wrap btm-border">Revised Second Constraints:</td>
-                                            <td class="text-right no-wrap btm-border" id="cs-revised-sec"></td>
-                                            <td class="outer-progress-white btm-border"><div id="revised-sec-cnst-bar" class="inner-progress-change"></div></td>
-                                        </tr>
-
                                         <tr>
                                             <td colspan="8">
-                                                <img src="./static/img/open.png" width="20px" height="10px" alt="open task"><span>: Remaining Work</span>
                                                 <img src="./static/img/complete.png" width="20px" height="10px" alt="open task"><span>: Actual Work</span>
+                                                <img src="./static/img/open.png" width="20px" height="10px" alt="open task"><span>: Remaining Work</span>
                                                 <img src="./static/img/open-lp.png" width="20px" height="10px" alt="open task"><span>: Longest Path</span>
                                                 <img src="./static/img/ms-open.png" width="20px" height="10px" alt="open task"><span>: Milestone</span>
                                             </td>

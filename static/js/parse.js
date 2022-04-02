@@ -10,11 +10,6 @@ const PERCENTTYPES = {
     CP_Units: 'Unit'
 }
 
-const CALENDARTYPES= {
-    CA_Base: 'Global',
-    CA_Project: 'Project',
-}
-
 const TASKTYPES = {
     TT_Mile: 'Start Milestone',
     TT_FinMile: 'Finish Milestone',
@@ -34,6 +29,12 @@ const CONSTRAINTTYPES = {
     CS_MSO: 'Start On',
     CS_MSOA: 'Start On or After',
     CS_MSOB: 'Start On or Before',
+}
+
+const CALENDARTYPES = {
+    CA_Base: 'Global',
+    CA_Rsrc: 'Resource',
+    CA_Project: 'Project',
 }
 
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -92,76 +93,50 @@ const newExceptionDay = (date, shifts) => {
 const parseWorkWeek = cal => {
     const searchFor = "DaysOfWeek()"
     const start = cal.clndr_data.indexOf(searchFor) + searchFor.length;
-    let end = start;
-
-    const findEnd = (start, data) => {
-        let parenthesesCnt = 0;
-        for (let i = start; i < data.length; i++) {
-            if (data[i] === '(') { parenthesesCnt++; }
-            else if (data[i] === ')') {
-                if (parenthesesCnt === 0) {
-                    throw 'Uneven amount of parantheses in Calendar Data';
-                }
-                parenthesesCnt--;
-            }
-            if (parenthesesCnt === 0) { return i; }
-        }
-        return
-    }
-
-    try {
-        end = findEnd(start, cal.clndr_data);
-    } catch (e) {
-        end = NaN;
-        console.log(e);
-    }
-
-    let weekDayData = cal.clndr_data.substring(start, end).slice(1, -1).trim();
-    let weekDayDataArr = weekDayData.split(/[1-7]\(\)\(/g).slice(1);
-    let workWeek = [];
-
-    weekDayDataArr.forEach((day, i) => {
-        workWeek.push(newWorkDay(WEEKDAYS[i], parseWorkShifts(day)));
-        // console.log(`${WEEKDAYS[i]}: ${workWeek[i].hours} hours : Start ${workWeek[i].start} : Finish ${workWeek[i].end}`)
-    })
+    const end = findClosingParentheses(cal.clndr_data, start);
+    const weekDayData = cal.clndr_data.substring(start, end).slice(1, -1).trim();
+    const weekDayDataArr = weekDayData.split(/[1-7]\(\)\(/g).slice(1);
+    const workWeek = weekDayDataArr.map((day, i) => newWorkDay(WEEKDAYS[i], parseWorkShifts(day)))
     return workWeek;
 }
 
+const parseAllExceptionStrings = cal => {
+    if (!('clndr_data' in cal)) return undefined;	
+    const data = cal.clndr_data;
+    if (!data.includes('d|')) return []
+    return exceptionStrings = data.split(/\(d\|/g).slice(1);
+}
+
 const parseHolidays = cal => {
-    let data = cal.clndr_data;
+    const exceptions = parseAllExceptionStrings(cal)
+    if (!exceptions) return {}
     let holidays = {}
-    if (data.includes('d|')) {
-        let exceptions = data.split(/\(d\|/g).slice(1)
-        exceptions.filter(e => !e.includes('s|')).forEach(e => {
-            let dt = excelDateToJSDate(e.slice(0, 5))
-            holidays[dt.getTime()] = dt;
-        })
-    }
+    exceptions.filter(e => !e.includes('s|')).forEach(e => {
+        const dt = excelDateToJSDate(e.slice(0, 5))
+        holidays[dt.getTime()] = dt;
+    })
     return holidays;
 }
 
 const parseExceptions = cal => {
-    let data = cal.clndr_data;
-    let exceptions = {};
-    if (data.includes('d|')) {
-        let exceptionStrings = data.split(/\(d\|/g).slice(1);
-        exceptionStrings.filter(e => e.includes('s|')).forEach(e => {
-            let dt = excelDateToJSDate(e.slice(0, 5));
-            exceptions[dt.getTime()] = newExceptionDay(dt, parseWorkShifts(e))
-        })
-    }
-    return exceptions;
+    const exceptions = parseAllExceptionStrings(cal)
+    if (!exceptions) return {}
+    let workExceptions = {};
+    exceptions.filter(e => e.includes('s|')).forEach(e => {
+        const dt = excelDateToJSDate(e.slice(0, 5));
+        workExceptions[dt.getTime()] = newExceptionDay(dt, parseWorkShifts(e))
+    })
+    return workExceptions;
 }
 
 const newCalendar = cal => {
     cal.default = cal.default_flag === 'Y';
-    cal.type = CALENDARTYPES[cal.clndr_type]
-    cal.isGlobal = cal.clndr_type === 'CA_base'
-    cal.id = cal.isGlobal ? cal.clndr_id : cal.clndr_name
+    cal.type = CALENDARTYPES[cal.clndr_type];
+    cal.id = (cal.clndr_type === 'CA_Project') ? cal.clndr_name : cal.clndr_id;
+    cal.assignments = 0;
     cal.week = parseWorkWeek(cal);
     cal.holidays = parseHolidays(cal);
     cal.exceptions = parseExceptions(cal);
-    cal.assignments = 0
     return cal;
 }
 
@@ -179,44 +154,13 @@ const newProj = proj => {
 }
 
 const calcPercent = task => {
+    if (task.notStarted) return 0.0;
     const pt = {
         CP_Phys: task.phys_complete_pct / 100,
         CP_Drtn: (task.remDur >= task.origDur) ? 0 : 1 - task.remDur / task.origDur,
         CP_Units: 1 - (task.act_work_qty + task.act_equip_qty) / (task.target_work_qty = task.target_equip_qty)
     }
     return pt[task.complete_pct_type];
-}
-
-const newTask = task => {
-    task.notStarted = task.status_code == 'TK_NotStart';
-    task.inProgress = task.status_code == 'TK_Active';
-    task.completed = task.status_code == 'TK_Complete';
-    task.longestPath = task.driving_path_flag == 'Y';
-    task.isMilestone = task.task_type.endsWith('Mile');
-    task.isLOE = task.task_type === 'TT_LOE';
-    task.totalFloat = task.completed ? NaN : task.total_float_hr_cnt / 8
-    task.freeFloat = task.completed ? NaN : task.free_float_hr_cnt / 8
-    task.status = STATUSTYPES[task.status_code];
-    task.resources = [];
-    task.predecessors = [];
-    task.successors = [];
-    task.wbsMap = [];
-    task.start = task.notStarted ? task.early_start_date : task.act_start_date;
-    task.finish = task.completed ? task.act_end_date : task.early_end_date;
-    task.origDur = task.target_drtn_hr_cnt / 8;
-    task.remDur = task.remain_drtn_hr_cnt / 8;
-    task.percentType = PERCENTTYPES[task.complete_pct_type];
-    task.taskType = TASKTYPES[task.task_type];
-    task.primeConstraint = CONSTRAINTTYPES[task.cstr_type];
-    task.secondConstraint = CONSTRAINTTYPES[task.cstr_type2];
-    task.percent = task.notStarted ? 0.0 : calcPercent(task);
-    return task;
-}
-
-const newRelationship = rel => {
-    rel.lag = rel.lag_hr_cnt / 8;
-    rel.link = rel.pred_type.substring(rel.pred_type.length - 2);
-    return rel;
 }
 
 const parseFile = (file, name) => {
@@ -226,7 +170,47 @@ const parseFile = (file, name) => {
 
     const getTask = (projId, taskId) => tables.PROJECT[projId]?.tasks?.get(taskId)
 
-    let lines = file.split('\n');
+    const newTask = task => {
+        task.notStarted = task.status_code === 'TK_NotStart';
+        task.inProgress = task.status_code === 'TK_Active';
+        task.completed = task.status_code === 'TK_Complete';
+        task.longestPath = task.driving_path_flag === 'Y';
+        task.isMilestone = task.task_type.endsWith('Mile');
+        task.isLOE = task.task_type === 'TT_LOE';
+        task.status = STATUSTYPES[task.status_code];
+        task.origDur = task.target_drtn_hr_cnt / 8;
+        task.remDur = task.remain_drtn_hr_cnt / 8;
+        task.totalFloat = task.completed ? NaN : task.total_float_hr_cnt / 8
+        task.freeFloat = task.completed ? NaN : task.free_float_hr_cnt / 8
+        task.resources = [];
+        task.predecessors = [];
+        task.successors = [];
+        task.wbsMap = [];
+        task.start = task.act_start_date ?? task.early_start_date;
+        task.finish = task.act_end_date ?? task.early_end_date;
+        task.percentType = PERCENTTYPES[task.complete_pct_type];
+        task.taskType = TASKTYPES[task.task_type];
+        task.primeConstraint = CONSTRAINTTYPES[task.cstr_type];
+        task.secondConstraint = CONSTRAINTTYPES[task.cstr_type2];
+        task.percent = calcPercent(task);
+        task.project = tables.PROJECT[task.proj_id]
+        task.calendar = tables.CALENDAR[task.clndr_id];
+	task.calendar.assignments += 1;
+        task.wbs = task.project.wbs.get(task.wbs_id);
+        task.wbsStruct = [task.wbs];
+        return task;
+    }
+
+    const newRelationship = rel => {
+        rel.lag = rel.lag_hr_cnt / 8;
+        rel.link = rel.pred_type.substring(rel.pred_type.length - 2);
+        rel.predTask = getTask(rel.pred_proj_id, rel.pred_task_id);
+        rel.succTask = getTask(rel.proj_id, rel.task_id);
+        rel.logicId = `${rel.predTask.task_code}|${rel.succTask.task_code}|${rel.link}`;
+        return rel;
+    }
+
+    const lines = file.split('\n');
     lines.forEach(line => {
         let cols = line.trim().split('\t');
         switch (cols.shift()) {
@@ -257,7 +241,7 @@ const parseFile = (file, name) => {
                         break;
                     case 'PROJWBS':
                         tables.PROJECT[row.proj_id].wbs.set(row.wbs_id, row);
-                        if (row.proj_node_flag == 'Y') {
+                        if (row.proj_node_flag === 'Y') {
                             tables.PROJECT[row.proj_id].name = row.wbs_name;
                         }
                         break;
@@ -266,16 +250,9 @@ const parseFile = (file, name) => {
                         break;
                     case 'TASK':
                         task = newTask(row);
-                        task.project = tables.PROJECT[task.proj_id];
-                        task.calendar = tables.CALENDAR[task.clndr_id];
-                        task.calendar.assignments += 1;
-                        task.wbs = task.project.wbs.get(task.wbs_id);
-                        task.wbsStruct = [task.wbs];
                         let wbs = task.wbs
                         while (true) {
-                            if (!task.project.wbs.has(wbs.parent_wbs_id)){
-                                break;
-                            }
+                            if (!task.project.wbs.has(wbs.parent_wbs_id)) break;
                             wbs = task.project.wbs.get(wbs.parent_wbs_id);
                             task.wbsStruct.unshift(wbs)
                         }
@@ -290,18 +267,13 @@ const parseFile = (file, name) => {
                         break;
                     case 'TASKPRED':
                         rel = newRelationship(row);
-                        rel.predTask = getTask(rel.pred_proj_id, rel.pred_task_id);
-                        rel.succTask = getTask(rel.proj_id, rel.task_id);
-                        rel.logicId = `${rel.predTask.task_code}|${rel.succTask.task_code}|${rel.link}`;
                         tables.PROJECT[rel.proj_id].rels.push(rel);
                         tables.PROJECT[rel.proj_id].relsById.set(rel.logicId, rel);
                         tables.PROJECT[rel.proj_id].tasks.get(rel.task_id).predecessors.push(rel);
                         tables.PROJECT[rel.pred_proj_id].tasks.get(rel.pred_task_id).successors.push(rel);
                         break;
                     case 'TASKRSRC':
-                        if (row.target_cost === 0 && row.target_qty === 0) {
-                            break;
-                        }
+                        if (row.target_cost === 0 && row.target_qty === 0) break;
                         row.task = tables.PROJECT[row.proj_id].tasks.get(row.task_id);
                         row.actualCost = row.act_reg_cost + row.act_ot_cost;
                         row.atCompletionCost = row.actualCost + row.remain_cost;
@@ -313,7 +285,7 @@ const parseFile = (file, name) => {
                         tables.PROJECT[row.proj_id].tasks.get(row.task_id).resources.push(row);
                         if (tables.hasOwnProperty('RSRC')) {
                             row.rsrcName = tables.RSRC[row.rsrc_id].rsrc_short_name;
-                            row.resId = `${row.task.task_code}|${row.rsrcName}|${row?.account?.acct_short_name}`; // need to add account #
+                            row.resId = `${row.task.task_code}|${row.rsrcName}|${row?.account?.acct_short_name}`;
                             tables.PROJECT[row.proj_id].resById.set(row.resId, row);
                         } 
                         break;
@@ -324,12 +296,14 @@ const parseFile = (file, name) => {
 
     Object.values(tables.PROJECT).forEach(proj => {
         proj.wbs.forEach(wbs => {
+
             let id = [wbs.wbs_short_name];
             let node = wbs;
+
             while (true) {
-                if (!proj.wbs.has(node.parent_wbs_id) || proj.wbs.get(node.parent_wbs_id).proj_node_flag === 'Y'){
-                    break;
-                }
+                if (!proj.wbs.has(node.parent_wbs_id) || 
+                    proj.wbs.get(node.parent_wbs_id).proj_node_flag === 'Y') break;
+
                 node = proj.wbs.get(node.parent_wbs_id);
                 id.unshift(node.wbs_short_name)
             }
