@@ -415,7 +415,7 @@ let calendarChanges = {
         data: [],
         getRows: function() {
             return this.data.map(cal => [
-                cal.clndr_name, cal.type, , cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, cal.week[4].hours, cal.week[5].hours, cal.week[6].hours 
+                cal.clndr_name, cal.type, cal.assignments, cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, cal.week[4].hours, cal.week[5].hours, cal.week[6].hours 
             ])
         }
     },

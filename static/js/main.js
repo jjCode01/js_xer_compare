@@ -197,19 +197,18 @@ function updateProjCard(name, value){
         let div = document.createElement("div")
         div.style.width = '100%';
         div.classList.add("card")
-        let caption = document.createElement("h2")
-	caption.style.width = '100%';
-        caption.innerText = `${title}: ${vals.length}`
-        caption.classList.add('caption', 'no-break')
-        div.append(caption)
         let table = document.createElement("table");
+        let caption = document.createElement("caption")
+        caption.innerText = `${title}: ${vals.length}`
+        table.append(caption)
+        
         let head = document.createElement("thead")
         head.classList.add('no-break')
         table.append(head)
         let body = document.createElement("tbody")
         table.append(body)
-	let footer = document.createElement("tfoot")
-	table.append(footer)
+	    let footer = document.createElement("tfoot")
+	    table.append(footer)
 
         let row = head.insertRow(), cell;
         row.classList.add('no-break')
@@ -237,12 +236,12 @@ function updateProjCard(name, value){
             })
         })
 
-	row = footer.insertRow();
-	cell = document.createElement("td")
-	cell.colSpan = `${labels.length}`
-	cell.innerText = foot
-	cell.style.color = '#5f5f5f'
-	row.append(cell)
+        row = footer.insertRow();
+        cell = document.createElement("td")
+        cell.colSpan = `${labels.length}`
+        cell.innerText = foot
+        cell.style.color = '#5f5f5f'
+        row.append(cell)
         div.append(table)
         return div  
     }
