@@ -112,6 +112,11 @@ span{padding: 0 0.4em;}
     height: 275px;
     padding: 0.25em;
 }
+.horiz-chart {
+    width: 500px;
+    height: 100px;
+    padding: 0.25em 0.25em 0.25em 2em;
+}
 .chart-red{background-color: var(--chart-red); border-radius: 3px;}
 .chart-yellow{background-color: var(--chart-yellow); border-radius: 3px;}
 .chart-blue{background-color: var(--chart-blue); border-radius: 3px;}

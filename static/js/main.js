@@ -14,6 +14,7 @@ let FLOAT = {
 const CHARTCOLOR = {
     BLUE: '54, 162, 235',
     GREEN: '113, 194, 92',
+    YELLOW: '255, 206, 86',
     RED: '255, 99, 132',
 }
 
@@ -180,10 +181,15 @@ function updateProjCard(name, value){
     updateElText(`${name}-schedule-per`, formatPercent(proj.schedPercentComp))
     updateElText(`${name}-physical-per`, formatPercent(proj.physPercentComp))
     updateElText(`${name}-cost-per`, formatPercent(proj.actualCost / proj.budgetCost))
-    updateElText(`${name}-critical`, proj.critical.length.toLocaleString())
-    updateElText(`${name}-near-critical`, proj.nearCritical.length.toLocaleString())
-    updateElText(`${name}-normal-tf`, proj.normalFloat.length.toLocaleString())
-    updateElText(`${name}-high-tf`, proj.highFloat.length.toLocaleString())
+    updateElText(`${name}-critical`, proj.critical.length.toLocaleString() + ":")
+    updateElText(`${name}-critical-per`, formatPercent(proj.critical.length / proj.open.length))
+    updateElText(`${name}-near-critical-per`, formatPercent(proj.nearCritical.length / proj.open.length))
+    updateElText(`${name}-normal-tf-per`, formatPercent(proj.normalFloat.length / proj.open.length))
+    updateElText(`${name}-high-tf-per`, formatPercent(proj.highFloat.length / proj.open.length))
+
+    updateElText(`${name}-near-critical`, proj.nearCritical.length.toLocaleString() + ":")
+    updateElText(`${name}-normal-tf`, proj.normalFloat.length.toLocaleString() + ":")
+    updateElText(`${name}-high-tf`, proj.highFloat.length.toLocaleString() + ":")
 
     function updateElements(obj) {
 	const revSec = document.getElementById('revisions-sec')
@@ -283,7 +289,7 @@ function updateProjCard(name, value){
             document.getElementById("cost-progress").style.width = `${formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
         }
 
-	updateElText('current-not-started-per', formatPercent(projects.current.notStarted.length / projects.current.tasks.size))
+	    updateElText('current-not-started-per', formatPercent(projects.current.notStarted.length / projects.current.tasks.size))
         updateElText('current-in-progress-per', formatPercent(projects.current.inProgress.length / projects.current.tasks.size))
         updateElText('current-complete-per', formatPercent(projects.current.completed.length / projects.current.tasks.size))
 
@@ -295,11 +301,6 @@ function updateProjCard(name, value){
             [`rgba(${CHARTCOLOR.GREEN}, 1)`, `rgba(${CHARTCOLOR.BLUE}, 1)`, `rgba(${CHARTCOLOR.RED}, 1)`,]
 	    )
 
-        updateElText('current-critical-per', formatPercent(projects.current.critical.length / projects.current.open.length))
-        updateElText('current-near-critical-per', formatPercent(projects.current.nearCritical.length / projects.current.open.length))
-        updateElText('current-normal-tf-per', formatPercent(projects.current.normalFloat.length / projects.current.open.length))
-        updateElText('current-high-tf-per', formatPercent(projects.current.highFloat.length / projects.current.open.length))
-        
         let ctxCostLoading = document.getElementById('costLoadingChart');
         let costLoadingChart = createPieChart(
             ctxCostLoading, 'Cost Loading',
@@ -328,6 +329,87 @@ function updateProjCard(name, value){
 
         const currResources = projects.current.resources
         const prevResources = projects.previous.resources
+
+        let ctxTotalFloatChart = document.getElementById('totalFloatChart');
+        let totalFloatChart = new Chart(ctxTotalFloatChart, {
+            type: 'bar',
+            data: {
+                labels: ['Current', 'Previous'],
+                datasets: [
+                    {
+                        label: 'Critical',
+                        data: [
+                            projects.current.critical.length / projects.current.open.length,
+                            projects.previous.critical.length / projects.previous.open.length, 
+                        ],
+                        backgroundColor: [`rgba(${CHARTCOLOR.RED}, 0.9)`],
+                        borderColor: [`rgba(${CHARTCOLOR.RED}, 1)`],
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Near Critical',
+                        data: [
+                            projects.current.nearCritical.length / projects.current.open.length,
+                            projects.previous.nearCritical.length / projects.previous.open.length,
+                        ],
+                        backgroundColor: [`rgba(${CHARTCOLOR.YELLOW}, 0.9)`],
+                        borderColor: [`rgba(${CHARTCOLOR.YELLOW}, 1)`], 
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Normal Float',
+                        data: [
+                            projects.current.normalFloat.length / projects.current.open.length, 
+                            projects.previous.normalFloat.length / projects.previous.open.length,
+
+                        ],
+                        backgroundColor: [`rgba(${CHARTCOLOR.GREEN}, 0.9)`],
+                        borderColor: [`rgba(${CHARTCOLOR.GREEN}, 1)`],
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'High Float',
+                        data: [
+                            projects.current.highFloat.length / projects.current.open.length, 
+                            projects.previous.highFloat.length / projects.previous.open.length,
+
+                        ],
+                        backgroundColor: [`rgba(${CHARTCOLOR.BLUE}, 0.9)`],
+                        borderColor: [`rgba(${CHARTCOLOR.BLUE}, 1)`],
+                        borderWidth: 1,
+                    },
+                ]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                      stacked: true,
+                      ticks: {
+                        // Include a dollar sign in the ticks
+                        callback: function(value, index, ticks) {
+                            return value * 100 + '%';
+                        }
+                        }
+                    },
+                    y: {
+                      stacked: true,
+                      
+                    },
+                },
+                // scales: {
+                //     y: {
+                //         beginAtZero: true
+                //     }
+                // },
+                maintainAspectRatio: false
+            }
+        });
 
         
         let constraintVariance = {
@@ -479,21 +561,24 @@ function updateProjCard(name, value){
         })
         updateElements(constraintChanges)
 
-	updateElText('start-var', formatAbsNum(dateVariance(projects.current.plan_start_date, projects.previous.plan_start_date)))
-	updateElText('dd-var', formatAbsNum(dateVariance(projects.current.last_recalc_date, projects.previous.last_recalc_date)))
-	updateElText('end-var', formatVariance(dateVariance(projects.previous.scd_end_date, projects.current.scd_end_date)))
-	updateElText('mfb-var', formatVariance(dateVariance(projects.current.plan_end_date, projects.previous.plan_end_date)))
-	updateElText('tasks-var', formatVariance((projects.current.tasks.size - projects.previous.tasks.size)))
-	updateElText('not-started-var', formatVariance((projects.current.notStarted.length - projects.previous.notStarted.length)))
-	updateElText('in-progress-var', formatVariance((projects.current.inProgress.length - projects.previous.inProgress.length)))
-	updateElText('complete-var', formatVariance((projects.current.completed.length - projects.previous.completed.length)))
-	updateElText('schedule-per-var', formatPercent(projects.current.schedPercentComp - projects.previous.schedPercentComp))
-	updateElText('physical-per-var', formatPercent(projects.current.physPercentComp - projects.previous.physPercentComp))
+        updateElText('start-var', formatAbsNum(dateVariance(projects.current.plan_start_date, projects.previous.plan_start_date)))
+        updateElText('dd-var', formatAbsNum(dateVariance(projects.current.last_recalc_date, projects.previous.last_recalc_date)))
+        updateElText('end-var', formatVariance(dateVariance(projects.previous.scd_end_date, projects.current.scd_end_date)))
+        updateElText('mfb-var', formatVariance(dateVariance(projects.current.plan_end_date, projects.previous.plan_end_date)))
+        updateElText('tasks-var', formatVariance((projects.current.tasks.size - projects.previous.tasks.size)))
+        updateElText('not-started-var', formatVariance((projects.current.notStarted.length - projects.previous.notStarted.length)))
+        updateElText('in-progress-var', formatVariance((projects.current.inProgress.length - projects.previous.inProgress.length)))
+        updateElText('complete-var', formatVariance((projects.current.completed.length - projects.previous.completed.length)))
+        updateElText('schedule-per-var', formatPercent(projects.current.schedPercentComp - projects.previous.schedPercentComp))
+        updateElText('physical-per-var', formatPercent(projects.current.physPercentComp - projects.previous.physPercentComp))
 
-        updateElText('critical-var', formatVariance(projects.current.critical.length - projects.previous.critical.length))
-        updateElText('near-critical-var', formatVariance(projects.current.nearCritical.length - projects.previous.nearCritical.length))
-        updateElText('normal-tf-var', formatVariance(projects.current.normalFloat.length - projects.previous.normalFloat.length))
-        updateElText('high-tf-var', formatVariance(projects.current.highFloat.length - projects.previous.highFloat.length))
+        const getFloatPercent = (float, version) => projects[version][float].length / projects[version].open.length
+        const getFloatPercentVar = (float) => getFloatPercent(float, 'current') - getFloatPercent(float, 'previous')
+
+        updateElText('critical-var', formatPercent(getFloatPercentVar('critical'), 'always'))
+        updateElText('near-critical-var', formatPercent(getFloatPercentVar('nearCritical'), 'always'))
+        updateElText('normal-tf-var', formatPercent(getFloatPercentVar('normalFloat'), 'always'))
+        updateElText('high-tf-var', formatPercent(getFloatPercentVar('highFloat'), 'always'))
         
         if (projects.current.budgetCost && projects.previous.budgetCost) {
             const currCostPer = projects.current.actualCost / projects.current.budgetCost

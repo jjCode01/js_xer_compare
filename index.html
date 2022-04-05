@@ -164,57 +164,7 @@
                                             <tbody></tbody>
                                         </table>
                                     </div>
-                                    <div class="card">
-                                <table>
-                                    <caption>Activity Float</caption>
-                                    <tbody>
-                                        <tr>
-                                            <th class="text-left btm-border col-6-5em">Activity Float</th>
-                                            <th class="text-right btm-border col-5em">Count</th>
-                                            <th class="text-right btm-border col-3em">%</th>
-                                            <th class="text-right btm-border col-5em ">Prev</th>
-                                            <th class="text-right btm-border col-3em ">Diff</th>
-                                            <td class="chart no-wrap" rowspan="7"><canvas id="activityFloatChart"></canvas></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap chart-red">Critical:</td>
-                                            <td id="current-critical" class="text-right no-wrap"></td>
-                                            <td id="current-critical-per" class="text-right no-wrap"></td>
-                                            <td id="previous-critical" class="text-right no-wrap "></td>
-                                            <td id="critical-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap chart-yellow">Near Critical:</td>
-                                            <td id="current-near-critical" class="text-right no-wrap"></td>
-                                            <td id="current-near-critical-per" class="text-right no-wrap"></td>
-                                            <td id="previous-near-critical" class="text-right no-wrap "></td>
-                                            <td id="near-critical-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap chart-green">Normal Float:</td>
-                                            <td id="current-normal-tf" class="text-right no-wrap"></td>
-                                            <td id="current-normal-tf-per" class="text-right no-wrap"></td>
-                                            <td id="previous-normal-tf" class="text-right no-wrap "></td>
-                                            <td id="normal-tf-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap chart-blue">High Float:</td>
-                                            <td id="current-high-tf" class="text-right no-wrap"></td>
-                                            <td id="current-high-tf-per" class="text-right no-wrap"></td>
-                                            <td id="previous-high-tf" class="text-right no-wrap "></td>
-                                            <td id="high-tf-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="no-wrap">Longest Path:</td>
-                                            <td id="current-longest-path" class="text-right no-wrap"></td>
-                                            <td id="current-longest-path-per" class="text-right no-wrap"></td>
-                                            <td id="previous-longest-path" class="text-right no-wrap "></td>
-                                            <td id="longest-path-var" class="text-right no-wrap "></td>
-                                        </tr>
-                                        <tr><td></td></tr>
-                                    </tbody>
-                                </table>
-                                    </div>
+                                    
                                 </div>
                                 <div class="card text-right" style="margin-left: 30px; height: 100%" >
                                     <table>
@@ -232,6 +182,64 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="card">
+                                <table>
+                                    <caption>Activity Float</caption>
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-left btm-border col-6-5em">Activity Float</th>
+                                            <th class="text-right btm-border" colspan="2">Current</th>
+                                            <!-- <th class="text-right btm-border col-3em">%</th> -->
+                                            <th class="text-right btm-border" colspan="2">Previous</th>
+                                            <th class="text-right btm-border col-3em ">Diff</th>
+                                            <th class="text-center btm-border">Float Chart</th>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-red">Critical:</td>
+                                            <td id="current-critical" class="text-right no-wrap col-5em"></td>
+                                            <td id="current-critical-per" class="text-right no-wrap"></td>
+                                            <td id="previous-critical" class="text-right no-wrap col-5em"></td>
+                                            <td id="previous-critical-per" class="text-right no-wrap "></td>
+                                            <td id="critical-var" class="text-right no-wrap "></td>
+                                            <td class="horiz-chart no-wrap" rowspan="5"><canvas id="totalFloatChart"></canvas></td>
+
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-yellow">Near Critical:</td>
+                                            <td id="current-near-critical" class="text-right no-wrap"></td>
+                                            <td id="current-near-critical-per" class="text-right no-wrap"></td>
+                                            <td id="previous-near-critical" class="text-right no-wrap "></td>
+                                            <td id="previous-near-critical-per" class="text-right no-wrap "></td>
+                                            <td id="near-critical-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-green">Normal Float:</td>
+                                            <td id="current-normal-tf" class="text-right no-wrap"></td>
+                                            <td id="current-normal-tf-per" class="text-right no-wrap"></td>
+                                            <td id="previous-normal-tf" class="text-right no-wrap "></td>
+                                            <td id="previous-normal-tf-per" class="text-right no-wrap "></td>
+                                            <td id="normal-tf-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-blue">High Float:</td>
+                                            <td id="current-high-tf" class="text-right no-wrap"></td>
+                                            <td id="current-high-tf-per" class="text-right no-wrap"></td>
+                                            <td id="previous-high-tf" class="text-right no-wrap "></td>
+                                            <td id="previous-high-tf-per" class="text-right no-wrap "></td>
+                                            <td id="high-tf-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap">Longest Path:</td>
+                                            <td id="current-longest-path" class="text-right no-wrap"></td>
+                                            <td id="current-longest-path-per" class="text-right no-wrap"></td>
+                                            <td id="previous-longest-path" class="text-right no-wrap "></td>
+                                            <td id="previous-longest-path-per" class="text-right no-wrap "></td>
+                                            <td id="longest-path-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <!-- <tr><td></td></tr> -->
+                                    </tbody>
+                                </table>
+                                    </div>
                             <div class="card"> <!-- Progress -->
                                 <table>
                                     <caption>Progress</caption>
@@ -356,7 +364,7 @@
                             </div>
                             <div class="card no-break"> <!-- Schedule revisions -->
                                 <table style="width: 100%;">
-                                    <caption>Schedule Revisions</caption>
+                                    <caption>Schedule Revisions Summary</caption>
                                     <tbody>
                                         <tr>
                                             <td class="text-left">Added Activities:</td>
