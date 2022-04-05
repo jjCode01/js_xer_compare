@@ -264,6 +264,20 @@ let taskChanges = {
             ])
         }
     },
+    type: {
+        id: "tk-type",
+        title: "Revised Activity Type",
+        align: ['left', 'left', 'left', 'center', 'center', 'center'],
+        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'normal'],
+        columns: ['Act ID', '', 'Act Name', 'New Type', 'Old Type'],
+        data: [],
+        getRows: function() {
+            return this.data.map(task => [
+                task.task_code, statusImg(task), task.task_name, task.taskType, 
+                getTask(task, projects.previous).taskType
+            ])
+        }
+    },
 }
 
 let logicChanges = {

@@ -120,6 +120,7 @@ const analyzeProject = proj => {
     proj.notStarted = tasks.filter(task => task.notStarted)
     proj.inProgress = tasks.filter(task => task.inProgress)
     proj.completed = tasks.filter(task => task.completed)
+    proj.open = tasks.filter(task => !task.completed)
 
     proj.milestones = tasks.filter(task => task.isMilestone)
 
@@ -179,6 +180,10 @@ function updateProjCard(name, value){
     updateElText(`${name}-schedule-per`, formatPercent(proj.schedPercentComp))
     updateElText(`${name}-physical-per`, formatPercent(proj.physPercentComp))
     updateElText(`${name}-cost-per`, formatPercent(proj.actualCost / proj.budgetCost))
+    updateElText(`${name}-critical`, proj.critical.length.toLocaleString())
+    updateElText(`${name}-near-critical`, proj.nearCritical.length.toLocaleString())
+    updateElText(`${name}-normal-tf`, proj.normalFloat.length.toLocaleString())
+    updateElText(`${name}-high-tf`, proj.highFloat.length.toLocaleString())
 
     function updateElements(obj) {
 	const revSec = document.getElementById('revisions-sec')
@@ -283,12 +288,17 @@ function updateProjCard(name, value){
         updateElText('current-complete-per', formatPercent(projects.current.completed.length / projects.current.tasks.size))
 
         let ctxActivityStatus = document.getElementById('activityStatusChart');
-	let activityStatusChart = createPieChart(
+	    let activityStatusChart = createPieChart(
             ctxActivityStatus, '# of Activities',
             ['In Progress', 'Complete', 'Not Started'],
             [projects.current.inProgress.length, projects.current.completed.length, projects.current.notStarted.length,],
             [`rgba(${CHARTCOLOR.GREEN}, 1)`, `rgba(${CHARTCOLOR.BLUE}, 1)`, `rgba(${CHARTCOLOR.RED}, 1)`,]
-	)
+	    )
+
+        updateElText('current-critical-per', formatPercent(projects.current.critical.length / projects.current.open.length))
+        updateElText('current-near-critical-per', formatPercent(projects.current.nearCritical.length / projects.current.open.length))
+        updateElText('current-normal-tf-per', formatPercent(projects.current.normalFloat.length / projects.current.open.length))
+        updateElText('current-high-tf-per', formatPercent(projects.current.highFloat.length / projects.current.open.length))
         
         let ctxCostLoading = document.getElementById('costLoadingChart');
         let costLoadingChart = createPieChart(
@@ -359,7 +369,7 @@ function updateProjCard(name, value){
         taskChanges.added.data = currTasks.filter(task => !hasTask(task, projects.previous))
         taskChanges.deleted.data = prevTasks.filter(task => !projects.current.tasksByCode.has(task.task_code))
 
-	const ongoingTasks = currTasks.filter(task => hasTask(task, projects.previous))
+	    const ongoingTasks = currTasks.filter(task => hasTask(task, projects.previous))
         taskChanges.name.data = ongoingTasks.filter(task => task.task_name !== getTask(task, projects.previous).task_name)
         taskChanges.duration.data = ongoingTasks.filter(task => {
             return (
@@ -367,7 +377,7 @@ function updateProjCard(name, value){
                 ((task.origDur !== getTask(task, projects.previous).origDur) || 
                 (task.notStarted && task.origDur !== task.remDur && task.remDur !== getTask(task, projects.previous).remDur))
             )
-	})
+	    })
         taskChanges.calendar.data = ongoingTasks.filter(task => task.calendar.id !== getTask(task, projects.previous).calendar.id)
         taskChanges.start.data = ongoingTasks.filter(task => {
             return (
@@ -375,15 +385,16 @@ function updateProjCard(name, value){
                 !getTask(task, projects.previous).notStarted && 
                 formatDate(task.start) !== formatDate(getTask(task, projects.previous).start)
             )
-	}).sort(sortByStart)
+	    }).sort(sortByStart)
         taskChanges.finish.data = ongoingTasks.filter(task => {
             return (
                 task.completed && 
                 getTask(task, projects.previous).completed && 
                 formatDate(task.finish) !== formatDate(getTask(task, projects.previous).finish)
             )
-	}).sort(sortByFinish)
+	    }).sort(sortByFinish)
         taskChanges.wbs.data = ongoingTasks.filter(task => task.wbs.wbsID !== getTask(task, projects.previous).wbs.wbsID)
+        taskChanges.type.data = ongoingTasks.filter(task => task.taskType !== getTask(task, projects.previous).taskType)
         updateElements(taskChanges)
 
         logicChanges.added.data = projects.current.rels.filter(rel => !prevHasLogic(rel))
@@ -410,7 +421,7 @@ function updateProjCard(name, value){
         resourceChanges.revisedUnits.data = currResources.filter(res => prevHasRes(res) && res.target_qty !== getPrevRes(res).target_qty)
         updateElements(resourceChanges)
 
-	const hasCalendar = (cal, table) => {
+	    const hasCalendar = (cal, table) => {
             if (!(cal.type === 'Project')) return (cal.clndr_id in table.CALENDAR)
             for (c in table.CALENDAR) {
                 if (table.CALENDAR[c].id === cal.id) return true
@@ -418,8 +429,8 @@ function updateProjCard(name, value){
             return false
         }
 
-        calendarChanges.added.data = currCalendars.filter(cal => !hasCalendar(cal, tables.previous))
-	calendarChanges.deleted.data = prevCalendars.filter(cal => !hasCalendar(cal, tables.current))
+        calendarChanges.added.data = currCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, tables.previous))
+	    calendarChanges.deleted.data = prevCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, tables.current))
         updateElements(calendarChanges)
 
         constraintChanges.addedPrim.data = currTasks.filter(task => {
@@ -478,6 +489,11 @@ function updateProjCard(name, value){
 	updateElText('complete-var', formatVariance((projects.current.completed.length - projects.previous.completed.length)))
 	updateElText('schedule-per-var', formatPercent(projects.current.schedPercentComp - projects.previous.schedPercentComp))
 	updateElText('physical-per-var', formatPercent(projects.current.physPercentComp - projects.previous.physPercentComp))
+
+        updateElText('critical-var', formatVariance(projects.current.critical.length - projects.previous.critical.length))
+        updateElText('near-critical-var', formatVariance(projects.current.nearCritical.length - projects.previous.nearCritical.length))
+        updateElText('normal-tf-var', formatVariance(projects.current.normalFloat.length - projects.previous.normalFloat.length))
+        updateElText('high-tf-var', formatVariance(projects.current.highFloat.length - projects.previous.highFloat.length))
         
         if (projects.current.budgetCost && projects.previous.budgetCost) {
             const currCostPer = projects.current.actualCost / projects.current.budgetCost

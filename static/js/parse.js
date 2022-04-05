@@ -195,7 +195,7 @@ const parseFile = (file, name) => {
         task.percent = calcPercent(task);
         task.project = tables.PROJECT[task.proj_id]
         task.calendar = tables.CALENDAR[task.clndr_id];
-	    task.calendar.assignments += 1;
+	task.calendar.assignments += 1;
         task.wbs = task.project.wbs.get(task.wbs_id);
         task.wbsStruct = [task.wbs];
         return task;
