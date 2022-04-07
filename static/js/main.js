@@ -6,6 +6,7 @@ let tables = {
 let projects = {}
 
 let FLOAT = {
+    show: true,
     critical: 0,
     nearCritical: 20,
     high: 50,
@@ -695,8 +696,48 @@ function updateProjList(projs, selector) {
 
 const fileSelectors = document.querySelectorAll(".xer");
 const analyzeButton = document.getElementById("analyze-btn");
+const nearCriticalTF = document.getElementById("near-critical-num")
+const highTF = document.getElementById("high-float-num")
+const showTF = document.getElementById("show-float")
+const showCost = document.getElementById("show-cost")
+const showUnits = document.getElementById("show-units")
+const showProgress = document.getElementById("show-progress")
+const showTrending = document.getElementById("show-trending")
+const floatTable = document.getElementById("float-table")
+const costTable = document.getElementById("cost-loading")
+const unitTable = document.getElementById("resource-loading")
+const progressTable = document.getElementById("progress-table")
+const trendingTable = document.getElementById("constraint-variance")
+
+nearCriticalTF.addEventListener("change", (e) => {
+    console.log('Near Critical: ', nearCriticalTF.value)
+    if (parseInt(nearCriticalTF.value) <= FLOAT.critical) {
+        nearCriticalTF.value = FLOAT.critical + 1
+    }
+    FLOAT.nearCritical = parseInt(nearCriticalTF.value)
+    if (FLOAT.nearCritical >= FLOAT.high) {
+        highTF.value = FLOAT.nearCritical + 1
+        FLOAT.high = parseInt(highTF.value)
+    }
+    highTF.min = FLOAT.nearCritical + 1    
+})
+highTF.addEventListener("change", (e) => {
+    console.log('High TF: ', highTF.value)
+    if (parseInt(highTF.value) <= FLOAT.nearCritical) {
+        highTF.value = FLOAT.nearCritical + 1
+    }
+    FLOAT.high = parseInt(highTF.value)  
+})
 
 analyzeButton.addEventListener("click", (e) => {
+    updateElText('near-critical-threshold', `Near Critical (TF < ${FLOAT.nearCritical + 1}):`)
+    updateElText('high-float-threshold', `High Float (TF > ${FLOAT.high - 1}):`)
+    if (!showTF.checked) floatTable.style.display = "none"
+    if (!showCost.checked) costTable.style.display = "none"
+    if (!showUnits.checked) unitTable.style.display = "none"
+    if (!showProgress.checked) progressTable.style.display = "none"
+    if (!showTrending.checked) trendingTable.style.display = "none"
+
     const currSelector = document.getElementById("current-project-selector")
     const prevSelector = document.getElementById("previous-project-selector")
     updateProjCard("current", currSelector.value)
@@ -708,7 +749,6 @@ analyzeButton.addEventListener("click", (e) => {
 
 const isEmptyObj = obj => Object.keys(obj).length === 0;
 const checkIfReady = () => (!isEmptyObj(tables.previous) && !isEmptyObj(tables.current))
-
 
 for (let i = 0; i < fileSelectors.length; i++) {
     fileSelectors[i].addEventListener("change", (e) => {

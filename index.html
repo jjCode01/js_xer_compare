@@ -38,47 +38,51 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="margin-top-20px tbl-border box-shadow">
+                            <div class="">
                                 <table>
                                     <caption>Advanced Options</caption>
                                     <tbody>
-                                        <!-- <tr>
+                                        <tr>
+                                            <td><label for="near-critical-num">Near Critical Total Float <= </label></td>
                                             <td>
-                                                <label for="critical-num">Critical Total Float <= 
-                                                    <input type="number" name="critical-num" id="critical-num" step="1" value="0" style="width: 50px">
-                                                </label>
+                                                <input type="number" name="near-critical-num" id="near-critical-num" step="1" value="20" style="width: 50px">
+                                            </td>
+                                            
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <label for="high-float-num">High Float Total Float >= </label>
                                             </td>
                                             <td>
-                                                <label for="near-critical-num">Near Critical Total Float <= 
-                                                    <input type="number" name="near-critical-num" id="near-critical-num" step="1" value="10" style="width: 50px">
-                                                </label>
+                                                <input type="number" name="high-float-num" id="high-float-num" step="1" value="50" style="width: 50px">
                                             </td>
-                                            <td>
-                                                <label for="high-float-num">High Float Total Float >= 
-                                                    <input type="number" name="high-float-num" id="high-float-num" step="1" value="50" style="width: 50px">
-                                                </label>
-                                            </td>
-                                        </tr> -->
+                                        </tr>
                                         <tr>
                                             <td>
                                                 <input type="checkbox" name="show-float" id="show-float" value="Show Total Float" checked>
                                                 <label for="show-float">Show Total Float</label>
                                             </td>
                                             <td>
-                                                <label for="critical-num">Critical Total Float <= 
-                                                    <input type="number" name="critical-num" id="critical-num" step="1" value="0" style="width: 50px">
-                                                </label>
+                                                <input type="checkbox" name="show-progress" id="show-progress" value="Show Progress" checked>
+                                                <label for="show-progress">Show Progress</label>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" name="show-cost" id="show-cost" value="Show Cost Loading" checked>
+                                                <label for="show-cost">Show Cost Loading</label>
                                             </td>
                                             <td>
-                                                <label for="near-critical-num">Near Critical Total Float <= 
-                                                    <input type="number" name="near-critical-num" id="near-critical-num" step="1" value="20" style="width: 50px">
-                                                </label>
+                                                <input type="checkbox" name="show-trending" id="show-trending" value="Show Constraint Trending" checked>
+                                                <label for="show-trending">Show Constraint Trending</label>
                                             </td>
+                                        </tr>
+                                        <tr>
                                             <td>
-                                                <label for="high-float-num">High Float Total Float >= 
-                                                    <input type="number" name="high-float-num" id="high-float-num" step="1" value="50" style="width: 50px">
-                                                </label>
+                                                <input type="checkbox" name="show-units" id="show-units" value="Show Resource Loading" checked>
+                                                <label for="show-units">Show Resource Loading</label>
                                             </td>
+                                        </tr>
                                             <!-- <td>
                                                 <label for="near-critical-num">Near Critical Total Float <= 
                                                     <input type="number" name="near-critical-num" id="near-critical-num" step="1" value="10" style="width: 50px">
@@ -237,7 +241,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="card">
+                            <div id="float-table" class="card">
                                 <table>
                                     <caption>Activity Total Float</caption>
                                     <tbody>
@@ -251,51 +255,39 @@
                                         </tr>
                                         <tr>
                                             <td class="no-wrap chart-red">Critical (TF < 1):</td>
-                                            <!-- <td id="current-critical" class="text-right no-wrap col-5em"></td> -->
                                             <td id="current-critical-per" class="text-right no-wrap"></td>
-                                            <!-- <td id="previous-critical" class="text-right no-wrap col-5em"></td> -->
                                             <td id="previous-critical-per" class="text-right no-wrap "></td>
                                             <td id="critical-var" class="text-right no-wrap "></td>
                                             <td class="horiz-chart no-wrap" rowspan="5"><canvas id="totalFloatChart"></canvas></td>
-
                                         </tr>
                                         <tr>
-                                            <td class="no-wrap chart-yellow">Near Critical (TF < 21):</td>
-                                            <!-- <td id="current-near-critical" class="text-right no-wrap"></td> -->
+                                            <td id="near-critical-threshold" class="no-wrap chart-yellow"></td>
                                             <td id="current-near-critical-per" class="text-right no-wrap"></td>
-                                            <!-- <td id="previous-near-critical" class="text-right no-wrap "></td> -->
                                             <td id="previous-near-critical-per" class="text-right no-wrap "></td>
                                             <td id="near-critical-var" class="text-right no-wrap "></td>
                                         </tr>
                                         <tr>
                                             <td class="no-wrap chart-green">Normal Float:</td>
-                                            <!-- <td id="current-normal-tf" class="text-right no-wrap"></td> -->
                                             <td id="current-normal-tf-per" class="text-right no-wrap"></td>
-                                            <!-- <td id="previous-normal-tf" class="text-right no-wrap "></td> -->
                                             <td id="previous-normal-tf-per" class="text-right no-wrap "></td>
                                             <td id="normal-tf-var" class="text-right no-wrap "></td>
                                         </tr>
                                         <tr>
-                                            <td class="no-wrap chart-blue">High Float (TF > 49):</td>
-                                            <!-- <td id="current-high-tf" class="text-right no-wrap"></td> -->
+                                            <td id="high-float-threshold" class="no-wrap chart-blue"></td>
                                             <td id="current-high-tf-per" class="text-right no-wrap"></td>
-                                            <!-- <td id="previous-high-tf" class="text-right no-wrap "></td> -->
                                             <td id="previous-high-tf-per" class="text-right no-wrap "></td>
                                             <td id="high-tf-var" class="text-right no-wrap "></td>
                                         </tr>
                                         <tr>
                                             <td class="no-wrap">Longest Path:</td>
-                                            <!-- <td id="current-longest-path" class="text-right no-wrap"></td> -->
                                             <td id="current-longest-path-per" class="text-right no-wrap"></td>
-                                            <!-- <td id="previous-longest-path" class="text-right no-wrap "></td> -->
                                             <td id="previous-longest-path-per" class="text-right no-wrap "></td>
                                             <td id="longest-path-var" class="text-right no-wrap "></td>
                                         </tr>
-                                        <!-- <tr><td></td></tr> -->
                                     </tbody>
                                 </table>
-                                    </div>
-                            <div class="card"> <!-- Progress -->
+                            </div>
+                            <div id="progress-table" class="card"> <!-- Progress -->
                                 <table>
                                     <caption>Progress</caption>
                                     <thead>
