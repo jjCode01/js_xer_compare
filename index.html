@@ -23,7 +23,7 @@
                     <td class="width-max">
                         <section id="upload" class="cat width-max">
                             <div class="margin-top-20px tbl-border box-shadow">
-                                <label for="current-file-selector" class="">Select Current XER</label>
+                                <label for="current-file-selector" class="caption">Select Current XER</label>
                                 <div class="pad-10px">
                                     <input type="file" name="current" id="current-file-selector" accept=".xer" class="xer margin-top-5px" required>
                                     <select name="current" id="current-project-selector" class="width-100 margin-top-10px hidden">
@@ -31,12 +31,67 @@
                                 </div>
                             </div>
                             <div class="margin-top-20px tbl-border box-shadow">
-                                <label for="previous-file-selector" class="">Select Previous XER</label>
+                                <label for="previous-file-selector" class="caption">Select Previous XER</label>
                                 <div class="pad-10px">
                                     <input type="file" name="previous" id="previous-file-selector" accept=".xer" class="xer margin-top-5px" required>
                                     <select name="previous" id="previous-project-selector" class="width-100 margin-top-10px hidden">
                                     </select>
                                 </div>
+                            </div>
+                            <div class="margin-top-20px tbl-border box-shadow">
+                                <table>
+                                    <caption>Advanced Options</caption>
+                                    <tbody>
+                                        <!-- <tr>
+                                            <td>
+                                                <label for="critical-num">Critical Total Float <= 
+                                                    <input type="number" name="critical-num" id="critical-num" step="1" value="0" style="width: 50px">
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label for="near-critical-num">Near Critical Total Float <= 
+                                                    <input type="number" name="near-critical-num" id="near-critical-num" step="1" value="10" style="width: 50px">
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label for="high-float-num">High Float Total Float >= 
+                                                    <input type="number" name="high-float-num" id="high-float-num" step="1" value="50" style="width: 50px">
+                                                </label>
+                                            </td>
+                                        </tr> -->
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" name="show-float" id="show-float" value="Show Total Float" checked>
+                                                <label for="show-float">Show Total Float</label>
+                                            </td>
+                                            <td>
+                                                <label for="critical-num">Critical Total Float <= 
+                                                    <input type="number" name="critical-num" id="critical-num" step="1" value="0" style="width: 50px">
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label for="near-critical-num">Near Critical Total Float <= 
+                                                    <input type="number" name="near-critical-num" id="near-critical-num" step="1" value="20" style="width: 50px">
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label for="high-float-num">High Float Total Float >= 
+                                                    <input type="number" name="high-float-num" id="high-float-num" step="1" value="50" style="width: 50px">
+                                                </label>
+                                            </td>
+                                            <!-- <td>
+                                                <label for="near-critical-num">Near Critical Total Float <= 
+                                                    <input type="number" name="near-critical-num" id="near-critical-num" step="1" value="10" style="width: 50px">
+                                                </label>
+                                            </td>
+                                            <td>
+                                                <label for="high-float-num">High Float Total Float >= 
+                                                    <input type="number" name="high-float-num" id="high-float-num" step="1" value="50" style="width: 50px">
+                                                </label>
+                                            </td> -->
+                                        </tr>
+                                    </tbody>
+                                </table>
                             </div>
                             <div class="width-100 margin-top-20px margin-hor">
                                 <button id="analyze-btn" disabled=true>Analyze</button>
@@ -184,55 +239,55 @@
                             </div>
                             <div class="card">
                                 <table>
-                                    <caption>Activity Float</caption>
+                                    <caption>Activity Total Float</caption>
                                     <tbody>
                                         <tr>
                                             <th class="text-left btm-border col-6-5em">Activity Float</th>
-                                            <th class="text-right btm-border" colspan="2">Current</th>
+                                            <th class="text-right btm-border">Current</th>
                                             <!-- <th class="text-right btm-border col-3em">%</th> -->
-                                            <th class="text-right btm-border" colspan="2">Previous</th>
+                                            <th class="text-right btm-border">Previous</th>
                                             <th class="text-right btm-border col-3em ">Diff</th>
                                             <th class="text-center btm-border">Float Chart</th>
                                         </tr>
                                         <tr>
-                                            <td class="no-wrap chart-red">Critical:</td>
-                                            <td id="current-critical" class="text-right no-wrap col-5em"></td>
+                                            <td class="no-wrap chart-red">Critical (TF < 1):</td>
+                                            <!-- <td id="current-critical" class="text-right no-wrap col-5em"></td> -->
                                             <td id="current-critical-per" class="text-right no-wrap"></td>
-                                            <td id="previous-critical" class="text-right no-wrap col-5em"></td>
+                                            <!-- <td id="previous-critical" class="text-right no-wrap col-5em"></td> -->
                                             <td id="previous-critical-per" class="text-right no-wrap "></td>
                                             <td id="critical-var" class="text-right no-wrap "></td>
                                             <td class="horiz-chart no-wrap" rowspan="5"><canvas id="totalFloatChart"></canvas></td>
 
                                         </tr>
                                         <tr>
-                                            <td class="no-wrap chart-yellow">Near Critical:</td>
-                                            <td id="current-near-critical" class="text-right no-wrap"></td>
+                                            <td class="no-wrap chart-yellow">Near Critical (TF < 21):</td>
+                                            <!-- <td id="current-near-critical" class="text-right no-wrap"></td> -->
                                             <td id="current-near-critical-per" class="text-right no-wrap"></td>
-                                            <td id="previous-near-critical" class="text-right no-wrap "></td>
+                                            <!-- <td id="previous-near-critical" class="text-right no-wrap "></td> -->
                                             <td id="previous-near-critical-per" class="text-right no-wrap "></td>
                                             <td id="near-critical-var" class="text-right no-wrap "></td>
                                         </tr>
                                         <tr>
                                             <td class="no-wrap chart-green">Normal Float:</td>
-                                            <td id="current-normal-tf" class="text-right no-wrap"></td>
+                                            <!-- <td id="current-normal-tf" class="text-right no-wrap"></td> -->
                                             <td id="current-normal-tf-per" class="text-right no-wrap"></td>
-                                            <td id="previous-normal-tf" class="text-right no-wrap "></td>
+                                            <!-- <td id="previous-normal-tf" class="text-right no-wrap "></td> -->
                                             <td id="previous-normal-tf-per" class="text-right no-wrap "></td>
                                             <td id="normal-tf-var" class="text-right no-wrap "></td>
                                         </tr>
                                         <tr>
-                                            <td class="no-wrap chart-blue">High Float:</td>
-                                            <td id="current-high-tf" class="text-right no-wrap"></td>
+                                            <td class="no-wrap chart-blue">High Float (TF > 49):</td>
+                                            <!-- <td id="current-high-tf" class="text-right no-wrap"></td> -->
                                             <td id="current-high-tf-per" class="text-right no-wrap"></td>
-                                            <td id="previous-high-tf" class="text-right no-wrap "></td>
+                                            <!-- <td id="previous-high-tf" class="text-right no-wrap "></td> -->
                                             <td id="previous-high-tf-per" class="text-right no-wrap "></td>
                                             <td id="high-tf-var" class="text-right no-wrap "></td>
                                         </tr>
                                         <tr>
                                             <td class="no-wrap">Longest Path:</td>
-                                            <td id="current-longest-path" class="text-right no-wrap"></td>
+                                            <!-- <td id="current-longest-path" class="text-right no-wrap"></td> -->
                                             <td id="current-longest-path-per" class="text-right no-wrap"></td>
-                                            <td id="previous-longest-path" class="text-right no-wrap "></td>
+                                            <!-- <td id="previous-longest-path" class="text-right no-wrap "></td> -->
                                             <td id="previous-longest-path-per" class="text-right no-wrap "></td>
                                             <td id="longest-path-var" class="text-right no-wrap "></td>
                                         </tr>
@@ -449,10 +504,11 @@
                                         </tr>
                                         <tr>
                                             <td colspan="8">
-                                                <img src="./static/img/complete.png" width="20px" height="10px" alt="open task"><span>: Actual Work</span>
-                                                <img src="./static/img/open.png" width="20px" height="10px" alt="open task"><span>: Remaining Work</span>
-                                                <img src="./static/img/open-lp.png" width="20px" height="10px" alt="open task"><span>: Longest Path</span>
-                                                <img src="./static/img/ms-open.png" width="20px" height="10px" alt="open task"><span>: Milestone</span>
+                                                <img src="./static/img/complete.png" width="20px" height="10px" alt="Actual Work"><span>: Actual Work</span>
+                                                <img src="./static/img/open.png" width="20px" height="10px" alt="Remaining Work"><span>: Remaining Work</span>
+                                                <img src="./static/img/open-lp.png" width="20px" height="10px" alt="Longest Path"><span>: Longest Path</span>
+                                                <img src="./static/img/ms-open.png" width="20px" height="10px" alt="Milestone"><span>: Milestone</span>
+                                                <img src="./static/img/deleted.png" width="20px" height="10px" alt="Deleted Task"><span>: Deleted</span>
                                             </td>
                                         </tr>
                                     </tbody>

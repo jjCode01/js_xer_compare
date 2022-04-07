@@ -125,7 +125,7 @@ const analyzeProject = proj => {
 
     proj.milestones = tasks.filter(task => task.isMilestone)
 
-    proj.longestPath = tasks.filter(task => task.longestPath)
+    proj.longestPath = tasks.filter(task => task.longestPath && !task.completed)
     proj.critical = tasks.filter(task => task.totalFloat <= FLOAT.critical)
     proj.nearCritical = tasks.filter(task => task.totalFloat > FLOAT.critical && task.totalFloat <= FLOAT.nearCritical)
     proj.normalFloat = tasks.filter(task => task.totalFloat > FLOAT.nearCritical && task.totalFloat < FLOAT.high)
@@ -181,15 +181,16 @@ function updateProjCard(name, value){
     updateElText(`${name}-schedule-per`, formatPercent(proj.schedPercentComp))
     updateElText(`${name}-physical-per`, formatPercent(proj.physPercentComp))
     updateElText(`${name}-cost-per`, formatPercent(proj.actualCost / proj.budgetCost))
-    updateElText(`${name}-critical`, proj.critical.length.toLocaleString() + ":")
+    //updateElText(`${name}-critical`, proj.critical.length.toLocaleString() + ":")
     updateElText(`${name}-critical-per`, formatPercent(proj.critical.length / proj.open.length))
     updateElText(`${name}-near-critical-per`, formatPercent(proj.nearCritical.length / proj.open.length))
     updateElText(`${name}-normal-tf-per`, formatPercent(proj.normalFloat.length / proj.open.length))
     updateElText(`${name}-high-tf-per`, formatPercent(proj.highFloat.length / proj.open.length))
+    updateElText(`${name}-longest-path-per`, formatPercent(proj.longestPath.length / proj.open.length))
 
-    updateElText(`${name}-near-critical`, proj.nearCritical.length.toLocaleString() + ":")
-    updateElText(`${name}-normal-tf`, proj.normalFloat.length.toLocaleString() + ":")
-    updateElText(`${name}-high-tf`, proj.highFloat.length.toLocaleString() + ":")
+    //updateElText(`${name}-near-critical`, proj.nearCritical.length.toLocaleString() + ":")
+    //updateElText(`${name}-normal-tf`, proj.normalFloat.length.toLocaleString() + ":")
+    //updateElText(`${name}-high-tf`, proj.highFloat.length.toLocaleString() + ":")
 
     function updateElements(obj) {
 	const revSec = document.getElementById('revisions-sec')
@@ -579,6 +580,7 @@ function updateProjCard(name, value){
         updateElText('near-critical-var', formatPercent(getFloatPercentVar('nearCritical'), 'always'))
         updateElText('normal-tf-var', formatPercent(getFloatPercentVar('normalFloat'), 'always'))
         updateElText('high-tf-var', formatPercent(getFloatPercentVar('highFloat'), 'always'))
+        updateElText('longest-path-var', formatPercent(getFloatPercentVar('longestPath'), 'always'))
         
         if (projects.current.budgetCost && projects.previous.budgetCost) {
             const currCostPer = projects.current.actualCost / projects.current.budgetCost

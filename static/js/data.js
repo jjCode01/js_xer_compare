@@ -1,9 +1,13 @@
 const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
 const statusImg = task => {
+    let img = new Image(20, 10);
+    if (!task) {
+	img.src = "./static/img/deleted.png";
+        return img;
+    }
     let postFix = (task.longestPath && !task.completed) ? '-lp.png' : '.png';
     let preFix = task.isMilestone ? 'ms-' : '';
     let imgName = task.notStarted ? `${preFix}open${postFix}` : (task.inProgress ? `${preFix}active${postFix}` : `${preFix}complete${postFix}`);
-    let img = new Image(20, 10);
     img.src = "./static/img/" + imgName;
     return img;
 }
@@ -310,8 +314,8 @@ let logicChanges = {
         data: [],
         getRows: function() {
             return this.data.map(task => [
-                task.predTask.task_code, statusImg(task.predTask), task.predTask.task_name, 
-                task.succTask.task_code, statusImg(task.succTask), task.succTask.task_name, task.link, task.lag 
+                task.predTask.task_code, statusImg(getTask(task.predTask, projects.current)), task.predTask.task_name, 
+                task.succTask.task_code, statusImg(getTask(task.succTask, projects.current)), task.succTask.task_name, task.link, task.lag 
             ])
         }
     },
