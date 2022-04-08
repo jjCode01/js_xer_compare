@@ -198,7 +198,7 @@ function updateProjCard(name, value){
         Object.values(obj).forEach(update => {
             updateElText(update.id, (update.data.length).toLocaleString())
             if (update.data.length) {
-                const table = createTable(update.title, update.align, update.columns, update.getRows(), update.wrap, update.footer ?? "");
+                const table = createTable(update.title, update.columns, update.getRows(), update.footer ?? "");
                 revSec.append(table)
             }
         })
@@ -206,7 +206,27 @@ function updateProjCard(name, value){
 
     const changeCount = obj => Object.values(obj).reduce((total, change) => total += change.data.length, 0)
 
-    function createTable(title, align, labels, vals, wrap, foot=""){
+    function createTable(title, labels, vals, foot=""){
+
+        const getAlign = name => {
+            const center = ['Assignments', 'Date', 'Dur', 'Finish', 'Float', 'Hrs', 'Lag', 'Link', 'Start']
+            const right = ['Cost', 'Qty', 'Var', 'Variance']
+
+            if (center.some(n => name.endsWith(n))) return 'center'
+            if (right.some(n => name.endsWith(n))) return 'right'
+
+            return 'left'
+        }
+
+        const getWrap = name => {
+            const normal = ['Name', 'Cal', 'WBS', 'Type', 'Resource', 'Constraint']
+            if (normal.some(n => name.endsWith(n))) return 'normal'
+            return 'nowrap'
+        }
+
+	const align = labels.map(getAlign)
+        const wrap = labels.map(getWrap)
+
         let div = document.createElement("div")
         div.style.width = '100%';
         div.classList.add("card")
@@ -442,7 +462,7 @@ function updateProjCard(name, value){
         }
         constraintVariance.data = currTasks.filter(task => task.primeConstraint === "Finish on or Before")
         if (constraintVariance.data.length) {
-            const table = createTable(constraintVariance.title, constraintVariance.align, constraintVariance.columns, constraintVariance.getRows(), constraintVariance.wrap);
+            const table = createTable(constraintVariance.title, constraintVariance.columns, constraintVariance.getRows());
             document.getElementById('constraint-variance').append(table)
         }
 
@@ -563,7 +583,7 @@ function updateProjCard(name, value){
         })
         updateElements(constraintChanges)
 
-        updateElText('start-var', formatAbsNum(dateVariance(projects.current.plan_start_date, projects.previous.plan_start_date)))
+        updateElText('start-var', formatAbsNum(dateVariance(projects.current.start, projects.previous.start)))
         updateElText('dd-var', formatAbsNum(dateVariance(projects.current.last_recalc_date, projects.previous.last_recalc_date)))
         updateElText('end-var', formatVariance(dateVariance(projects.previous.scd_end_date, projects.current.scd_end_date)))
         updateElText('mfb-var', formatVariance(dateVariance(projects.current.plan_end_date, projects.previous.plan_end_date)))

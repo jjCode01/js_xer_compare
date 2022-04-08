@@ -12,108 +12,93 @@ const statusImg = task => {
     return img;
 }
 
+function Change(id, title, columns, getRowFunc, footer="") {
+    this.id = id
+    this.title = title
+    this.columns = columns
+    this.data = []
+    this.getRows = getRowFunc
+    this.footer = footer
+}
+
 let updates = {
-    started: {
-        id: "ud-started",
-        title: 'Activities Started',
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
-        data: [],
-        getRows: function() {
+    started: new Change(
+        "ud-started", 'Activities Started',
+        ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, 
                 formatDate(task.start), formatDate(task.finish)
             ])
         }
-    },
-    finished: {
-        id: "ud-finished",
-        title: "Activities Finished",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
-        data: [],
-        getRows: function() {
+    ),
+    finished: new Change(
+        "ud-finished", "Activities Finished",
+        ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.start), 
                 formatDate(task.finish)
             ])
         }
-    },
-    startFinish: {
-        id: "ud-startFinish",
-        title: "Activities Started and Finished",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
-        data: [],
-        getRows: function() {
+    ),
+    startFinish: new Change(
+        "ud-startFinish", "Activities Started and Finished",
+        ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.start), 
                 formatDate(task.finish)
             ])
         }
-    },
-    percent: {
-        id: "ud-percent",
-        title: "Updated Percent Completes",
-        align: ['left', 'left', 'left', 'left', 'center', 'center', 'center'],
-        columns: ['Act ID', 'Act Name', 'Status', 'Percent\r\nType', '% Comp', 'Prev\r\n% Comp', 'Var'],
-        data: [],
-        getRows: function() {
+    ),
+    percent: new Change(
+        "ud-percent", "Updated Percent Completes",
+        ['Act ID', 'Act Name', 'Status', 'Percent\r\nType', '% Comp', 'Prev\r\n% Comp', 'Var'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, task.percentType, 
                 formatPercent(task.percent), formatPercent(getTask(task, projects.previous).percent), 
                 formatPercent(task.percent - getTask(task, projects.previous).percent, 'always')
             ])
         }
-    },
-    duration: {
-        id: "ud-duration",
-        title: "Updated Remaining Durations",
-        align: ['left', 'left', 'left', 'center', 'center', 'center', 'center'],
-        columns: [
+    ),
+    duration: new Change(
+        "ud-duration", "Updated Remaining Durations",
+        [
             'Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 
             'Rem\r\nDur', 'Prev\r\nRem\r\nDur', 'Var'
         ],
-        data: [],
-        getRows: function() {
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatNumber(task.origDur), 
                 formatNumber(task.remDur), formatNumber(getTask(task, projects.previous).remDur), 
                 formatVariance(task.remDur - getTask(task, projects.previous).remDur)
             ])
         }
-    },
-    cost: {
-        id: "ud-cost",
-        title: "Updated Actual Cost",
-        align: ['left', 'left', 'left', 'right', 'right', 'right', 'right'],
-        columns: [
+    ),
+    cost: new Change(
+        "ud-cost", "Updated Actual Cost",
+        [
             'Act ID', 'Act Name', 'Status', 'Budgeted\r\nCost', 
             'Actual\r\nCost', 'Prev\r\nActual\r\nCost', 'Var'
         ],
-        data: [],
-        getRows: function() {
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatCost(budgetedCost(task)), 
                 formatCost(actualCost(task)), formatCost(actualCost(getTask(task, projects.previous))), 
                 formatCost(actualCost(task) - actualCost(getTask(task, projects.previous)))
             ])
         }
-    },
-    regress: {
-        id: "ud-regress",
-        title: "Regressive Updates",
-        align: [
-            'left', 'left', 'left', 'left', 'center', 'center', 
-            'center', 'center', 'center', 'center', 'center'
-        ],
-        columns: [
+    ),
+    regress: new Change(
+        "ud-regress", "Regressive Updates",
+        [
             'Act ID', 'Act Name', 'Status', 'Prev\r\nStatus', 'Orig\r\nDur', 
             'Rem\r\nDur', 'Prev\r\nRem\r\nDur', 'RD\r\nVar', '%\r\nComp', 
             'Prev\r\n%\r\nComp', '%\r\nVar'
         ],
-        data: [],
-        getRows: function() {
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, 
                 getTask(task, projects.previous).status, task.origDur, 
@@ -123,207 +108,149 @@ let updates = {
                 formatPercent(task.percent - getTask(task, projects.previous).percent, 'always')
             ])
         }
-    }
+    )
 }
 
 let taskChanges = {
-    added: {
-        id: "tk-added",
-        title: "Added Activities",
-        align: ['left', 'left', 'left', 'center', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Act Name', 'Orig Dur', 
-            'Start', 'Finish'
-        ],
-        data: [],
-        getRows: function() {
-            return this.data.map(task => [
-                    task.task_code, statusImg(task), task.task_name, task.origDur, 
-                    formatDate(task.start, false), formatDate(task.finish, false)
-            ])
-        }
-    },
-    deleted: {
-        id: "tk-deleted",
-        title: "Deleted Activities",
-        align: ['left', 'left', 'left', 'center', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Act Name', 'Orig Dur', 
-            'Start', 'Finish'
-        ],
-        data: [],
-        getRows: function() {
+    added: new Change(
+        "tk-added", "Added Activities",
+        ['Act ID', '', 'Act Name', 'Orig Dur', 'Start', 'Finish'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, task.origDur, 
                 formatDate(task.start, false), formatDate(task.finish, false)
             ])
         }
-    },
-    name: {
-        id: "tk-name",
-        title: "Revised Activity Names",
-        align: ['left', 'left', 'left', 'left'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal'],
-        columns: ['Act ID', '', 'Act Name', 'Prev Name'],
-        data: [],
-        getRows: function() {
+    ),
+    deleted: new Change(
+        "tk-deleted", "Deleted Activities",
+        ['Act ID', '', 'Act Name', 'Orig Dur', 'Start', 'Finish'],
+        function() {
+            return this.data.map(task => [
+                task.task_code, statusImg(task), task.task_name, task.origDur, 
+                formatDate(task.start, false), formatDate(task.finish, false)
+            ])
+        }
+    ),
+    name: new Change(
+        "tk-name", "Revised Activity Names",
+        ['Act ID', '', 'Act Name', 'Prev Name'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, getTask(task, projects.previous).task_name
             ])
         }
-    },
-    duration: {
-        id: "tk-duration",
-        title: "Revised Durations",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: ['Act ID', '', 'Act Name', 'New Dur', 'Old Dur', 'Var'],
-        data: [],
-	footer: '* Change to Remaining Duration',
-        getRows: function() {
+    ),
+    duration: new Change(
+        "tk-duration", "Revised Durations",
+        ['Act ID', '', 'Act Name', 'New Dur', 'Old Dur', 'Var'],
+        function() {
             return this.data.map(task => {
 		let prevTask = getTask(task, projects.previous)
 		let currDur = task.origDur
 		let prevDur = prevTask.origDur
 		let remDurChange = false
 		if (task.notStarted && task.origDur !== task.remDur) {
-			currDur = task.remDur
-			prevDur = prevTask.remDur
-			remDurChange = true
+		    currDur = task.remDur
+		    prevDur = prevTask.remDur
+		    remDurChange = true
 		}
 		return [
-                	task.task_code,
-			statusImg(task),
-			task.task_name,
-			`${formatNumber(currDur)}${remDurChange ? '*' : ""}`, 
-                	formatNumber(prevDur), 
-                	formatVariance(currDur - prevDur)
+                    task.task_code,
+		    statusImg(task),
+		    task.task_name,
+		    `${formatNumber(currDur)}${remDurChange ? '*' : ""}`, 
+                    formatNumber(prevDur), 
+                    formatVariance(currDur - prevDur)
             	]
 	    })
-        }
-    },
-    calendar: {
-        id: "tk-calendar",
-        title: "Revised Activity Calendars",
-        align: ['left', 'left', 'left', 'left', 'left'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'normal'],
-        columns: ['Act ID', '', 'Act Name', 'New Cal', 'Old Cal'],
-        data: [],
-        getRows: function() {
+        },
+        '* Change to Remaining Duration'
+    ),
+    calendar: new Change(
+        "tk-calendar", "Revised Activity Calendars",
+        ['Act ID', '', 'Act Name', 'New Cal', 'Old Cal'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, task.calendar.clndr_name, 
                 getTask(task, projects.previous).calendar.clndr_name 
             ])
         }
-    },
-    start: {
-        id: "tk-start",
-        title: "Revised Actual Starts",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Act Name', 'New Start', 
-            'Old Start', 'Var'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    start: new Change(
+        "tk-start", "Revised Actual Starts",
+        ['Act ID', '', 'Act Name', 'New Start', 'Old Start', 'Var'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, formatDate(task.start, false), 
                 formatDate(getTask(task, projects.previous).start, false), 
                 formatVariance(dateVariance(task.start, getTask(task, projects.previous).start))
             ])
         }
-    },
-    finish: {
-        id: "tk-finish",
-        title: "Revised Actual Finishes",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Act Name', 'New Finish', 
-            'Old Finish', 'Var'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    finish: new Change(
+        "tk-finish", "Revised Actual Finishes",
+        ['Act ID', '', 'Act Name', 'New Finish', 'Old Finish', 'Var'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, formatDate(task.finish, false), 
                 formatDate(getTask(task, projects.previous).finish, false), 
                 formatVariance(dateVariance(task.finish, getTask(task, projects.previous).finish))
             ])
         }
-    },
-    wbs: {
-        id: "tk-wbs",
-        title: "Revised WBS Assignment",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'normal'],
-        columns: ['Act ID', '', 'Act Name', 'New WBS', 'Old WBS'],
-        data: [],
-        getRows: function() {
+    ),
+    wbs: new Change(
+        "tk-wbs", "Revised WBS Assignment",
+        ['Act ID', '', 'Act Name', 'New WBS', 'Old WBS'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, task.wbs.wbsID, 
                 getTask(task, projects.previous).wbs.wbsID
             ])
         }
-    },
-    type: {
-        id: "tk-type",
-        title: "Revised Activity Type",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'normal'],
-        columns: ['Act ID', '', 'Act Name', 'New Type', 'Old Type'],
-        data: [],
-        getRows: function() {
+    ),
+    type: new Change(
+        "tk-type", "Revised Activity Type",
+        ['Act ID', '', 'Act Name', 'New Type', 'Old Type'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, task.taskType, 
                 getTask(task, projects.previous).taskType
             ])
         }
-    },
+    ),
 }
 
 let logicChanges = {
-    added: {
-        id: "rl-added",
-        title: "Added Relationships",
-        align: ['left', 'left', 'left', 'left', 'left', 'left', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap'],
-        columns: [
+    added: new Change(
+        "rl-added", "Added Relationships",
+        [
             'Pred ID', '', 'Predecessor Name', 
             'Succ ID', '', 'Successor Name', 'Link', 'Lag'
         ],
-        data: [],
-        getRows: function() {
+        function() {
             return this.data.map(task => [
                 task.predTask.task_code, statusImg(task.predTask), task.predTask.task_name, 
                 task.succTask.task_code, statusImg(task.succTask), task.succTask.task_name, task.link, task.lag 
             ])
         }
-    },
-    deleted: {
-        id: "rl-deleted",
-        title: "Deleted Relationships",
-        align: ['left', 'left', 'left', 'left', 'left', 'left', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap'],
-        columns: [
+    ),
+    deleted: new Change(
+        "rl-deleted", "Deleted Relationships",
+        [
             'Pred ID', '', 'Predecessor Name', 
             'Succ ID', '', 'Successor Name', 'Link', 'Lag'
         ],
-        data: [],
-        getRows: function() {
+        function() {
             return this.data.map(task => [
                 task.predTask.task_code, statusImg(getTask(task.predTask, projects.current)), task.predTask.task_name, 
                 task.succTask.task_code, statusImg(getTask(task.succTask, projects.current)), task.succTask.task_name, task.link, task.lag 
             ])
         }
-    },
+    ),
     revised: {
-        id: "rl-revised",
+        id: "rl-revised", 
         title: "Revised Relationships",
-        align: ['left', 'left', 'left', 'left', 'left', 'left', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap'],
         columns: [
             'Pred ID', '', 'Predecessor Name', 
             'Succ ID', '', 'Successor Name', 'New\r\nLink:Lag', 'Old\r\nLink:Lag'
@@ -343,51 +270,30 @@ let logicChanges = {
 }
 
 let resourceChanges = {
-    added: {
-        id: "rs-added",
-        title: "Added Resources",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name',
-            'Resource', 'Qty', 'Cost'
-        ],
-        data: [],
-        getRows: function() {
+    added: new Change(
+        "rs-added", "Added Resources",
+        ['Act ID', '', 'Activity Name', 'Resource', 'Qty', 'Cost'],
+        function() {
             return this.data.map(task => [
                 task.task.task_code, statusImg(task.task), task.task.task_name,
                 task.rsrcName, formatNumber(task.target_qty), formatCost(task.target_cost)
             ])
         }
-    },
-    deleted: {
-        id: "rs-deleted",
-        title: "Deleted Resources",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name',
-            'Resource', 'Qty', 'Cost'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    deleted: new Change(
+        "rs-deleted", "Deleted Resources",
+        ['Act ID', '', 'Activity Name', 'Resource', 'Qty', 'Cost'],
+        function() {
             return this.data.map(task => [
                 task.task.task_code, statusImg(task.task), task.task.task_name,
                 task.rsrcName, formatNumber(task.target_qty), formatCost(task.target_cost)
             ])
         }
-    },
-    revisedCost: {
-        id: "rs-cost",
-        title: "Revised Resource Budgeted Cost",
-        align: ['left', 'left', 'left', 'left', 'right', 'right', 'right'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name',
-            'Resource', 'New Cost', 'Old Cost', 'Var'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    revisedCost: new Change(
+        "rs-cost", "Revised Resource Budgeted Cost",
+         ['Act ID', '', 'Activity Name', 'Resource', 'New Cost', 'Old Cost', 'Var'],
+        function() {
             return this.data.map(res => {
                 const prevCost = getPrevRes(res).target_cost;
                 return [
@@ -397,18 +303,11 @@ let resourceChanges = {
                 ]
             })
         }
-    },
-    revisedUnits: {
-        id: "rs-units",
-        title: "Revised Resource Budgeted Quantity",
-        align: ['left', 'left', 'left', 'left', 'right', 'right', 'right'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name', 'Resource', 'New Qty', 
-            'Old Qty', 'Var'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    revisedUnits: new Change(
+        "rs-units", "Revised Resource Budgeted Quantity",
+        ['Act ID', '', 'Activity Name', 'Resource', 'New Qty', 'Old Qty', 'Var'],
+        function() {
             return this.data.map(res => {
                 const prevQty = getPrevRes(res).target_qty;
                 return [
@@ -418,62 +317,42 @@ let resourceChanges = {
                 ]
             })
         }
-    },
+    ),
 }
 
 let calendarChanges = {
-    added: {
-        id: "cal-added",
-        title: "Added Calendar",
-        align: ['left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Calendar Name', 'Type', 'Assignments', 'Sun Hrs', 'Mon Hrs', 'Tue Hrs', 'Wed Hrs', 'Thu Hrs', 'Fri Hrs', 'Sat Hrs'
-        ],
-        data: [],
-        getRows: function() {
+    added: new Change(
+        "cal-added", "Added Calendar",
+        ['Calendar Name', 'Type', 'Assignments', 'Sun Hrs', 'Mon Hrs', 'Tue Hrs', 'Wed Hrs', 'Thu Hrs', 'Fri Hrs', 'Sat Hrs'],
+        function() {
             return this.data.map(cal => [
                 cal.clndr_name, cal.type, cal.assignments, cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, cal.week[4].hours, cal.week[5].hours, cal.week[6].hours 
             ])
         }
-    },
-    deleted: {
-        id: "cal-deleted",
-        title: "Deleted Calendar",
-        align: ['left', 'left', 'center', 'center', 'center', 'center', 'center', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Calendar Name', 'Type', 'Assignments', 'Sun Hrs', 'Mon Hrs', 'Tue Hrs', 'Wed Hrs', 'Thu Hrs', 'Fri Hrs', 'Sat Hrs'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    deleted: new Change(
+        "cal-deleted", "Deleted Calendar",
+        ['Calendar Name', 'Type', 'Assignments', 'Sun Hrs', 'Mon Hrs', 'Tue Hrs', 'Wed Hrs', 'Thu Hrs', 'Fri Hrs', 'Sat Hrs'],
+        function() {
             return this.data.map(cal => [
                 cal.clndr_name, cal.type, , cal.week[0].hours, cal.week[1].hours, cal.week[2].hours, cal.week[3].hours, cal.week[4].hours, cal.week[5].hours, cal.week[6].hours 
             ])
         }
-    },
-//    addedException: {
-//        id: "cal-added-exception",
-//        title: "Added Calendar Exceptions",
-//        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-//        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-//        columns: [
-//            'Calendar', 'Type', 'Exception Date', 'Exception Hrs', 'Normal Hrs', 'Variance'
-//        ],
-//        data: [],
-//        getRows: function() {
+    ),
+//    addedException: new Change(
+//        "cal-added-exception", "Added Calendar Exceptions",
+//        ['Calendar', 'Type', 'Exception Date', 'Exception Hrs', 'Normal Hrs', 'Variance'],
+//        function() {
 //            return this.data.map(cal => {
 //                return [
 //                    cal.clndr_name, cal.type, '', '', '', ''
 //                ]
 //            })
 //        }
-//    },
+//    ),
 //    deletedException: {
 //        id: "cal-deleted-exception",
 //        title: "Deleted Calendar Exceptions",
-//        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-//        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap', 'nowrap', 'nowrap'],
 //        columns: [
 //            'Calendar', 'Type', 'Exception Date', 'Exception Hrs', 'Normal Hrs', 'Variance'
 //        ],
@@ -489,89 +368,53 @@ let calendarChanges = {
 }
 
 let constraintChanges = {
-    addedPrim: {
-        id: "cs-added-prim",
-        title: "Added Primary Constraints",
-        align: ['left', 'left', 'left', 'left', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name', 
-            'Constraint', 'Date'
-        ],
-        data: [],
-        getRows: function() {
+    addedPrim: new Change(
+        "cs-added-prim", "Added Primary Constraints",
+        ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name,
                 task.primeConstraint, formatDate(task.cstr_date)
             ])
         }
-    },
-    addedSec: {
-        id: "cs-added-sec",
-        title: "Added Secondary Constraints",
-        align: ['left', 'left', 'left', 'left', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name',
-            'Constraint', 'Date'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    addedSec: new Change(
+        "cs-added-sec", "Added Secondary Constraints",
+        ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name,
                 task.secondConstraint, formatDate(task.cstr_date2)
             ])
         }
-    },
-    deletedPrim: {
-        id: "cs-deleted-prim",
-        title: "Deleted Primary Constraints",
-        align: ['left', 'left', 'left', 'left', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name',
-            'Constraint', 'Date'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    deletedPrim: new Change(
+        "cs-deleted-prim", "Deleted Primary Constraints",
+        ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name,
                 task.primeConstraint, formatDate(task.cstr_date)
             ])
         }
-    },
-    deletedSec: {
-        id: "cs-deleted-sec",
-        title: "Deleted Secondary Constraints",
-        align: ['left', 'left', 'left', 'left', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name',
-            'Constraint', 'Date'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    deletedSec: new Change(
+        "cs-deleted-sec", "Deleted Secondary Constraints",
+        ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
+        function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name,
                 task.secondConstraint, formatDate(task.cstr_date2)
             ])
         }
-    },
-    revisedPrim: {
-        id: "cs-revised-prim",
-        title: "Revised Primary Constraint Dates",
-        align: ['left', 'left', 'left', 'left', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name', 'Constraint', 
-            'New Date', 'Old Date', 'Var'],
-        data: [],
-        getRows: function() {
+    ),
+    revisedPrim: new Change(
+        "cs-revised-prim", "Revised Primary Constraint Dates",
+        ['Act ID', '', 'Activity Name', 'Constraint', 'New Date', 'Old Date', 'Var'],
+        function() {
             return this.data.map(task => {
                 const prevDate = getTask(task, projects.previous).cstr_date
-                const variance = (
-                    (task.cstr_date && prevDate) ? dateVariance(task.cstr_date, prevDate) : "N/A"
-                )
+                const variance = dateVariance(task.cstr_date, prevDate) ?? "N/A"
                 return [
                     task.task_code, statusImg(task), task.task_name, task.primeConstraint, 
                     formatDate(task.cstr_date), formatDate(getTask(task, projects.previous).cstr_date), 
@@ -579,22 +422,14 @@ let constraintChanges = {
                 ]
             })
         }
-    },
-    revisedSec: {
-        id: "cs-revised-sec",
-        title: "Revised Secondary Constraint Dates",
-        align: ['left', 'left', 'left', 'left', 'center', 'center', 'center'],
-        wrap: ['nowrap', 'nowrap', 'normal', 'normal', 'nowrap', 'nowrap', 'nowrap'],
-        columns: [
-            'Act ID', '', 'Activity Name', 'Constraint', 
-            'New Date', 'Old Date', 'Var'],
-        data: [],
-        getRows: function() {
+    ),
+    revisedSec: new Change(
+        "cs-revised-sec", "Revised Secondary Constraint Dates",
+        ['Act ID', '', 'Activity Name', 'Constraint', 'New Date', 'Old Date', 'Var'],
+        function() {
             return this.data.map(task => {
                 const prevDate = getTask(task, projects.previous).cstr_date2
-                const variance = (
-                    (task.cstr_date2 && prevDate) ? dateVariance(task.cstr_date2, prevDate) : "N/A"
-                )
+                const variance = dateVariance(task.cstr_date2, prevDate) ?? "N/A"
                 return [
                     task.task_code, statusImg(task), task.task_name, task.secondConstraint, 
                     formatDate(task.cstr_date2), formatDate(getTask(task, projects.previous).cstr_date2), 
@@ -602,228 +437,153 @@ let constraintChanges = {
                 ]
             })
         }
-    },
+    ),
 }
 
 let openEnds = {
-    predecessor: {
-        id: "open-pred",
-        title: "Activities With No Predecessor",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Type'],
-        data: [],
-        getRows: function() {
+    predecessor: new Change(
+        "open-pred", "Activities With No Predecessor",
+        ['Act ID', 'Activity Name', 'Status', 'Type'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, task.taskType
             ])
         }
-    },
-    successor: {
-        id: "open-succ",
-        title: "Activities With No Successor",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Type'],
-        data: [],
-        getRows: function() {
+    ),
+    successor: new Change(
+        "open-succ", "Activities With No Successor",
+        ['Act ID', 'Activity Name', 'Status', 'Type'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, task.taskType
             ])
         }
-    },
-    start: {
-        id: "open-start",
-        title: "Activities With No Start (SS or FS) Predecessor",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Type'],
-        data: [],
-        getRows: function() {
+    ),
+    start: new Change(
+        "open-start", "Activities With No Start (SS or FS) Predecessor",
+        ['Act ID', 'Activity Name', 'Status', 'Type'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, task.taskType
             ])
         }
-    },
-    finish: {
-        id: "open-finish",
-        title: "Activities With No Finish (FS or FF) Successor",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Type'],
-        data: [],
-        getRows: function() {
+    ),
+    finish: new Change(
+        "open-finish", "Activities With No Finish (FS or FF) Successor",
+        ['Act ID', 'Activity Name', 'Status', 'Type'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, task.taskType
             ])
         }
-    },
-    duplicate: {
-        id: "open-duplicate",
-        title: "Duplicate Relationships",
-        align: ['left', 'left', 'left', 'left', 'center', 'center'],
-        columns: [
-            'Pred ID', 'Predecessor Name', 'Succ ID', 'Successor Name', 
-            "Link:Lag", "Duplicate\r\nLink:Lag"
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    duplicate: new Change(
+        "open-duplicate", "Duplicate Relationships",
+        ['Pred ID', 'Predecessor Name', 'Succ ID', 'Successor Name', "Link:Lag", "Duplicate\r\nLink:Lag"],
+        function() {
             return this.data.map(task => [
                 task[0].predTask.task_code, task[0].predTask.task_name, 
                 task[0].succTask.task_code, task[0].succTask.task_name,
                 `${task[0].link}:${task[0].lag}`, `${task[1].link}:${task[1].lag}`
             ])
         }
-    }
+    )
 }
 
 let dateWarnings = {
-    start: {
-        id: "inv-start",
-        title: "Activities With Actual Start on or After Data Date",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: [
-            'Act ID', 'Activity Name', 'Status', 'Actual\r\nStart', 'Data\r\nData'
-        ],
-        data: [],
-        getRows: function() {
+    start: new Change(
+        "inv-start", "Activities With Actual Start on or After Data Date",
+        ['Act ID', 'Activity Name', 'Status', 'Actual\r\nStart', 'Data\r\nData'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.start), 
                 formatDate(projects.current.last_recalc_date)
             ])
         }
-    },
-    finish: {
-        id: "inv-finish",
-        title: "Activities With Actual Finish on or After Data Date",
-        align: ['left', 'left', 'left', 'center', 'center'],
-        columns: [
-            'Act ID', 'Activity Name', 'Status', 'Actual\r\nFinish', 'Data\r\nData'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    finish: new Change(
+        "inv-finish", "Activities With Actual Finish on or After Data Date",
+        ['Act ID', 'Activity Name', 'Status', 'Actual\r\nFinish', 'Data\r\nData'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.finish), 
                 formatDate(projects.current.last_recalc_date)
             ])
         }
-    },
-    expected: {
-        id: "inv-expected",
-        title: "Activities With an Expected Finish Date",
-        align: ['left', 'left', 'left', 'center', 'center', 'center'],
-        columns: [
-            'Act ID', 'Activity Name', 'Status', 'Expected\r\nFinish', 
-            'Orig\r\nDur', 'Rem\r\nDur'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    expected: new Change(
+        "inv-expected", "Activities With an Expected Finish Date",
+        ['Act ID', 'Activity Name', 'Status', 'Expected\r\nFinish', 'Orig\r\nDur', 'Rem\r\nDur'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.expect_end_date), 
                 formatNumber(task.origDur), formatNumber(task.remDur)
             ])
         }
-    },
-    suspend: {
-        id: "inv-suspend",
-        title: "Activities With Suspend / Resume Dates",
-        align: ['left', 'left', 'left', 'left', 'center', 'center'],
-        columns: ['Act ID', 'Activity Name', 'Status', 'Suspend', 'Resume'],
-        data: [],
-        getRows: function() {
+    ),
+    suspend: new Change(
+        "inv-suspend", "Activities With Suspend / Resume Dates",
+        ['Act ID', 'Activity Name', 'Status', 'Suspend', 'Resume'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.suspend_date), 
                 formatDate(task.resume_date)
             ])
         }
-    }
+    )
 }
 
 let durWarnings = {
-    long: {
-        id: "dur-long",
-        title: "Construction Activities With Original Durations Greater than 20 Days",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur'],
-        data: [],
-        getRows: function() {
+    long: new Change(
+        "dur-long", "Construction Activities With Original Durations Greater than 20 Days",
+        ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.taskType, task.status, 
                 task.calendar.clndr_name, task.origDur
             ])
         }
-    },
-    short: {
-        id: "dur-short",
-        title: "Activities With Original Durations Equal to 1 Day",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: [
-            'Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    zero: new Change(
+        "dur-zero", "Activities With Original Durations Equal to 0 Days",
+        ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.taskType, task.status, 
                 task.calendar.clndr_name, task.origDur
             ])
         }
-    },
-    zero: {
-        id: "dur-zero",
-        title: "Activities With Original Durations Equal to 0 Days",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: [
-            'Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur'
-        ],
-        data: [],
-        getRows: function() {
-            return this.data.map(task => [
-                task.task_code, task.task_name, task.taskType, task.status, 
-                task.calendar.clndr_name, task.origDur
-            ])
-        }
-    },
-    rdzero: {
-        id: "dur-rdzero",
-        title: "Incomplete Activities with Zero Remaining Duration",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: [
-            'Act ID', 'Activity Name', 'Act Type', 'Status', 
-            'Cal', 'Orig\r\nDur', 'Rem\r\nDur'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    rdzero: new Change(
+        "dur-rdzero", "Open Activities with Zero Remaining Duration",
+        ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur', 'Rem\r\nDur'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.taskType, task.status, 
                 task.calendar.clndr_name, task.origDur, task.remDur
             ])
         }
-    },
-    odrd: {
-        id: "dur-odrd",
-        title: "Open Activities With Unequal Original and Remaining Durations",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: [
-            'Act ID', 'Activity Name', 'Act Type', 'Status', 
-            'Cal', 'Orig\r\nDur', 'Rem\r\nDur'
-        ],
-        data: [],
-        getRows: function() {
+    ),
+    odrd: new Change(
+        "dur-odrd", "Open Activities With Unequal Original and Remaining Durations",
+        ['Act ID', 'Activity Name', 'Act Type', 'Status', 'Cal', 'Orig\r\nDur', 'Rem\r\nDur'],
+        function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.taskType, task.status, 
                 task.calendar.clndr_name, task.origDur, task.remDur
             ])
         }
-    }
+    )
 }
 
 let costWarnings = {
-    budget: {
-        id: "cost-budget",
-        title: "Budgeted Cost Differs from At Completion Cost",
-        align: ['left', 'left', 'left', 'left', 'right', 'right', 'right'],
-        columns: [
+    budget: new Change(
+        "cost-budget", "Budgeted Cost Differs from At Completion Cost",
+        [
             'Act ID', 'Activity Name', 'Status', 'Resource', 'Budgeted\r\nCost', 
             'At Completion\r\nCost', 'Variance'
         ],
-        data: [],
-        getRows: function() {
+        function() {
             return this.data.map(res => {
                 return [
                     res.task.task_code, res.task.task_name, res.task.status, 
@@ -832,16 +592,12 @@ let costWarnings = {
                 ]
             })
         }
-    },
-    earned: {
-        id: "cost-ev",
-        title: "Actual Cost to Date Differs from Earned Value",
-        align: ['left', 'left', 'left', 'left', 'center', 'right', 'right', 'right'],
-        columns: [
-            'Act ID', 'Activity Name', 'Status', 'Resource', '%\r\nComp', 
-            'Actual\r\nCost', 'Earned\r\nValue', 'Variance'],
-        data: [],
-        getRows: function() {
+    ),
+    earned: new Change(
+        "cost-ev", "Actual Cost to Date Differs from Earned Value",
+        ['Act ID', 'Activity Name', 'Status', 'Resource', '%\r\nComp', 
+         'Actual\r\nCost', 'Earned\r\nValue', 'Variance'],
+        function() {
             return this.data.map(res => {
                 return [
                     res.task.task_code, res.task.task_name, res.task.status, 
@@ -850,17 +606,14 @@ let costWarnings = {
                 ]
             })
         }
-    },
-    regress: {
-        id: "cost-regress",
-        title: "Regressive This Period Cost",
-        align: ['left', 'left', 'left', 'left', 'right', 'right'],
-        columns: [
+    ),
+    regress: new Change(
+        "cost-regress", "Regressive This Period Cost",
+        [
             'Act ID', 'Activity Name', 'Status', 
             'Resource', 'Budgeted\r\nCost', 'This Period\r\nCost'
         ],
-        data: [],
-        getRows: function() {
+        function() {
             return this.data.map(res => {
                 return [
                     res.task.task_code, res.task.task_name, res.task.status, 
@@ -868,14 +621,12 @@ let costWarnings = {
                 ]
             })
         }
-    }
+    )
 }
 
 let plannedProgress = {
     earlyStart: 0,
     lateStart: 0,
-    actualStart: 0,
     earlyFinish: 0,
     lateFinish: 0,
-    actualFinish: 0,
 }
