@@ -414,84 +414,100 @@
                                     <caption>Schedule Revisions Summary</caption>
                                     <tbody>
                                         <tr>
-                                            <td class="text-left">Added Activities:</td>
+                                            <td class="text-left" id="tk-added-label">Added Activities:</td>
                                             <td class="text-right" id="tk-added"></td>
                                             <td></td>
-                                            <td class="text-left">Added Relationships:</td>
+                                            <td></td>
+                                            <td class="text-left" id="rl-added-label">Added Relationships:</td>
                                             <td class="text-right" id="rl-added"></td>
                                             <td></td>
-                                            <td class="text-left">Added Resources:</td>
+                                            <td></td>
+                                            <td class="text-left" id="rs-added-label">Added Resources:</td>
                                             <td class="text-right" id="rs-added"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Deleted Activities:</td>
+                                            <td class="text-left" id="tk-deleted-label">Deleted Activities:</td>
                                             <td class="text-right" id="tk-deleted"></td>
                                             <td></td>
-                                            <td class="text-left">Deleted Relationships:</td>
+                                            <td></td>
+                                            <td class="text-left" id="rl-deleted-label">Deleted Relationships:</td>
                                             <td class="text-right" id="rl-deleted"></td>
                                             <td></td>
-                                            <td class="text-left">Deleted Resources:</td>
+                                            <td></td>
+                                            <td class="text-left" id="rs-deleted-label">Deleted Resources:</td>
                                             <td class="text-right" id="rs-deleted"></td>
                             
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Name Changes:</td>
+                                            <td class="text-left" id="tk-name-label">Name Changes:</td>
                                             <td class="text-right" id="tk-name"></td>
                                             <td></td>
-                                            <td class="text-left">Revised Relationships:</td>
+                                            <td></td>
+                                            <td class="text-left" id="rl-revised-label">Revised Relationships:</td>
                                             <td class="text-right" id="rl-revised"></td>
                                             <td></td>
-                                            <td class="text-left">Budgeted Cost Changes:</td>
+                                            <td></td>
+                                            <td class="text-left" id="rs-cost-label">Budgeted Cost Changes:</td>
                                             <td class="text-right" id="rs-cost"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Duration Changes:</td>
+                                            <td class="text-left" id="tk-duration-label">Duration Changes:</td>
                                             <td class="text-right" id="tk-duration"></td>
                                             <td></td>
-                                            <td class="text-left">Actual Start Changes:</td>
+                                            <td></td>
+                                            <td class="text-left" id="tk-start-label">Actual Start Changes:</td>
                                             <td class="text-right" id="tk-start"></td>
                                             <td></td>
-                                            <td class="text-left">Budgeted Qty Changes:</td>
+                                            <td></td>
+                                            <td class="text-left" id="rs-units-label">Budgeted Qty Changes:</td>
                                             <td class="text-right" id="rs-units"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Activity Type Changes:</td>
+                                            <td class="text-left" id="tk-type-label">Activity Type Changes:</td>
                                             <td class="text-right" id="tk-type"></td>                                          
                                             <td></td>
-                                            <td class="text-left">Actual Finish Changes:</td>
+                                            <td></td>
+                                            <td class="text-left" id="tk-finish-label">Actual Finish Changes:</td>
                                             <td class="text-right" id="tk-finish"></td>
                                             <td></td>
-                                            <td class="text-left">WBS Changes:</td>
+                                            <td></td>
+                                            <td class="text-left" id="tk-wbs-label">WBS Changes:</td>
                                             <td class="text-right" id="tk-wbs"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Added Prime Constraints:</td>
+                                            <td class="text-left" id="cs-added-prim-label">Added Prime Constraints:</td>
                                             <td class="text-right" id="cs-added-prim"></td>
                                             <td></td>
-                                            <td class="text-left">Deleted Prime Constraints:</td>
+                                            <td></td>
+                                            <td class="text-left" id="cs-deleted-prim-label">Deleted Prime Constraints:</td>
                                             <td class="text-right" id="cs-deleted-prim"></td>
                                             <td></td>
-                                            <td class="text-left">Revised Prime Constraints:</td>
+                                            <td></td>
+                                            <td class="text-left" id="cs-revised-prim-label">Revised Prime Constraints:</td>
                                             <td class="text-right" id="cs-revised-prim"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left">Added Second Constraints:</td>
+                                            <td class="text-left" id="cs-added-sec-label">Added Second Constraints:</td>
                                             <td class="text-right" id="cs-added-sec"></td>
                                             <td></td>
-                                            <td class="text-left">Deleted Second Constraints:</td>
+                                            <td></td>
+                                            <td class="text-left" id="cs-deleted-sec-label">Deleted Second Constraints:</td>
                                             <td class="text-right" id="cs-deleted-sec"></td>
                                             <td></td>
-                                            <td class="text-left">Revised Second Constraints:</td>
+                                            <td></td>
+                                            <td class="text-left" id="cs-revised-sec-label">Revised Second Constraints:</td>
                                             <td class="text-right" id="cs-revised-sec"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left btm-border">Added Calendars:</td>
+                                            <td class="text-left btm-border" id="cal-added-label"><span>Added Calendars:</span></td>
                                             <td class="text-right btm-border" id="cal-added"></td>
                                             <td class=" btm-border"></td>
-                                            <td class="text-left btm-border">Deleted Calendars:</td>
+                                            <td class=" btm-border"></td>
+                                            <td class="text-left btm-border" id="cal-deleted-label">Deleted Calendars:</td>
                                             <td class="text-right btm-border" id="cal-deleted"></td>
                                             <td class=" btm-border"></td>
-                                            <td class="text-left btm-border">Calendar Assignments:</td>
+                                            <td class=" btm-border"></td>
+                                            <td class="text-left btm-border" id="tk-calendar-label">Calendar Assignments:</td>
                                             <td class="text-right btm-border" id="tk-calendar"></td>
                                         </tr>
                                         <tr>

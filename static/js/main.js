@@ -75,7 +75,6 @@ const currHasRes = res => {
 }
 
 const getMonthIntervalObj = proj => {
-
     function MonthData() {
         this.actualStart = 0
         this.actualFinish = 0
@@ -114,7 +113,7 @@ const analyzeProject = proj => {
         const finishMonth = getMonthID(task.finish)
 
         if (!task.completed) proj.months[finishMonth].earlyFinish += 1;
-	if (!task.notStarted) proj.months[startMonth].actualStart += 1;
+	    if (!task.notStarted) proj.months[startMonth].actualStart += 1;
         if (task.notStarted) proj.months[startMonth].earlyStart += 1;
         if (task.completed) proj.months[finishMonth].actualFinish += 1;
     })
@@ -182,39 +181,41 @@ function updateProjCard(name, value){
     updateElText(`${name}-schedule-per`, formatPercent(proj.schedPercentComp))
     updateElText(`${name}-physical-per`, formatPercent(proj.physPercentComp))
     updateElText(`${name}-cost-per`, formatPercent(proj.actualCost / proj.budgetCost))
-    //updateElText(`${name}-critical`, proj.critical.length.toLocaleString() + ":")
     updateElText(`${name}-critical-per`, formatPercent(proj.critical.length / proj.open.length))
     updateElText(`${name}-near-critical-per`, formatPercent(proj.nearCritical.length / proj.open.length))
     updateElText(`${name}-normal-tf-per`, formatPercent(proj.normalFloat.length / proj.open.length))
     updateElText(`${name}-high-tf-per`, formatPercent(proj.highFloat.length / proj.open.length))
     updateElText(`${name}-longest-path-per`, formatPercent(proj.longestPath.length / proj.open.length))
 
-    //updateElText(`${name}-near-critical`, proj.nearCritical.length.toLocaleString() + ":")
-    //updateElText(`${name}-normal-tf`, proj.normalFloat.length.toLocaleString() + ":")
-    //updateElText(`${name}-high-tf`, proj.highFloat.length.toLocaleString() + ":")
-
     function updateElements(obj) {
-	const revSec = document.getElementById('revisions-sec')
+	    const revSec = document.getElementById('revisions-sec')
         Object.values(obj).forEach(update => {
-            updateElText(update.id, (update.data.length).toLocaleString())
+            
             if (update.data.length) {
-                const table = createTable(update.title, update.columns, update.getRows(), update.footer ?? "");
+                const valueEl = document.getElementById(update.id)
+                const labelEl = document.getElementById(`${update.id}-label`)
+                valueEl.style.cursor = 'pointer'
+                valueEl.style.fontWeight = 'bold'
+                labelEl.style.cursor = 'pointer'
+                labelEl.style.fontWeight = 'bold'
+                const table = createTable(update.id, update.title, update.columns, update.getRows(), update.footer ?? "");
                 revSec.append(table)
+                
+                valueEl.addEventListener("click", () => table.scrollIntoView({ behavior: 'smooth'}))
+                // labelEl.addEventListener("click", () => location.href=`#${update.id}-table`)
+                labelEl.addEventListener("click", () => table.scrollIntoView({ behavior: 'smooth'}))
             }
+            updateElText(update.id, (update.data.length).toLocaleString())
         })
     }
 
-    const changeCount = obj => Object.values(obj).reduce((total, change) => total += change.data.length, 0)
-
-    function createTable(title, labels, vals, foot=""){
+    function createTable(id, title, labels, vals, foot=""){
 
         const getAlign = name => {
             const center = ['Assignments', 'Date', 'Dur', 'Finish', 'Float', 'Hrs', 'Lag', 'Link', 'Start']
             const right = ['Cost', 'Qty', 'Var', 'Variance']
-
             if (center.some(n => name.endsWith(n))) return 'center'
             if (right.some(n => name.endsWith(n))) return 'right'
-
             return 'left'
         }
 
@@ -224,15 +225,13 @@ function updateProjCard(name, value){
             return 'nowrap'
         }
 
-	const align = labels.map(getAlign)
+	    const align = labels.map(getAlign)
         const wrap = labels.map(getWrap)
 
-        let div = document.createElement("div")
-        div.style.width = '100%';
-        div.classList.add("card")
         let table = document.createElement("table");
         let caption = document.createElement("caption")
         caption.innerText = `${title}: ${vals.length}`
+        caption.id = id + '-table'
         table.append(caption)
         
         let head = document.createElement("thead")
@@ -275,8 +274,7 @@ function updateProjCard(name, value){
         cell.innerText = foot
         cell.style.color = '#5f5f5f'
         row.append(cell)
-        div.append(table)
-        return div  
+        return table
     }
 
     function createPieChart(parent, chartLabel, dataLabels, data, colors) {
@@ -303,7 +301,7 @@ function updateProjCard(name, value){
     }
 
     if (name === "current") {
-        const currResources = projects.current.resources
+        // const currResources = projects.current.resources
 
         document.getElementById("sched-progress").style.width = `${formatPercent(projects.current.schedPercentComp)}`
         document.getElementById("phys-progress").style.width = `${formatPercent(projects.current.physPercentComp)}`
@@ -413,7 +411,6 @@ function updateProjCard(name, value){
                     x: {
                       stacked: true,
                       ticks: {
-                        // Include a dollar sign in the ticks
                         callback: function(value, index, ticks) {
                             return value * 100 + '%';
                         }
@@ -424,20 +421,14 @@ function updateProjCard(name, value){
                       
                     },
                 },
-                // scales: {
-                //     y: {
-                //         beginAtZero: true
-                //     }
-                // },
                 maintainAspectRatio: false
             }
         });
 
         
         let constraintVariance = {
+            id: "cnst-var",
             title: "Finish On or Before Constraint Trending",
-            align: ['left', 'left', 'left', 'center', 'center', 'center', 'center', 'center'],
-            wrap: ['nowrap', 'nowrap', 'normal', 'nowrap', 'nowrap', 'nowrap', 'nowrap', 'nowrap'],
             columns: [
                 'Act ID', '', 'Act Name', 'Constraint',
                 'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Finish\r\nVariance'
@@ -452,17 +443,17 @@ function updateProjCard(name, value){
                             formatDate(getTask(task, projects.previous).finish, false),
                             formatVariance(dateVariance(getTask(task, projects.previous).finish, task.finish))
                         ]
-		    }
-		    return [
+		            }
+		            return [
                         task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
                         formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A", "N/A"
                     ]
-		})
+		        })
             }
         }
         constraintVariance.data = currTasks.filter(task => task.primeConstraint === "Finish on or Before")
         if (constraintVariance.data.length) {
-            const table = createTable(constraintVariance.title, constraintVariance.columns, constraintVariance.getRows());
+            const table = createTable(constraintVariance.id, constraintVariance.title, constraintVariance.columns, constraintVariance.getRows());
             document.getElementById('constraint-variance').append(table)
         }
 
