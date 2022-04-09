@@ -1,16 +1,6 @@
-
 import Task from './modules/task.js'
-
-const CALENDARTYPES = {
-    CA_Base: 'Global',
-    CA_Rsrc: 'Resource',
-    CA_Project: 'Project',
-}
-
-const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
-const REGEXSHIFT = /s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g;
-const REGEXHOUR = /[0-1][0-9]:[0-5][0-9]/g;
+import Calendar from './modules/calendar.js';
+import Project from './modules/project.js';
 
 const setDataType = (col, val) => {
     if (!val) {
@@ -22,115 +12,12 @@ const setDataType = (col, val) => {
     if (col.endsWith('_num')) {
         return parseInt(val);
     }
-    if (col.endsWith('_cost') || col.endsWith('_qty') || col.endsWith('_cnt')) {
-        return parseFloat(val);
-    }
+    const floatType = ['_cost', '_qty', '_cnt']
+    if (floatType.some(s => col.endsWith(s))) return parseFloat(val)
+    // if (col.endsWith('_cost') || col.endsWith('_qty') || col.endsWith('_cnt')) {
+    //     return parseFloat(val);
+    // }
     return val;
-}
-
-const parseWorkShifts = (data) => {
-    let workHours = Array.from(data.matchAll(REGEXSHIFT), m => m[0])
-    let shifts = [];
-    workHours.forEach(shift => {
-        let hours = Array.from(shift.matchAll(REGEXHOUR), m => m[0]);
-        for (let s = 0; s < hours.length; s += 2) {
-            shifts.push([hours[s], hours[s + 1]]);
-        }
-    })
-    return shifts
-}
-
-const newWorkDay = (dayName, shifts) => {
-    return {
-        day: dayName,
-        shifts: shifts,
-        hours: shifts.reduce((a, s) => {
-            let h = parseInt(s[1].slice(0,2)) - parseInt(s[0].slice(0,2));
-            let m = parseInt(String(s[1]).slice(-2)) / 60 - parseInt(String(s[0]).slice(-2)) / 60
-            return a + h + m;
-        }, 0),
-        start: shifts.length ? shifts[0][0] : "",
-        end: shifts.length ? shifts[shifts.length - 1][1] : ""
-    }
-}
-
-const newExceptionDay = (date, shifts) => {
-    let workDay = newWorkDay(WEEKDAYS[date.getDay()], shifts)
-    workDay.date = date
-    return workDay
-}
-
-const parseWorkWeek = cal => {
-    const searchFor = "DaysOfWeek()"
-    const start = cal.clndr_data.indexOf(searchFor) + searchFor.length;
-    const end = findClosingParentheses(cal.clndr_data, start);
-    const weekDayData = cal.clndr_data.substring(start, end).slice(1, -1).trim();
-    const weekDayDataArr = weekDayData.split(/[1-7]\(\)\(/g).slice(1);
-    const workWeek = weekDayDataArr.map((day, i) => newWorkDay(WEEKDAYS[i], parseWorkShifts(day)))
-    return workWeek;
-}
-
-export const parseAllExceptionStrings = cal => {
-    if (!('clndr_data' in cal)) return undefined;	
-    const data = cal.clndr_data;
-    if (!data.includes('d|')) return []
-    return data.split(/\(d\|/g).slice(1);
-}
-
-export const parseHolidays = cal => {
-    const exceptions = parseAllExceptionStrings(cal)
-    if (!exceptions) return {}
-    let holidays = {}
-    exceptions.filter(e => !e.includes('s|')).forEach(e => {
-        const dt = excelDateToJSDate(e.slice(0, 5))
-        holidays[dt.getTime()] = dt;
-    })
-    return holidays;
-}
-
-const parseExceptions = cal => {
-    const exceptions = parseAllExceptionStrings(cal)
-    if (!exceptions) return {}
-    let workExceptions = {};
-    exceptions.filter(e => e.includes('s|')).forEach(e => {
-        const dt = excelDateToJSDate(e.slice(0, 5));
-        workExceptions[dt.getTime()] = newExceptionDay(dt, parseWorkShifts(e))
-    })
-    return workExceptions;
-}
-
-export const newCalendar = cal => {
-    cal.default = cal.default_flag === 'Y';
-    cal.type = CALENDARTYPES[cal.clndr_type];
-    cal.id = (cal.clndr_type === 'CA_Project') ? cal.clndr_name : cal.clndr_id;
-    cal.assignments = 0;
-    cal.week = parseWorkWeek(cal);
-    cal.holidays = parseHolidays(cal);
-    cal.exceptions = parseExceptions(cal);
-    return cal;
-}
-
-const newProj = proj => {
-    proj.tasks = new Map();
-    proj.tasksByCode = new Map();
-    proj.rels = [];
-    proj.relsById = new Map();
-    proj.resources = [];
-    proj.resById = new Map();
-    proj.start = proj.last_recalc_date;
-    proj.lateEnd = proj.scd_end_date;
-    proj.wbs = new Map()
-    return proj;
-}
-
-const calcPercent = task => {
-    if (task.notStarted) return 0.0;
-    const pt = {
-        CP_Phys: task.phys_complete_pct / 100,
-        CP_Drtn: (task.remDur >= task.origDur) ? 0 : 1 - task.remDur / task.origDur,
-        CP_Units: 1 - (task.act_work_qty + task.act_equip_qty) / (task.target_work_qty = task.target_equip_qty)
-    }
-    return pt[task.complete_pct_type];
 }
 
 export const parseFile = (file, name) => {
@@ -139,37 +26,6 @@ export const parseFile = (file, name) => {
     let columns = [];
 
     const getTask = (projId, taskId) => tables.PROJECT[projId]?.tasks?.get(taskId)
-
-    const newTask = task => {
-        task.notStarted = task.status_code === 'TK_NotStart';
-        task.inProgress = task.status_code === 'TK_Active';
-        task.completed = task.status_code === 'TK_Complete';
-        task.longestPath = task.driving_path_flag === 'Y';
-        task.isMilestone = task.task_type.endsWith('Mile');
-        task.isLOE = task.task_type === 'TT_LOE';
-        task.status = STATUSTYPES[task.status_code];
-        task.origDur = task.target_drtn_hr_cnt / 8;
-        task.remDur = task.remain_drtn_hr_cnt / 8;
-        task.totalFloat = task.completed ? NaN : task.total_float_hr_cnt / 8
-        task.freeFloat = task.completed ? NaN : task.free_float_hr_cnt / 8
-        task.resources = [];
-        task.predecessors = [];
-        task.successors = [];
-        task.wbsMap = [];
-        task.start = task.act_start_date ?? task.early_start_date;
-        task.finish = task.act_end_date ?? task.early_end_date;
-        task.percentType = PERCENTTYPES[task.complete_pct_type];
-        task.taskType = TASKTYPES[task.task_type];
-        task.primeConstraint = CONSTRAINTTYPES[task.cstr_type];
-        task.secondConstraint = CONSTRAINTTYPES[task.cstr_type2];
-        task.percent = calcPercent(task);
-        task.project = tables.PROJECT[task.proj_id]
-        task.calendar = tables.CALENDAR[task.clndr_id];
-	    task.calendar.assignments += 1;
-        task.wbs = task.project.wbs.get(task.wbs_id);
-        task.wbsStruct = [task.wbs];
-        return task;
-    }
 
     const newRelationship = rel => {
         rel.lag = rel.lag_hr_cnt / 8;
@@ -201,13 +57,13 @@ export const parseFile = (file, name) => {
                 columns.forEach((k, i) => row[k] = setDataType(k, cols[i]));
                 switch (currTable) {
                     case 'CALENDAR':
-                        tables.CALENDAR[row.clndr_id] = newCalendar(row);
+                        tables.CALENDAR[row.clndr_id] = new Calendar(row);
                         break;
                     case 'ACCOUNT':
                         tables.ACCOUNT[row.acct_id] = row;
                         break;
                     case 'PROJECT':
-                        tables.PROJECT[row.proj_id] = newProj(row);
+                        tables.PROJECT[row.proj_id] = new Project(row);
                         break;
                     case 'PROJWBS':
                         tables.PROJECT[row.proj_id].wbs.set(row.wbs_id, row);
@@ -220,7 +76,6 @@ export const parseFile = (file, name) => {
                         break;
                     case 'TASK':
                         let task = new Task(row, tables.PROJECT[row.proj_id], tables.CALENDAR[row.clndr_id])
-                        // task = newTask(row);
                         let wbs = task.wbs
                         while (true) {
                             if (!task.project.wbs.has(wbs.parent_wbs_id)) break;
