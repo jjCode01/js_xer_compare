@@ -1,9 +1,12 @@
-let tables = {
+import {parseFile, parseAllExceptionStrings, parseHolidays, newCalendar} from "./parse.js"
+import {updates, constraintVariance, taskChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress} from "./data.js"
+
+export let tables = {
     current: {},
     previous: {}
 }
 
-let projects = {}
+export let projects = {}
 
 let FLOAT = {
     show: true,
@@ -21,13 +24,13 @@ const CHARTCOLOR = {
 
 const MONTHNAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-const hasTask = (task, proj) => proj.tasksByCode.has(task.task_code)
-const getTask = (task, proj) => proj.tasksByCode.get(task.task_code)
+export const hasTask = (task, proj) => proj.tasksByCode.has(task.task_code)
+export const getTask = (task, proj) => proj.tasksByCode.get(task.task_code)
 
-const getPrevLogic = rel => projects.previous.relsById.get(rel.logicId)
-const prevHasLogic = rel => projects.previous.relsById.has(rel.logicId)
+export const getPrevLogic = rel => projects.previous.relsById.get(rel.logicId)
+export const prevHasLogic = rel => projects.previous.relsById.has(rel.logicId)
 
-const getPrevRes = res => {
+export const getPrevRes = res => {
     if (tables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.previous.resById.get(res.resId)
     }
@@ -426,31 +429,31 @@ function updateProjCard(name, value){
         });
 
         
-        let constraintVariance = {
-            id: "cnst-var",
-            title: "Finish On or Before Constraint Trending",
-            columns: [
-                'Act ID', '', 'Act Name', 'Constraint',
-                'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Finish\r\nVariance'
-            ],
-            data: [],
-            getRows: function() {
-                return this.data.map(task => {
-                    if (hasTask(task, projects.previous)) {
-                        return [
-                            task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
-                            formatDate(task.finish, false), formatVariance(task.totalFloat), 
-                            formatDate(getTask(task, projects.previous).finish, false),
-                            formatVariance(dateVariance(getTask(task, projects.previous).finish, task.finish))
-                        ]
-		            }
-		            return [
-                        task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
-                        formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A", "N/A"
-                    ]
-		        })
-            }
-        }
+        // let constraintVariance = {
+        //     id: "cnst-var",
+        //     title: "Finish On or Before Constraint Trending",
+        //     columns: [
+        //         'Act ID', '', 'Act Name', 'Constraint',
+        //         'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Finish\r\nVariance'
+        //     ],
+        //     data: [],
+        //     getRows: function() {
+        //         return this.data.map(task => {
+        //             if (hasTask(task, projects.previous)) {
+        //                 return [
+        //                     task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
+        //                     formatDate(task.finish, false), formatVariance(task.totalFloat), 
+        //                     formatDate(getTask(task, projects.previous).finish, false),
+        //                     formatVariance(dateVariance(getTask(task, projects.previous).finish, task.finish))
+        //                 ]
+		//             }
+		//             return [
+        //                 task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
+        //                 formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A", "N/A"
+        //             ]
+		//         })
+        //     }
+        // }
         constraintVariance.data = currTasks.filter(task => task.primeConstraint === "Finish on or Before")
         if (constraintVariance.data.length) {
             const table = createTable(constraintVariance.id, constraintVariance.title, constraintVariance.columns, constraintVariance.getRows());
@@ -518,7 +521,7 @@ function updateProjCard(name, value){
 
 	    const hasCalendar = (cal, table) => {
             if (!(cal.type === 'Project')) return (cal.clndr_id in table.CALENDAR)
-            for (c in table.CALENDAR) {
+            for (let c in table.CALENDAR) {
                 if (table.CALENDAR[c].id === cal.id) return true
             }
             return false

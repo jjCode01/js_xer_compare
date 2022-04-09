@@ -1,3 +1,5 @@
+import {tables, projects, getTask, hasTask, getPrevLogic, prevHasLogic, getPrevRes} from "./main.js"
+
 const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
 const statusImg = task => {
     let img = new Image(20, 10);
@@ -12,16 +14,19 @@ const statusImg = task => {
     return img;
 }
 
-function Change(id, title, columns, getRowFunc, footer="") {
-    this.id = id
-    this.title = title
-    this.columns = columns
-    this.data = []
-    this.getRows = getRowFunc
-    this.footer = footer
+class Change {
+    constructor(id, title, columns, getRowFunc, footer = "") {
+        this.id = id;
+        this.title = title;
+        this.columns = columns;
+        this.data = [];
+        this.prev = [];
+        this.getRows = getRowFunc;
+        this.footer = footer;
+    }
 }
 
-let updates = {
+export let updates = {
     started: new Change(
         "ud-started", 'Activities Started',
         ['Act ID', 'Act Name', 'Status', 'Start', 'Finish'],
@@ -111,7 +116,46 @@ let updates = {
     )
 }
 
-let taskChanges = {
+const getCellVal = (label, data) => {
+    const labelMap = {
+        'Act ID': 'task_code',
+        'Act Name': 'task_name',
+        'Orig Dur': 'origDur',
+        'Start': 'start',
+        'Finish': 'finish',
+        '': function(d) {
+            return statusImg(d)
+        }
+    }
+}
+
+export let constraintVariance = {
+    id: "cnst-var",
+    title: "Finish On or Before Constraint Trending",
+    columns: [
+        'Act ID', '', 'Act Name', 'Constraint',
+        'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Finish\r\nVariance'
+    ],
+    data: [],
+    getRows: function() {
+        return this.data.map(task => {
+            if (hasTask(task, projects.previous)) {
+                return [
+                    task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
+                    formatDate(task.finish, false), formatVariance(task.totalFloat), 
+                    formatDate(getTask(task, projects.previous).finish, false),
+                    formatVariance(dateVariance(getTask(task, projects.previous).finish, task.finish))
+                ]
+            }
+            return [
+                task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
+                formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A", "N/A"
+            ]
+        })
+    }
+}
+
+export let taskChanges = {
     added: new Change(
         "tk-added", "Added Activities",
         ['Act ID', '', 'Act Name', 'Orig Dur', 'Start', 'Finish'],
@@ -221,7 +265,7 @@ let taskChanges = {
     ),
 }
 
-let logicChanges = {
+export let logicChanges = {
     added: new Change(
         "rl-added", "Added Relationships",
         [
@@ -269,7 +313,7 @@ let logicChanges = {
     },
 }
 
-let resourceChanges = {
+export let resourceChanges = {
     added: new Change(
         "rs-added", "Added Resources",
         ['Act ID', '', 'Activity Name', 'Resource', 'Qty', 'Cost'],
@@ -320,7 +364,7 @@ let resourceChanges = {
     ),
 }
 
-let calendarChanges = {
+export let calendarChanges = {
     added: new Change(
         "cal-added", "Added Calendar",
         ['Calendar Name', 'Type', 'Assignments', 'Sun Hrs', 'Mon Hrs', 'Tue Hrs', 'Wed Hrs', 'Thu Hrs', 'Fri Hrs', 'Sat Hrs'],
@@ -367,7 +411,7 @@ let calendarChanges = {
 //    },
 }
 
-let constraintChanges = {
+export let constraintChanges = {
     addedPrim: new Change(
         "cs-added-prim", "Added Primary Constraints",
         ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
@@ -624,7 +668,7 @@ let costWarnings = {
     )
 }
 
-let plannedProgress = {
+export let plannedProgress = {
     earlyStart: 0,
     lateStart: 0,
     earlyFinish: 0,

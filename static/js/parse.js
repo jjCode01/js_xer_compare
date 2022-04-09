@@ -1,35 +1,5 @@
-const STATUSTYPES = {
-    TK_NotStart: 'Not Started',
-    TK_Active: 'In Progress',
-    TK_Complete: 'Completed'
-}
 
-const PERCENTTYPES = {
-    CP_Phys: 'Physical',
-    CP_Drtn: 'Duration',
-    CP_Units: 'Unit'
-}
-
-const TASKTYPES = {
-    TT_Mile: 'Start Milestone',
-    TT_FinMile: 'Finish Milestone',
-    TT_LOE: 'Level of Effort',
-    TT_Task: 'Task Dependent',
-    TT_Rsrc: 'Resource Dependent',
-    TT_WBS: 'WBS Summary'
-}
-
-const CONSTRAINTTYPES = {
-    CS_ALAP: 'As Late as Possible',
-    CS_MEO: 'Finish On',
-    CS_MEOA: 'Finish on or After',
-    CS_MEOB: 'Finish on or Before',
-    CS_MANDFIN: 'Mandatory Finish',
-    CS_MANDSTART: 'Mandatory Start',
-    CS_MSO: 'Start On',
-    CS_MSOA: 'Start On or After',
-    CS_MSOB: 'Start On or Before',
-}
+import Task from './modules/task.js'
 
 const CALENDARTYPES = {
     CA_Base: 'Global',
@@ -100,14 +70,14 @@ const parseWorkWeek = cal => {
     return workWeek;
 }
 
-const parseAllExceptionStrings = cal => {
+export const parseAllExceptionStrings = cal => {
     if (!('clndr_data' in cal)) return undefined;	
     const data = cal.clndr_data;
     if (!data.includes('d|')) return []
-    return exceptionStrings = data.split(/\(d\|/g).slice(1);
+    return data.split(/\(d\|/g).slice(1);
 }
 
-const parseHolidays = cal => {
+export const parseHolidays = cal => {
     const exceptions = parseAllExceptionStrings(cal)
     if (!exceptions) return {}
     let holidays = {}
@@ -129,7 +99,7 @@ const parseExceptions = cal => {
     return workExceptions;
 }
 
-const newCalendar = cal => {
+export const newCalendar = cal => {
     cal.default = cal.default_flag === 'Y';
     cal.type = CALENDARTYPES[cal.clndr_type];
     cal.id = (cal.clndr_type === 'CA_Project') ? cal.clndr_name : cal.clndr_id;
@@ -163,7 +133,7 @@ const calcPercent = task => {
     return pt[task.complete_pct_type];
 }
 
-const parseFile = (file, name) => {
+export const parseFile = (file, name) => {
     let tables = {};
     let currTable = '';
     let columns = [];
@@ -249,7 +219,8 @@ const parseFile = (file, name) => {
                         tables.RSRC[row.rsrc_id] = row;
                         break;
                     case 'TASK':
-                        task = newTask(row);
+                        let task = new Task(row, tables.PROJECT[row.proj_id], tables.CALENDAR[row.clndr_id])
+                        // task = newTask(row);
                         let wbs = task.wbs
                         while (true) {
                             if (!task.project.wbs.has(wbs.parent_wbs_id)) break;
@@ -266,7 +237,7 @@ const parseFile = (file, name) => {
                         }
                         break;
                     case 'TASKPRED':
-                        rel = newRelationship(row);
+                        let rel = newRelationship(row);
                         tables.PROJECT[rel.proj_id].rels.push(rel);
                         tables.PROJECT[rel.proj_id].relsById.set(rel.logicId, rel);
                         tables.PROJECT[rel.proj_id].tasks.get(rel.task_id).predecessors.push(rel);
