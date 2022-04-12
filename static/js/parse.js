@@ -53,6 +53,9 @@ export const parseFile = (file, name) => {
                 let row = {};
                 columns.forEach((k, i) => row[k] = setDataType(k, cols[i]));
                 switch (currTable) {
+                    case 'MEMOTYPE':
+                        tables.MEMOTYPE[row.memo_type_id] = row;
+                        break;
                     case 'CALENDAR':
                         tables.CALENDAR[row.clndr_id] = new Calendar(row);
                         break;
@@ -111,6 +114,28 @@ export const parseFile = (file, name) => {
                             row.resId = `${row.task.task_code}|${row.rsrcName}|${row?.account?.acct_short_name}`;
                             tables.PROJECT[row.proj_id].resById.set(row.resId, row);
                         } 
+                        break;
+                    case 'TASKMEMO':
+                        tables.TASKMEMO[row.memo_id] = row;
+                        let parser = new DOMParser()
+                        let memoStr = row.task_memo.replace(/<BR>/g, '\n')
+                        memoStr = memoStr.replace(/(\x7F)+/g, '')
+                        let memoHTML = parser.parseFromString(memoStr, 'text/html')
+
+                        const getPTagMemos = (el) => {
+                            const pMems = el.getElementsByTagName('p')
+                            if (!pMems.length) return
+                            return Array.from(pMems).map(m => m.innerText).join('\n').trim()
+                        }
+
+                        const getBodyTagMemos = (el) => {
+                            const bodyMems = el.getElementsByTagName('body')
+                            if (!bodyMems.length) return undefined
+                            return Array.from(bodyMems).map(m => m.innerText).join('\n').trim()
+                        }
+
+                        const memos = getPTagMemos(memoHTML) ?? getBodyTagMemos(memoHTML)
+                        tables.PROJECT[row.proj_id].tasks.get(row.task_id).memos[tables.MEMOTYPE[row.memo_type_id].memo_type] = memos
                         break;
                 }
             break;

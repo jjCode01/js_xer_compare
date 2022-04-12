@@ -1,5 +1,5 @@
 import {parseFile} from "./parse.js"
-import {updates, constraintVariance, taskChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress} from "./data.js"
+import {updates, constraintVariance, taskChanges, noteBookChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress} from "./data.js"
 import * as util from "./utilities.js"
 import ParsXer from "./modules/parseXerTables.js"
 
@@ -37,7 +37,7 @@ export const getPrevRes = res => {
     if (hasTask(res.task, projects.previous)) {
         const t = getTask(res.task, projects.previous);
         for (let i = 0; i < t.resources.length; i++) {
-            cr = t.resources[i]
+            let cr = t.resources[i]
             if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
                 return cr;
             }
@@ -53,7 +53,7 @@ const prevHasRes = res => {
     if (hasTask(res.task, projects.previous)) {
         const t = getTask(res.task, projects.previous);
         for (let i = 0; i < t.resources.length; i++) {
-            cr = t.resources[i]
+            let cr = t.resources[i]
             if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
                 return true;
             }
@@ -68,7 +68,7 @@ const currHasRes = res => {
     }
     if (hasTask(res.task, projects.current)) {
         for (let i = 0; i < getTask(res.task, projects.current).resources.length; i++) {
-            cr = getTask(res.task, projects.current).resources[i]
+            let cr = getTask(res.task, projects.current).resources[i]
             if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
                 return true;
             }
@@ -389,6 +389,24 @@ function updateProjCard(name, value){
         taskChanges.wbs.data = ongoingTasks.filter(task => task.wbs.wbsID !== getTask(task, projects.previous).wbs.wbsID)
         taskChanges.type.data = ongoingTasks.filter(task => task.taskType !== getTask(task, projects.previous).taskType)
         updateElements(taskChanges)
+
+        // ongoingTasks.forEach(task => {
+        //    let nbs = Object.entries(task.memos).map(entry => {
+        //         const [key, value] = entry;
+        //         if (entry.length) console.log(key, value)
+        //         if (!(key in getTask(task, projects.previous).memos)) {
+        //             console.log(task, key)
+        //             return [task, key]
+        //         }
+        //     })
+            
+        //     if (nbs.length) {
+        //         console.log(nbs)
+        //         noteBookChanges.added.data.push(nbs)
+        //     }
+        // })
+        // console.log(noteBookChanges.added.data)
+        // updateElements(noteBookChanges)
 
         logicChanges.added.data = projects.current.rels.filter(rel => !prevHasLogic(rel))
         logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.relsById.has(rel.logicId))

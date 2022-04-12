@@ -266,6 +266,18 @@ export let taskChanges = {
     ),
 }
 
+export let noteBookChanges = {
+    added: new Change(
+        "nb-added", "Added Notebook Memo",
+        ['Act ID', '', 'Act Name', 'Notebook', 'Memo'],
+        function() {
+            return this.data.map((task, key) => [
+                task.task_code, statusImg(task), task.task_name, key, key,
+            ])
+        }
+    ),
+}
+
 export let logicChanges = {
     added: new Change(
         "rl-added", "Added Relationships",
