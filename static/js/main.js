@@ -1,14 +1,16 @@
 import {parseFile} from "./parse.js"
 import {updates, constraintVariance, taskChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress} from "./data.js"
+import * as util from "./utilities.js"
+import ParsXer from "./modules/parseXerTables.js"
 
-export let tables = {
+let xerTables = {
     current: {},
     previous: {}
 }
 
 export let projects = {}
 
-let FLOAT = {
+export let FLOAT = {
     show: true,
     critical: 0,
     nearCritical: 20,
@@ -22,16 +24,14 @@ const CHARTCOLOR = {
     RED: '255, 99, 132',
 }
 
-const MONTHNAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-
 export const hasTask = (task, proj) => proj.tasksByCode.has(task.task_code)
 export const getTask = (task, proj) => proj.tasksByCode.get(task.task_code)
 
-export const getPrevLogic = rel => projects.previous.relsById.get(rel.logicId)
-export const prevHasLogic = rel => projects.previous.relsById.has(rel.logicId)
+const getPrevLogic = rel => projects.previous.relsById.get(rel.logicId)
+const prevHasLogic = rel => projects.previous.relsById.has(rel.logicId)
 
 export const getPrevRes = res => {
-    if (tables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
+    if (xerTables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.previous.resById.get(res.resId)
     }
     if (hasTask(res.task, projects.previous)) {
@@ -47,7 +47,7 @@ export const getPrevRes = res => {
 }
 
 const prevHasRes = res => {
-    if (tables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
+    if (xerTables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.previous.resById.has(res.resId)
     }
     if (hasTask(res.task, projects.previous)) {
@@ -63,7 +63,7 @@ const prevHasRes = res => {
 }
 
 const currHasRes = res => {
-    if (tables.current.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
+    if (xerTables.current.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.current.resById.has(res.resId)
     }
     if (hasTask(res.task, projects.current)) {
@@ -77,118 +77,39 @@ const currHasRes = res => {
     return false
 }
 
-const getMonthIntervalObj = proj => {
-    function MonthData() {
-        this.actualStart = 0
-        this.actualFinish = 0
-        this.earlyStart = 0
-        this.earlyFinish = 0
-        this.lateStart = 0
-        this.lateFinish = 0
-        this.actualCost = 0.0
-        this.earlyCost = 0.0
-        this.lateCost = 0.0
-    }
-
-    let months = {};
-    let endDate = proj.scd_end_date.getTime() > proj.lateEnd.getTime() ? proj.scd_end_date : proj.lateEnd;
-    for (let y = proj.start.getFullYear(); y <= endDate.getFullYear(); y++) {
-        let m = y === proj.start.getFullYear() ? proj.start.getMonth() : 0;
-        let lastMonth = y === endDate.getFullYear() ? endDate.getMonth() : 11;
-        for (; m <= lastMonth; m++){
-            months[`${MONTHNAMES[m]}-${y}`] = new MonthData()
-        }
-    }
-    return months;
-}
-
-const analyzeProject = proj => {
-    const tasks = [...proj.tasks.values()]
-
-    proj.months = getMonthIntervalObj(proj);
-    
-    const percentPerActualDate = (1 / tasks.length) / 2 * 100;
-
-    const getMonthID = date => `${MONTHNAMES[date.getMonth()]}-${date.getFullYear()}`
-
-    tasks.forEach(task => {
-        const startMonth = getMonthID(task.start)
-        const finishMonth = getMonthID(task.finish)
-
-        if (!task.completed) proj.months[finishMonth].earlyFinish += 1;
-	    if (!task.notStarted) proj.months[startMonth].actualStart += 1;
-        if (task.notStarted) proj.months[startMonth].earlyStart += 1;
-        if (task.completed) proj.months[finishMonth].actualFinish += 1;
-    })
-
-    proj.notStarted = tasks.filter(task => task.notStarted)
-    proj.inProgress = tasks.filter(task => task.inProgress)
-    proj.completed = tasks.filter(task => task.completed)
-    proj.open = tasks.filter(task => !task.completed)
-
-    proj.milestones = tasks.filter(task => task.isMilestone)
-
-    proj.longestPath = tasks.filter(task => task.longestPath && !task.completed)
-    proj.critical = tasks.filter(task => task.totalFloat <= FLOAT.critical)
-    proj.nearCritical = tasks.filter(task => task.totalFloat > FLOAT.critical && task.totalFloat <= FLOAT.nearCritical)
-    proj.normalFloat = tasks.filter(task => task.totalFloat > FLOAT.nearCritical && task.totalFloat < FLOAT.high)
-    proj.highFloat = tasks.filter(task => task.totalFloat >= FLOAT.high)
-
-    proj.scheduleDuration = (proj.scd_end_date.getTime() - proj.start.getTime()) / (1000 * 3600 * 24)
-    proj.remScheduleDuration = (proj.scd_end_date.getTime() - proj.last_recalc_date.getTime()) / (1000 * 3600 * 24)
-
-    proj.origDurSum = [...proj.tasks.values()].reduce((od, task) => od += task.origDur, 0)
-    proj.remDurSum = [...proj.tasks.values()].reduce((rd, task) => rd += task.remDur, 0)
-
-    const actDateTerm = (proj.inProgress.length / 2 + proj.completed.length) / proj.tasks.size
-    const durTerm = (1 - proj.remDurSum / proj.origDurSum)
-    proj.physPercentComp = (actDateTerm + durTerm) / 2
-    proj.schedPercentComp = 1 - proj.remScheduleDuration / proj.scheduleDuration
-
-    proj.budgetCost = budgetedCost(proj)
-    proj.actualCost = actualCost(proj)
-    proj.thisPeriodCost = thisPeriodCost(proj)
-    proj.remainingCost = remainingCost(proj)
-
-    proj.budgetQty = budgetedQty(proj)
-    proj.actualQty = actualQty(proj)
-    proj.thisPeriodQty = thisPeriodQty(proj)
-    proj.remainingQty = remainingQty(proj)
-    return proj
-}
-
 const updateElText = (id, value) => document.getElementById(id).textContent = value
 
 function updateProjCard(name, value){
-    const proj = analyzeProject(tables[name].PROJECT[value])
+    const proj = xerTables[name].PROJECT[value]
+    proj.deepAnalysis()
     projects[name] = proj
 
     updateElText(`${name}-project-id`, proj.proj_short_name)
     updateElText(`${name}-project-name`, proj.name)
-    updateElText(`${name}-start`, formatDate(proj.start))
-    updateElText(`${name}-data-date`, formatDate(proj.last_recalc_date))
-    updateElText(`${name}-end`, formatDate(proj.scd_end_date))
-    updateElText(`${name}-mfb`, formatDate(proj.plan_end_date) ?? "None")
-    updateElText(`${name}-budget`, formatCost(proj.budgetCost))
-    updateElText(`${name}-actual-cost`, formatCost(proj.actualCost))
-    updateElText(`${name}-this-period`, formatCost(proj.thisPeriodCost))
-    updateElText(`${name}-remaining-cost`, formatCost(proj.remainingCost))
-    updateElText(`${name}-qty`, formatNumber(proj.budgetQty))
-    updateElText(`${name}-actual-qty`, formatNumber(proj.actualQty))
-    updateElText(`${name}-this-period-qty`, formatNumber(proj.thisPeriodQty))
-    updateElText(`${name}-remaining-qty`, formatNumber(proj.remainingQty))
+    updateElText(`${name}-start`, util.formatDate(proj.start))
+    updateElText(`${name}-data-date`, util.formatDate(proj.last_recalc_date))
+    updateElText(`${name}-end`, util.formatDate(proj.scd_end_date))
+    updateElText(`${name}-mfb`, util.formatDate(proj.plan_end_date) ?? "None")
+    updateElText(`${name}-budget`, util.formatCost(proj.budgetCost))
+    updateElText(`${name}-actual-cost`, util.formatCost(proj.actualCost))
+    updateElText(`${name}-this-period`, util.formatCost(proj.thisPeriodCost))
+    updateElText(`${name}-remaining-cost`, util.formatCost(proj.remainingCost))
+    updateElText(`${name}-qty`, util.formatNumber(proj.budgetQty))
+    updateElText(`${name}-actual-qty`, util.formatNumber(proj.actualQty))
+    updateElText(`${name}-this-period-qty`, util.formatNumber(proj.thisPeriodQty))
+    updateElText(`${name}-remaining-qty`, util.formatNumber(proj.remainingQty))
     updateElText(`${name}-tasks`, proj.tasks.size.toLocaleString())
     updateElText(`${name}-not-started`, proj.notStarted.length.toLocaleString())
     updateElText(`${name}-in-progress`, proj.inProgress.length.toLocaleString())
     updateElText(`${name}-complete`, proj.completed.length.toLocaleString())
-    updateElText(`${name}-schedule-per`, formatPercent(proj.schedPercentComp))
-    updateElText(`${name}-physical-per`, formatPercent(proj.physPercentComp))
-    updateElText(`${name}-cost-per`, formatPercent(proj.actualCost / proj.budgetCost))
-    updateElText(`${name}-critical-per`, formatPercent(proj.critical.length / proj.open.length))
-    updateElText(`${name}-near-critical-per`, formatPercent(proj.nearCritical.length / proj.open.length))
-    updateElText(`${name}-normal-tf-per`, formatPercent(proj.normalFloat.length / proj.open.length))
-    updateElText(`${name}-high-tf-per`, formatPercent(proj.highFloat.length / proj.open.length))
-    updateElText(`${name}-longest-path-per`, formatPercent(proj.longestPath.length / proj.open.length))
+    updateElText(`${name}-schedule-per`, util.formatPercent(proj.schedPercentComp))
+    updateElText(`${name}-physical-per`, util.formatPercent(proj.physPercentComp))
+    updateElText(`${name}-cost-per`, util.formatPercent(proj.actualCost / proj.budgetCost))
+    updateElText(`${name}-critical-per`, util.formatPercent(proj.critical.length / proj.open.length))
+    updateElText(`${name}-near-critical-per`, util.formatPercent(proj.nearCritical.length / proj.open.length))
+    updateElText(`${name}-normal-tf-per`, util.formatPercent(proj.normalFloat.length / proj.open.length))
+    updateElText(`${name}-high-tf-per`, util.formatPercent(proj.highFloat.length / proj.open.length))
+    updateElText(`${name}-longest-path-per`, util.formatPercent(proj.longestPath.length / proj.open.length))
 
     function updateElements(obj) {
 	    const revSec = document.getElementById('revisions-sec')
@@ -306,15 +227,15 @@ function updateProjCard(name, value){
     if (name === "current") {
         // const currResources = projects.current.resources
 
-        document.getElementById("sched-progress").style.width = `${formatPercent(projects.current.schedPercentComp)}`
-        document.getElementById("phys-progress").style.width = `${formatPercent(projects.current.physPercentComp)}`
+        document.getElementById("sched-progress").style.width = `${util.formatPercent(projects.current.schedPercentComp)}`
+        document.getElementById("phys-progress").style.width = `${util.formatPercent(projects.current.physPercentComp)}`
         if (projects.current.budgetCost) {
-            document.getElementById("cost-progress").style.width = `${formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
+            document.getElementById("cost-progress").style.width = `${util.formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
         }
 
-	    updateElText('current-not-started-per', formatPercent(projects.current.notStarted.length / projects.current.tasks.size))
-        updateElText('current-in-progress-per', formatPercent(projects.current.inProgress.length / projects.current.tasks.size))
-        updateElText('current-complete-per', formatPercent(projects.current.completed.length / projects.current.tasks.size))
+	    updateElText('current-not-started-per', util.formatPercent(projects.current.notStarted.length / projects.current.tasks.size))
+        updateElText('current-in-progress-per', util.formatPercent(projects.current.inProgress.length / projects.current.tasks.size))
+        updateElText('current-complete-per', util.formatPercent(projects.current.completed.length / projects.current.tasks.size))
 
         let ctxActivityStatus = document.getElementById('activityStatusChart');
 	    let activityStatusChart = createPieChart(
@@ -344,11 +265,11 @@ function updateProjCard(name, value){
     if (name === "previous") {
         document.getElementById('title').innerText = `Schedule Comparison - ${projects.current.proj_short_name} vs ${projects.previous.proj_short_name}`
 
-        const currCalendars = [...Object.values(tables.current.CALENDAR)]
-        const prevCalendars = [...Object.values(tables.previous.CALENDAR)]
+        const currCalendars = [...Object.values(xerTables.current.CALENDAR)]
+        const prevCalendars = [...Object.values(xerTables.previous.CALENDAR)]
 
-        const currTasks = [...projects.current.tasks.values()].sort(sortById)
-        const prevTasks = [...projects.previous.tasks.values()].sort(sortById)
+        const currTasks = [...projects.current.tasks.values()].sort(util.sortById)
+        const prevTasks = [...projects.previous.tasks.values()].sort(util.sortById)
 
         const currResources = projects.current.resources
         const prevResources = projects.previous.resources
@@ -428,41 +349,15 @@ function updateProjCard(name, value){
             }
         });
 
-        
-        // let constraintVariance = {
-        //     id: "cnst-var",
-        //     title: "Finish On or Before Constraint Trending",
-        //     columns: [
-        //         'Act ID', '', 'Act Name', 'Constraint',
-        //         'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Finish\r\nVariance'
-        //     ],
-        //     data: [],
-        //     getRows: function() {
-        //         return this.data.map(task => {
-        //             if (hasTask(task, projects.previous)) {
-        //                 return [
-        //                     task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
-        //                     formatDate(task.finish, false), formatVariance(task.totalFloat), 
-        //                     formatDate(getTask(task, projects.previous).finish, false),
-        //                     formatVariance(dateVariance(getTask(task, projects.previous).finish, task.finish))
-        //                 ]
-		//             }
-		//             return [
-        //                 task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
-        //                 formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A", "N/A"
-        //             ]
-		//         })
-        //     }
-        // }
         constraintVariance.data = currTasks.filter(task => task.primeConstraint === "Finish on or Before")
         if (constraintVariance.data.length) {
             const table = createTable(constraintVariance.id, constraintVariance.title, constraintVariance.columns, constraintVariance.getRows());
             document.getElementById('constraint-variance').append(table)
         }
 
-        updates.started.data = currTasks.filter(task => task.inProgress && getTask(task, projects.previous)?.notStarted).sort(sortByStart)
-        updates.finished.data = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).inProgress)).sort(sortByFinish)
-        updates.startFinish.data = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted)).sort(sortByFinish)
+        updates.started.data = currTasks.filter(task => task.inProgress && getTask(task, projects.previous)?.notStarted).sort(util.sortByStart)
+        updates.finished.data = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).inProgress)).sort(util.sortByFinish)
+        updates.startFinish.data = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted)).sort(util.sortByFinish)
 
         taskChanges.added.data = currTasks.filter(task => !hasTask(task, projects.previous))
         taskChanges.deleted.data = prevTasks.filter(task => !projects.current.tasksByCode.has(task.task_code))
@@ -481,16 +376,16 @@ function updateProjCard(name, value){
             return (
                 !task.notStarted && 
                 !getTask(task, projects.previous).notStarted && 
-                formatDate(task.start) !== formatDate(getTask(task, projects.previous).start)
+                util.formatDate(task.start) !== util.formatDate(getTask(task, projects.previous).start)
             )
-	    }).sort(sortByStart)
+	    }).sort(util.sortByStart)
         taskChanges.finish.data = ongoingTasks.filter(task => {
             return (
                 task.completed && 
                 getTask(task, projects.previous).completed && 
-                formatDate(task.finish) !== formatDate(getTask(task, projects.previous).finish)
+                util.formatDate(task.finish) !== util.formatDate(getTask(task, projects.previous).finish)
             )
-	    }).sort(sortByFinish)
+	    }).sort(util.sortByFinish)
         taskChanges.wbs.data = ongoingTasks.filter(task => task.wbs.wbsID !== getTask(task, projects.previous).wbs.wbsID)
         taskChanges.type.data = ongoingTasks.filter(task => task.taskType !== getTask(task, projects.previous).taskType)
         updateElements(taskChanges)
@@ -527,8 +422,8 @@ function updateProjCard(name, value){
             return false
         }
 
-        calendarChanges.added.data = currCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, tables.previous))
-	    calendarChanges.deleted.data = prevCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, tables.current))
+        calendarChanges.added.data = currCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, xerTables.previous))
+	    calendarChanges.deleted.data = prevCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, xerTables.current))
         updateElements(calendarChanges)
 
         constraintChanges.addedPrim.data = currTasks.filter(task => {
@@ -577,30 +472,30 @@ function updateProjCard(name, value){
         })
         updateElements(constraintChanges)
 
-        updateElText('start-var', formatAbsNum(dateVariance(projects.current.start, projects.previous.start)))
-        updateElText('dd-var', formatAbsNum(dateVariance(projects.current.last_recalc_date, projects.previous.last_recalc_date)))
-        updateElText('end-var', formatVariance(dateVariance(projects.previous.scd_end_date, projects.current.scd_end_date)))
-        updateElText('mfb-var', formatVariance(dateVariance(projects.current.plan_end_date, projects.previous.plan_end_date)))
-        updateElText('tasks-var', formatVariance((projects.current.tasks.size - projects.previous.tasks.size)))
-        updateElText('not-started-var', formatVariance((projects.current.notStarted.length - projects.previous.notStarted.length)))
-        updateElText('in-progress-var', formatVariance((projects.current.inProgress.length - projects.previous.inProgress.length)))
-        updateElText('complete-var', formatVariance((projects.current.completed.length - projects.previous.completed.length)))
-        updateElText('schedule-per-var', formatPercent(projects.current.schedPercentComp - projects.previous.schedPercentComp))
-        updateElText('physical-per-var', formatPercent(projects.current.physPercentComp - projects.previous.physPercentComp))
+        updateElText('start-var', util.formatAbsNum(util.dateVariance(projects.current.start, projects.previous.start)))
+        updateElText('dd-var', util.formatAbsNum(util.dateVariance(projects.current.last_recalc_date, projects.previous.last_recalc_date)))
+        updateElText('end-var', util.formatVariance(util.dateVariance(projects.previous.scd_end_date, projects.current.scd_end_date)))
+        updateElText('mfb-var', util.formatVariance(util.dateVariance(projects.current.plan_end_date, projects.previous.plan_end_date)))
+        updateElText('tasks-var', util.formatVariance((projects.current.tasks.size - projects.previous.tasks.size)))
+        updateElText('not-started-var', util.formatVariance((projects.current.notStarted.length - projects.previous.notStarted.length)))
+        updateElText('in-progress-var', util.formatVariance((projects.current.inProgress.length - projects.previous.inProgress.length)))
+        updateElText('complete-var', util.formatVariance((projects.current.completed.length - projects.previous.completed.length)))
+        updateElText('schedule-per-var', util.formatPercent(projects.current.schedPercentComp - projects.previous.schedPercentComp))
+        updateElText('physical-per-var', util.formatPercent(projects.current.physPercentComp - projects.previous.physPercentComp))
 
         const getFloatPercent = (float, version) => projects[version][float].length / projects[version].open.length
         const getFloatPercentVar = (float) => getFloatPercent(float, 'current') - getFloatPercent(float, 'previous')
 
-        updateElText('critical-var', formatPercent(getFloatPercentVar('critical'), 'always'))
-        updateElText('near-critical-var', formatPercent(getFloatPercentVar('nearCritical'), 'always'))
-        updateElText('normal-tf-var', formatPercent(getFloatPercentVar('normalFloat'), 'always'))
-        updateElText('high-tf-var', formatPercent(getFloatPercentVar('highFloat'), 'always'))
-        updateElText('longest-path-var', formatPercent(getFloatPercentVar('longestPath'), 'always'))
+        updateElText('critical-var', util.formatPercent(getFloatPercentVar('critical'), 'always'))
+        updateElText('near-critical-var', util.formatPercent(getFloatPercentVar('nearCritical'), 'always'))
+        updateElText('normal-tf-var', util.formatPercent(getFloatPercentVar('normalFloat'), 'always'))
+        updateElText('high-tf-var', util.formatPercent(getFloatPercentVar('highFloat'), 'always'))
+        updateElText('longest-path-var', util.formatPercent(getFloatPercentVar('longestPath'), 'always'))
         
         if (projects.current.budgetCost && projects.previous.budgetCost) {
             const currCostPer = projects.current.actualCost / projects.current.budgetCost
             const prevCostPer = projects.previous.actualCost / projects.previous.budgetCost
-            updateElText('cost-per-var', formatPercent(currCostPer - prevCostPer))
+            updateElText('cost-per-var', util.formatPercent(currCostPer - prevCostPer))
         } else {
             document.getElementById("cost-per-var").textContent = "N/A"
         }
@@ -611,15 +506,15 @@ function updateProjCard(name, value){
             document.getElementById('resource-loading').style.display = "none";
         }
 
-        updateElText("budget-var", formatCost(projects.current.budgetCost - projects.previous.budgetCost))
-        updateElText("actual-cost-var", formatCost(projects.current.actualCost - projects.previous.actualCost))
-        updateElText("this-period-var", formatCost(projects.current.thisPeriodCost - projects.previous.thisPeriodCost))
-        updateElText("remaining-cost-var", formatCost(projects.current.remainingCost - projects.previous.remainingCost))
+        updateElText("budget-var", util.formatCost(projects.current.budgetCost - projects.previous.budgetCost))
+        updateElText("actual-cost-var", util.formatCost(projects.current.actualCost - projects.previous.actualCost))
+        updateElText("this-period-var", util.formatCost(projects.current.thisPeriodCost - projects.previous.thisPeriodCost))
+        updateElText("remaining-cost-var", util.formatCost(projects.current.remainingCost - projects.previous.remainingCost))
         
-        updateElText("qty-var", formatVariance(projects.current.budgetQty - projects.previous.budgetQty))
-        updateElText("actual-qty-var", formatVariance(projects.current.actualQty - projects.previous.actualQty))
-        updateElText("this-period-qty-var", formatVariance(projects.current.thisPeriodQty - projects.previous.thisPeriodQty))
-        updateElText("remaining-qty-var", formatVariance(projects.current.remainingQty - projects.previous.remainingQty))
+        updateElText("qty-var", util.formatVariance(projects.current.budgetQty - projects.previous.budgetQty))
+        updateElText("actual-qty-var", util.formatVariance(projects.current.actualQty - projects.previous.actualQty))
+        updateElText("this-period-qty-var", util.formatVariance(projects.current.thisPeriodQty - projects.previous.thisPeriodQty))
+        updateElText("remaining-qty-var", util.formatVariance(projects.current.remainingQty - projects.previous.remainingQty))
 
         const currDD = projects.current.last_recalc_date.getTime()
         const prevPlannedTasks = [...projects.previous.tasks.values()].filter(task => !task.completed && task.start.getTime() < currDD)
@@ -642,8 +537,8 @@ function updateProjCard(name, value){
         plannedProgress.actualStart = updates.started.data.length + updates.startFinish.data.length
         plannedProgress.actualFinish = updates.finished.data.length + updates.startFinish.data.length
 
-        updateElText('start-period', formatDate(projects.previous.last_recalc_date))
-        updateElText('end-period', formatDate(projects.current.last_recalc_date))
+        updateElText('start-period', util.formatDate(projects.previous.last_recalc_date))
+        updateElText('end-period', util.formatDate(projects.current.last_recalc_date))
 
         let ctxStartFinishProgress = document.getElementById('startFinishChart');
         let startFinishChart = new Chart(ctxStartFinishProgress, {
@@ -762,16 +657,18 @@ analyzeButton.addEventListener("click", (e) => {
 })
 
 const isEmptyObj = obj => Object.keys(obj).length === 0;
-const checkIfReady = () => (!isEmptyObj(tables.previous) && !isEmptyObj(tables.current))
+const checkIfReady = () => (!isEmptyObj(xerTables.previous) && !isEmptyObj(xerTables.current))
 
 for (let i = 0; i < fileSelectors.length; i++) {
     fileSelectors[i].addEventListener("change", (e) => {
         let reader = new FileReader();
         let projSelector = document.getElementById(`${e.target.name}-project-selector`);
         reader.onload = (r) => {
-            tables[e.target.name] = parseFile(r.target.result, e.target.files[0].name);
-            updateProjList(tables[e.target.name].PROJECT, projSelector);
-            if (Object.keys(tables[e.target.name].PROJECT).length > 1){
+            xerTables[e.target.name] = parseFile(r.target.result, e.target.files[0].name);
+            const xer = new ParsXer(r.target.result, e.target.files[0].name)
+            xer.print()
+            updateProjList(xerTables[e.target.name].PROJECT, projSelector);
+            if (Object.keys(xerTables[e.target.name].PROJECT).length > 1){
                 projSelector.classList.remove("hidden")
             } else {
                 if (!projSelector.classList.contains("hidden")) {

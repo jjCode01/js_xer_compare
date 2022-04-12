@@ -2,21 +2,18 @@ import Task from './modules/task.js'
 import Calendar from './modules/calendar.js';
 import Project from './modules/project.js';
 
+// let tables = {}
+
 const setDataType = (col, val) => {
-    if (!val) {
-        return;
-    }
+    if (!val) return;
+
     if (col.endsWith('_date') || col.endsWith('_date2')) {
         return new Date(val.split(' ').join('T'));
     }
-    if (col.endsWith('_num')) {
-        return parseInt(val);
-    }
+    if (col.endsWith('_num')) return parseInt(val);
+    
     const floatType = ['_cost', '_qty', '_cnt']
     if (floatType.some(s => col.endsWith(s))) return parseFloat(val)
-    // if (col.endsWith('_cost') || col.endsWith('_qty') || col.endsWith('_cnt')) {
-    //     return parseFloat(val);
-    // }
     return val;
 }
 
@@ -25,13 +22,13 @@ export const parseFile = (file, name) => {
     let currTable = '';
     let columns = [];
 
-    const getTask = (projId, taskId) => tables.PROJECT[projId]?.tasks?.get(taskId)
+    const getTaskbyID = (projId, taskId) => tables.PROJECT[projId]?.tasks?.get(taskId)
 
     const newRelationship = rel => {
         rel.lag = rel.lag_hr_cnt / 8;
         rel.link = rel.pred_type.substring(rel.pred_type.length - 2);
-        rel.predTask = getTask(rel.pred_proj_id, rel.pred_task_id);
-        rel.succTask = getTask(rel.proj_id, rel.task_id);
+        rel.predTask = getTaskbyID(rel.pred_proj_id, rel.pred_task_id);
+        rel.succTask = getTaskbyID(rel.proj_id, rel.task_id);
         rel.logicId = `${rel.predTask.task_code}|${rel.succTask.task_code}|${rel.link}`;
         return rel;
     }

@@ -1,4 +1,5 @@
-import {tables, projects, getTask, hasTask, getPrevLogic, prevHasLogic, getPrevRes} from "./main.js"
+import {projects, getTask, hasTask, getPrevRes} from "./main.js"
+import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance } from "./utilities.js";
 
 const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
 const statusImg = task => {
