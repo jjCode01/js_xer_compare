@@ -3,7 +3,7 @@ import {updates, constraintVariance, taskChanges, noteBookChanges, logicChanges,
 import * as util from "./utilities.js"
 import ParsXer from "./modules/parseXerTables.js"
 
-let xerTables = {
+export let xerTables = {
     current: {},
     previous: {}
 }
@@ -26,6 +26,7 @@ const CHARTCOLOR = {
 
 export const hasTask = (task, proj) => proj.tasksByCode.has(task.task_code)
 export const getTask = (task, proj) => proj.tasksByCode.get(task.task_code)
+export const getMemo = (memo, tbl) => tbl.TASKMEMO[memo.id]
 
 const getPrevLogic = rel => projects.previous.relsById.get(rel.logicId)
 const prevHasLogic = rel => projects.previous.relsById.has(rel.logicId)
@@ -146,6 +147,7 @@ function updateProjCard(name, value){
         const getWrap = name => {
             const normal = ['Name', 'Cal', 'WBS', 'Type', 'Resource', 'Constraint']
             if (normal.some(n => name.endsWith(n))) return 'normal'
+            if (name.endsWith('Memo')) return 'pre-line'
             return 'nowrap'
         }
 
@@ -390,24 +392,6 @@ function updateProjCard(name, value){
         taskChanges.type.data = ongoingTasks.filter(task => task.taskType !== getTask(task, projects.previous).taskType)
         updateElements(taskChanges)
 
-        // ongoingTasks.forEach(task => {
-        //    let nbs = Object.entries(task.memos).map(entry => {
-        //         const [key, value] = entry;
-        //         if (entry.length) console.log(key, value)
-        //         if (!(key in getTask(task, projects.previous).memos)) {
-        //             console.log(task, key)
-        //             return [task, key]
-        //         }
-        //     })
-            
-        //     if (nbs.length) {
-        //         console.log(nbs)
-        //         noteBookChanges.added.data.push(nbs)
-        //     }
-        // })
-        // console.log(noteBookChanges.added.data)
-        // updateElements(noteBookChanges)
-
         logicChanges.added.data = projects.current.rels.filter(rel => !prevHasLogic(rel))
         logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.relsById.has(rel.logicId))
         logicChanges.revised.data = projects.current.rels.filter(rel => prevHasLogic(rel) && rel.lag !== getPrevLogic(rel).lag)
@@ -489,6 +473,35 @@ function updateProjCard(name, value){
             )
         })
         updateElements(constraintChanges)
+
+        if ('TASKMEMO' in xerTables.current) {
+            const currMemoArr = Object.values(xerTables.current.TASKMEMO)
+            noteBookChanges.added.data = currMemoArr.filter(memo => {
+                return (
+                    !('TASKMEMO' in xerTables.previous) || 
+                    (memo.proj_id === projects.current.proj_id && !(memo.id in xerTables.previous.TASKMEMO))
+                )
+            })
+
+            noteBookChanges.revised.data = currMemoArr.filter(memo => {
+                return (
+                    'TASKMEMO' in xerTables.previous && 
+                    memo.proj_id === projects.current.proj_id &&
+                    memo.id in xerTables.previous.TASKMEMO && 
+                    memo.note !== xerTables.previous.TASKMEMO[memo.id].note
+                )
+            })
+        }
+
+        if ('TASKMEMO' in xerTables.previous) {
+            noteBookChanges.deleted.data = Object.values(xerTables.previous.TASKMEMO).filter(memo => {
+                return (
+                    !('TASKMEMO' in xerTables.current) || 
+                    (memo.proj_id === projects.previous.proj_id && !(memo.id in xerTables.current.TASKMEMO))
+                )
+            })
+        }
+        updateElements(noteBookChanges)
 
         updateElText('start-var', util.formatAbsNum(util.dateVariance(projects.current.start, projects.previous.start)))
         updateElText('dd-var', util.formatAbsNum(util.dateVariance(projects.current.last_recalc_date, projects.previous.last_recalc_date)))

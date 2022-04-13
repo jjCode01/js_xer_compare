@@ -1,4 +1,4 @@
-import {projects, getTask, hasTask, getPrevRes} from "./main.js"
+import {projects, xerTables, getTask, hasTask, getPrevRes, getMemo} from "./main.js"
 import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance } from "./utilities.js";
 
 const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
@@ -268,11 +268,29 @@ export let taskChanges = {
 
 export let noteBookChanges = {
     added: new Change(
-        "nb-added", "Added Notebook Memo",
-        ['Act ID', '', 'Act Name', 'Notebook', 'Memo'],
+        "nb-added", "Added Notebook Memos",
+        ['Act ID', 'Act Name', 'Notebook', 'Memo'],
         function() {
-            return this.data.map((task, key) => [
-                task.task_code, statusImg(task), task.task_name, key, key,
+            return this.data.map(memo => [
+                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, memo.note,
+            ])
+        }
+    ),
+    deleted: new Change(
+        "nb-deleted", "Deleted Notebook Memos",
+        ['Act ID', 'Act Name', 'Notebook', 'Memo'],
+        function() {
+            return this.data.map(memo => [
+                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, memo.note,
+            ])
+        }
+    ),
+    revised: new Change(
+        "nb-revised", "Revised Notebook Memos",
+        ['Act ID', 'Act Name', 'Notebook', 'New Memo', 'Old Memo'],
+        function() {
+            return this.data.map(memo => [
+                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, memo.note, getMemo(memo, xerTables.previous).note
             ])
         }
     ),

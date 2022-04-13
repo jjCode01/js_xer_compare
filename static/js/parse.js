@@ -1,6 +1,8 @@
 import Task from './modules/task.js'
 import Calendar from './modules/calendar.js';
 import Project from './modules/project.js';
+import Memo from './modules/memo.js';
+// import { getTask } from './main.js';
 
 // let tables = {}
 
@@ -116,26 +118,10 @@ export const parseFile = (file, name) => {
                         } 
                         break;
                     case 'TASKMEMO':
-                        tables.TASKMEMO[row.memo_id] = row;
-                        let parser = new DOMParser()
-                        let memoStr = row.task_memo.replace(/<BR>/g, '\n')
-                        memoStr = memoStr.replace(/(\x7F)+/g, '')
-                        let memoHTML = parser.parseFromString(memoStr, 'text/html')
-
-                        const getPTagMemos = (el) => {
-                            const pMems = el.getElementsByTagName('p')
-                            if (!pMems.length) return
-                            return Array.from(pMems).map(m => m.innerText).join('\n').trim()
-                        }
-
-                        const getBodyTagMemos = (el) => {
-                            const bodyMems = el.getElementsByTagName('body')
-                            if (!bodyMems.length) return undefined
-                            return Array.from(bodyMems).map(m => m.innerText).join('\n').trim()
-                        }
-
-                        const memos = getPTagMemos(memoHTML) ?? getBodyTagMemos(memoHTML)
-                        tables.PROJECT[row.proj_id].tasks.get(row.task_id).memos[tables.MEMOTYPE[row.memo_type_id].memo_type] = memos
+                        let memTask = getTaskbyID(row.proj_id, row.task_id)
+                        let memType = tables?.MEMOTYPE[row.memo_type_id]
+                        let memo = new Memo(row, memTask, memType)
+                        tables.TASKMEMO[memo.id] = memo
                         break;
                 }
             break;

@@ -89,4 +89,5 @@ export default class Project {
         this.thisPeriodQty = thisPeriodQty(this)
         this.remainingQty = remainingQty(this)
     }
+    
 }
