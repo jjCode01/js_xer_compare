@@ -1,20 +1,15 @@
-const parseHtmltoString = data => {
-    const parser = new DOMParser()
-    let memoStr = data.replace(/<BR>/g, '\n')
-    memoStr = memoStr.replace(/(\x7F)+/g, '')
-    return parser.parseFromString(memoStr, 'text/html')
-}
 
-const getPTagMemos = (el) => {
-    const pMems = el.getElementsByTagName('p')
-    if (!pMems.length) return
-    return Array.from(pMems).map(m => m.innerText).join('\n').trim()
-}
+const parseMemo = memo => {
+    //let memoStr = memo.replace(/+/g, '') // remove special character
+    let memoStr = memo.replace(/\u007F+/g, '') // remove special character
 
-const getBodyTagMemos = (el) => {
-    const bodyMems = el.getElementsByTagName('body')
-    if (!bodyMems.length) return
-    return Array.from(bodyMems).map(m => m.innerText).join('\n').trim()
+    memoStr = memoStr.replace(/(?<!(<\/LI>|<[OU]L>)\s*)<LI>/g, '\n\u2022 ')  // check for list items that are not closed
+    memoStr = memoStr.replace(/(<BR>|<\/P>|<\/LI>)/g, '\n')
+    memoStr = memoStr.replace(/<LI>\s*/g, '\u2022 ')
+    memoStr = memoStr.replace(/<!*\/*[A-Z]+.*?>/g, '')
+    memoStr = memoStr.replace(/^[^\S\r\n]+(?=\S)/gm, '') // trim leading spaces
+    console.log(memoStr)
+    return memoStr
 }
 
 export default class Memo {
@@ -22,9 +17,11 @@ export default class Memo {
         Object.assign(this, obj)
         this.task = task
         this.noteBook = noteBook
-        const memoHTML = parseHtmltoString(this.task_memo)
-        this.note = getPTagMemos(memoHTML) ?? getBodyTagMemos(memoHTML)
+        this.note = parseMemo(this.task_memo)
         this.id = `${this.task.task_code}|${this.noteBook.memo_type}`
+    }
+    toArray() {
+        return Array.from(this.note.split('\n'))
     }
     print() {
         console.log(this.noteBook.memo_type)
