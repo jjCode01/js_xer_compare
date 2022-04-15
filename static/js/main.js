@@ -24,8 +24,6 @@ const CHARTCOLOR = {
     RED: '255, 99, 132',
 }
 
-export const hasTask = (task, proj) => proj.tasksByCode.has(task.task_code)
-export const getTask = (task, proj) => proj.tasksByCode.get(task.task_code)
 export const getMemo = (memo, tbl) => tbl.TASKMEMO[memo.id]
 
 const getPrevLogic = rel => projects.previous.relsById.get(rel.logicId)
@@ -35,8 +33,8 @@ export const getPrevRes = res => {
     if (xerTables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.previous.resById.get(res.resId)
     }
-    if (hasTask(res.task, projects.previous)) {
-        const t = getTask(res.task, projects.previous);
+    if (projects.previous.hasTask(res.task)) {
+        const t = projects.previous.getTask(res.task);
         for (let i = 0; i < t.resources.length; i++) {
             let cr = t.resources[i]
             if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
@@ -51,8 +49,8 @@ const prevHasRes = res => {
     if (xerTables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.previous.resById.has(res.resId)
     }
-    if (hasTask(res.task, projects.previous)) {
-        const t = getTask(res.task, projects.previous);
+    if (projects.previous.hasTask(res.task)) {
+        const t = projects.previous.getTask(res.task);
         for (let i = 0; i < t.resources.length; i++) {
             let cr = t.resources[i]
             if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
@@ -67,9 +65,10 @@ const currHasRes = res => {
     if (xerTables.current.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.current.resById.has(res.resId)
     }
-    if (hasTask(res.task, projects.current)) {
-        for (let i = 0; i < getTask(res.task, projects.current).resources.length; i++) {
-            let cr = getTask(res.task, projects.current).resources[i]
+    if (projects.current.hasTask(res.task)) {
+        const ct = projects.current.getTask(res.task)
+        for (let i = 0; i < ct.resources.length; i++) {
+            let cr = ct.resources[i]
             if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
                 return true;
             }
@@ -357,39 +356,39 @@ function updateProjCard(name, value){
             document.getElementById('constraint-variance').append(table)
         }
 
-        updates.started.data = currTasks.filter(task => task.inProgress && getTask(task, projects.previous)?.notStarted).sort(util.sortByStart)
-        updates.finished.data = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).inProgress)).sort(util.sortByFinish)
-        updates.startFinish.data = (currTasks.filter(task => task.completed && hasTask(task, projects.previous) && getTask(task, projects.previous).notStarted)).sort(util.sortByFinish)
+        updates.started.data = currTasks.filter(task => task.inProgress && projects.previous.getTask(task)?.notStarted).sort(util.sortByStart)
+        updates.finished.data = (currTasks.filter(task => task.completed && projects.previous.hasTask(task) && projects.previous.getTask(task).inProgress)).sort(util.sortByFinish)
+        updates.startFinish.data = (currTasks.filter(task => task.completed && projects.previous.hasTask(task) && projects.previous.getTask(task).notStarted)).sort(util.sortByFinish)
 
-        taskChanges.added.data = currTasks.filter(task => !hasTask(task, projects.previous))
-        taskChanges.deleted.data = prevTasks.filter(task => !projects.current.tasksByCode.has(task.task_code))
+        taskChanges.added.data = currTasks.filter(task => !projects.previous.hasTask(task))
+        taskChanges.deleted.data = prevTasks.filter(task => !projects.current.hasTask(task))
 
-	    const ongoingTasks = currTasks.filter(task => hasTask(task, projects.previous))
-        taskChanges.name.data = ongoingTasks.filter(task => task.task_name !== getTask(task, projects.previous).task_name)
+	    const ongoingTasks = currTasks.filter(task => projects.previous.hasTask(task))
+        taskChanges.name.data = ongoingTasks.filter(task => task.task_name !== projects.previous.getTask(task).task_name)
         taskChanges.duration.data = ongoingTasks.filter(task => {
             return (
                 !task.isLOE && 
-                ((task.origDur !== getTask(task, projects.previous).origDur) || 
-                (task.notStarted && task.origDur !== task.remDur && task.remDur !== getTask(task, projects.previous).remDur))
+                ((task.origDur !== projects.previous.getTask(task).origDur) || 
+                (task.notStarted && task.origDur !== task.remDur && task.remDur !== projects.previous.getTask(task).remDur))
             )
 	    })
-        taskChanges.calendar.data = ongoingTasks.filter(task => task.calendar.id !== getTask(task, projects.previous).calendar.id)
+        taskChanges.calendar.data = ongoingTasks.filter(task => task.calendar.id !== projects.previous.getTask(task).calendar.id)
         taskChanges.start.data = ongoingTasks.filter(task => {
             return (
                 !task.notStarted && 
-                !getTask(task, projects.previous).notStarted && 
-                util.formatDate(task.start) !== util.formatDate(getTask(task, projects.previous).start)
+                !projects.previous.getTask(task).notStarted && 
+                util.formatDate(task.start) !== util.formatDate(projects.previous.getTask(task).start)
             )
 	    }).sort(util.sortByStart)
         taskChanges.finish.data = ongoingTasks.filter(task => {
             return (
                 task.completed && 
-                getTask(task, projects.previous).completed && 
-                util.formatDate(task.finish) !== util.formatDate(getTask(task, projects.previous).finish)
+                projects.previous.getTask(task).completed && 
+                util.formatDate(task.finish) !== util.formatDate(projects.previous.getTask(task).finish)
             )
 	    }).sort(util.sortByFinish)
-        taskChanges.wbs.data = ongoingTasks.filter(task => task.wbs.wbsID !== getTask(task, projects.previous).wbs.wbsID)
-        taskChanges.type.data = ongoingTasks.filter(task => task.taskType !== getTask(task, projects.previous).taskType)
+        taskChanges.wbs.data = ongoingTasks.filter(task => task.wbs.wbsID !== projects.previous.getTask(task).wbs.wbsID)
+        taskChanges.type.data = ongoingTasks.filter(task => task.taskType !== projects.previous.getTask(task).taskType)
         updateElements(taskChanges)
 
         logicChanges.added.data = projects.current.rels.filter(rel => !prevHasLogic(rel))
@@ -429,47 +428,47 @@ function updateProjCard(name, value){
         updateElements(calendarChanges)
 
         constraintChanges.addedPrim.data = currTasks.filter(task => {
-            hasTask(task, projects.previous) && 
+            projects.previous.hasTask(task) && 
             task.primeConstraint && 
-            task.primeConstraint !== getTask(task, projects.previous).primeConstraint
+            task.primeConstraint !== projects.previous.getTask(task).primeConstraint
         })
         constraintChanges.deletedPrim.data = prevTasks.filter(task => {
             return (
-                hasTask(task, projects.current) && 
+                projects.current.hasTask(task) && 
                 task.primeConstraint && 
-                task.primeConstraint !== getTask(task, projects.previous).primeConstraint
+                task.primeConstraint !== projects.previous.getTask(task).primeConstraint
             )
         })
         constraintChanges.revisedPrim.data = currTasks.filter(task => {
             return (
-                hasTask(task, projects.previous) && 
+                projects.previous.hasTask(task) && 
                 task.primeConstraint &&
                 task.cstr_date &&
-                task.primeConstraint === getTask(task, projects.previous).primeConstraint &&
-                task.cstr_date.getTime() !== getTask(task, projects.previous).cstr_date.getTime()
+                task.primeConstraint === projects.previous.getTask(task).primeConstraint &&
+                task.cstr_date.getTime() !== projects.previous.getTask(task).cstr_date.getTime()
             )
         })
         constraintChanges.addedSec.data = currTasks.filter(task => {
             return (
-                hasTask(task, projects.previous) && 
+                projects.previous.hasTask(task) && 
                 task.secondConstraint && 
-                task.secondConstraint !== getTask(task, projects.previous).secondConstraint
+                task.secondConstraint !== projects.previous.getTask(task).secondConstraint
             )
         })
         constraintChanges.deletedSec.data = prevTasks.filter(task => {
             return (
-                hasTask(task, projects.current) && 
+                projects.current.hasTask(task) && 
                 task.secondConstraint && 
-                task.secondConstraint !== getTask(task, projects.previous).secondConstraint
+                task.secondConstraint !== projects.previous.getTask(task).secondConstraint
             )
         })
         constraintChanges.revisedSec.data = currTasks.filter(task => {
             return (
-                hasTask(task, projects.previous) && 
+                projects.previous.hasTask(task) && 
                 task.secondConstraint &&
                 task.cstr_date2 &&
-                task.secondConstraint === getTask(task, projects.previous).secondConstraint &&
-                task.cstr_date2.getTime() !== getTask(task, projects.previous).cstr_date2.getTime()
+                task.secondConstraint === projects.previous.getTask(task).secondConstraint &&
+                task.cstr_date2.getTime() !== projects.previous.getTask(task).cstr_date2.getTime()
             )
         })
         updateElements(constraintChanges)
@@ -650,7 +649,6 @@ const progressTable = document.getElementById("progress-table")
 const trendingTable = document.getElementById("constraint-variance")
 
 nearCriticalTF.addEventListener("change", (e) => {
-    console.log('Near Critical: ', nearCriticalTF.value)
     if (parseInt(nearCriticalTF.value) <= FLOAT.critical) {
         nearCriticalTF.value = FLOAT.critical + 1
     }
@@ -662,7 +660,6 @@ nearCriticalTF.addEventListener("change", (e) => {
     highTF.min = FLOAT.nearCritical + 1    
 })
 highTF.addEventListener("change", (e) => {
-    console.log('High TF: ', highTF.value)
     if (parseInt(highTF.value) <= FLOAT.nearCritical) {
         highTF.value = FLOAT.nearCritical + 1
     }

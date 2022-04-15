@@ -1,4 +1,4 @@
-import {projects, xerTables, getTask, hasTask, getPrevRes, getMemo} from "./main.js"
+import {projects, xerTables, getPrevRes, getMemo} from "./main.js"
 import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance } from "./utilities.js";
 
 const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
@@ -64,8 +64,8 @@ export let updates = {
         function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, task.percentType, 
-                formatPercent(task.percent), formatPercent(getTask(task, projects.previous).percent), 
-                formatPercent(task.percent - getTask(task, projects.previous).percent, 'always')
+                formatPercent(task.percent), formatPercent(projects.previous.getTask(task).percent), 
+                formatPercent(task.percent - projects.previous.getTask(task).percent, 'always')
             ])
         }
     ),
@@ -78,8 +78,8 @@ export let updates = {
         function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatNumber(task.origDur), 
-                formatNumber(task.remDur), formatNumber(getTask(task, projects.previous).remDur), 
-                formatVariance(task.remDur - getTask(task, projects.previous).remDur)
+                formatNumber(task.remDur), formatNumber(projects.previous.getTask(task).remDur), 
+                formatVariance(task.remDur - projects.previous.getTask(task).remDur)
             ])
         }
     ),
@@ -92,8 +92,8 @@ export let updates = {
         function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatCost(budgetedCost(task)), 
-                formatCost(actualCost(task)), formatCost(actualCost(getTask(task, projects.previous))), 
-                formatCost(actualCost(task) - actualCost(getTask(task, projects.previous)))
+                formatCost(actualCost(task)), formatCost(actualCost(projects.previous.getTask(task))), 
+                formatCost(actualCost(task) - actualCost(projects.previous.getTask(task)))
             ])
         }
     ),
@@ -107,11 +107,11 @@ export let updates = {
         function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, 
-                getTask(task, projects.previous).status, task.origDur, 
-                task.remDur, getTask(task, projects.previous).remDur, 
-                formatVariance(task.remDur - getTask(task, projects.previous).remDur),
-                formatPercent(task.percent), formatPercent(getTask(task, projects.previous).percent), 
-                formatPercent(task.percent - getTask(task, projects.previous).percent, 'always')
+                projects.previous.getTask(task).status, task.origDur, 
+                task.remDur, projects.previous.getTask(task).remDur, 
+                formatVariance(task.remDur - projects.previous.getTask(task).remDur),
+                formatPercent(task.percent), formatPercent(projects.previous.getTask(task).percent), 
+                formatPercent(task.percent - projects.previous.getTask(task).percent, 'always')
             ])
         }
     )
@@ -140,12 +140,12 @@ export let constraintVariance = {
     data: [],
     getRows: function() {
         return this.data.map(task => {
-            if (hasTask(task, projects.previous)) {
+            if (projects.previous.hasTask(task)) {
                 return [
                     task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
                     formatDate(task.finish, false), formatVariance(task.totalFloat), 
-                    formatDate(getTask(task, projects.previous).finish, false),
-                    formatVariance(dateVariance(getTask(task, projects.previous).finish, task.finish))
+                    formatDate(projects.previous.getTask(task).finish, false),
+                    formatVariance(dateVariance(projects.previous.getTask(task).finish, task.finish))
                 ]
             }
             return [
@@ -182,7 +182,7 @@ export let taskChanges = {
         ['Act ID', '', 'Act Name', 'Prev Name'],
         function() {
             return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, getTask(task, projects.previous).task_name
+                task.task_code, statusImg(task), task.task_name, projects.previous.getTask(task).task_name
             ])
         }
     ),
@@ -191,7 +191,7 @@ export let taskChanges = {
         ['Act ID', '', 'Act Name', 'New Dur', 'Old Dur', 'Var'],
         function() {
             return this.data.map(task => {
-		let prevTask = getTask(task, projects.previous)
+		let prevTask = projects.previous.getTask(task)
 		let currDur = task.origDur
 		let prevDur = prevTask.origDur
 		let remDurChange = false
@@ -218,7 +218,7 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, task.calendar.clndr_name, 
-                getTask(task, projects.previous).calendar.clndr_name 
+                projects.previous.getTask(task).calendar.clndr_name 
             ])
         }
     ),
@@ -228,8 +228,8 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, formatDate(task.start, false), 
-                formatDate(getTask(task, projects.previous).start, false), 
-                formatVariance(dateVariance(task.start, getTask(task, projects.previous).start))
+                formatDate(projects.previous.getTask(task).start, false), 
+                formatVariance(dateVariance(task.start, projects.previous.getTask(task).start))
             ])
         }
     ),
@@ -239,8 +239,8 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, formatDate(task.finish, false), 
-                formatDate(getTask(task, projects.previous).finish, false), 
-                formatVariance(dateVariance(task.finish, getTask(task, projects.previous).finish))
+                formatDate(projects.previous.getTask(task).finish, false), 
+                formatVariance(dateVariance(task.finish, projects.previous.getTask(task).finish))
             ])
         }
     ),
@@ -250,7 +250,7 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, task.wbs.wbsID, 
-                getTask(task, projects.previous).wbs.wbsID
+                projects.previous.getTask(task).wbs.wbsID
             ])
         }
     ),
@@ -260,7 +260,7 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, statusImg(task), task.task_name, task.taskType, 
-                getTask(task, projects.previous).taskType
+                projects.previous.getTask(task).taskType
             ])
         }
     ),
@@ -318,8 +318,8 @@ export let logicChanges = {
         ],
         function() {
             return this.data.map(task => [
-                task.predTask.task_code, statusImg(getTask(task.predTask, projects.current)), task.predTask.task_name, 
-                task.succTask.task_code, statusImg(getTask(task.succTask, projects.current)), task.succTask.task_name, task.link, task.lag 
+                task.predTask.task_code, statusImg(projects.current.getTask(task.predTask)), task.predTask.task_name, 
+                task.succTask.task_code, statusImg(projects.current.getTask(task.succTask)), task.succTask.task_name, task.link, task.lag 
             ])
         }
     ),
@@ -488,11 +488,11 @@ export let constraintChanges = {
         ['Act ID', '', 'Activity Name', 'Constraint', 'New Date', 'Old Date', 'Var'],
         function() {
             return this.data.map(task => {
-                const prevDate = getTask(task, projects.previous).cstr_date
+                const prevDate = projects.previous.getTask(task).cstr_date
                 const variance = dateVariance(task.cstr_date, prevDate) ?? "N/A"
                 return [
                     task.task_code, statusImg(task), task.task_name, task.primeConstraint, 
-                    formatDate(task.cstr_date), formatDate(getTask(task, projects.previous).cstr_date), 
+                    formatDate(task.cstr_date), formatDate(projects.previous.getTask(task).cstr_date), 
                     formatVariance(variance)
                 ]
             })
@@ -503,11 +503,11 @@ export let constraintChanges = {
         ['Act ID', '', 'Activity Name', 'Constraint', 'New Date', 'Old Date', 'Var'],
         function() {
             return this.data.map(task => {
-                const prevDate = getTask(task, projects.previous).cstr_date2
+                const prevDate = projects.previous.getTask(task).cstr_date2
                 const variance = dateVariance(task.cstr_date2, prevDate) ?? "N/A"
                 return [
                     task.task_code, statusImg(task), task.task_name, task.secondConstraint, 
-                    formatDate(task.cstr_date2), formatDate(getTask(task, projects.previous).cstr_date2), 
+                    formatDate(task.cstr_date2), formatDate(projects.previous.getTask(task).cstr_date2), 
                     formatVariance(variance)
                 ]
             })

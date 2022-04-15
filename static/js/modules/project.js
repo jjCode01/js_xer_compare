@@ -1,5 +1,6 @@
 import { FLOAT } from "../main.js"
 import {budgetedCost, actualCost, thisPeriodCost, remainingCost, budgetedQty, actualQty, thisPeriodQty, remainingQty} from "../utilities.js"
+import Task from "./task.js"
 
 const MONTHNAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -31,10 +32,11 @@ const getMonthIntervalObj = proj => {
 }
 
 export default class Project {
+    #tasksByCode
     constructor(obj) {
         Object.assign(this, obj)
         this.tasks = new Map();
-        this.tasksByCode = new Map();
+        this.#tasksByCode = new Map()
         this.rels = [];
         this.relsById = new Map();
         this.resources = [];
@@ -44,6 +46,36 @@ export default class Project {
         this.wbs = new Map();
         this.name = '';
     }
+  
+    /**
+     * @param { Task } task
+     */
+    set addTask(task) {
+        if (task instanceof Task){
+            this.tasks.set(task.task_id, task)
+            this.#tasksByCode.set(task.task_code, task)
+        }
+    }
+
+    get notStarted() {
+        return Array.from(this.tasks.values()).filter(task => task.notStarted)
+    }
+
+    get inProgress() {
+        return Array.from(this.tasks.values()).filter(task => task.inProgress)
+    }
+
+    getTask(task) {
+        if (task instanceof Task) return this.#tasksByCode.get(task.task_code)
+        if (task instanceof String) return this.#tasksByCode.get(task)
+        return
+    }
+
+    hasTask(task) {
+        if (task instanceof Task) return this.#tasksByCode.has(task.task_code)
+        if (task instanceof String) return this.#tasksByCode.has(task)
+    }
+
     deepAnalysis() {
         const tasks = [...this.tasks.values()]
         this.months = getMonthIntervalObj(this);    
@@ -58,8 +90,6 @@ export default class Project {
             if (task.completed) this.months[finishMonth].actualFinish += 1;
         })
     
-        this.notStarted = tasks.filter(task => task.notStarted)
-        this.inProgress = tasks.filter(task => task.inProgress)
         this.completed = tasks.filter(task => task.completed)
         this.open = tasks.filter(task => !task.completed)
         this.milestones = tasks.filter(task => task.isMilestone)

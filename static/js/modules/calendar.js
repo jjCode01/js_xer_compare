@@ -6,7 +6,8 @@ const CALENDARTYPES = {
     CA_Project: 'Project',
 }
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const REGEXSHIFT = /s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g;
+// const REGEXSHIFT = /s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g;
+const REGEXSHIFT = /([sf]\|[0-1][0-9]:[0-5][0-9]\|*){2}/g;
 const REGEXHOUR = /[0-1][0-9]:[0-5][0-9]/g;
 
 const parseWorkShifts = (data) => {

@@ -84,8 +84,8 @@ export const parseFile = (file, name) => {
                             wbs = task.project.wbs.get(wbs.parent_wbs_id);
                             task.wbsStruct.unshift(wbs)
                         }
-                        tables.PROJECT[task.proj_id].tasks.set(task.task_id, task);
-                        tables.PROJECT[task.proj_id].tasksByCode.set(task.task_code, task); 
+                        tables.PROJECT[task.proj_id].addTask = task;
+                        // tables.PROJECT[task.proj_id].tasksByCode.set(task.task_code, task); 
                         if (task.start < tables.PROJECT[task.proj_id].start) {
                             tables.PROJECT[task.proj_id].start = task.start;
                         }
