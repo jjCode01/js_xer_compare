@@ -6,36 +6,37 @@ const regExFindTable = /%T\t/gm;
 
 const setDataType = (col, val) => {
     if (!val) return;
-    if (col === /.+_date2*/) return new Date(val.replace(' ', 'T'))
+    if (/.+_date2*/.test(col)) return new Date(val.replace(' ', 'T'))
     if (col.endsWith('_num')) return parseInt(val);
-    
-    const floatType = ['_cost', '_qty', '_cnt']
-    if (floatType.some(s => col.endsWith(s))) return parseFloat(val)
+    if (/.+_(cost|qty|cnt)/.test(col)) return parseFloat(val)
     return val;
 }
 
 const setObjType = (tableName, obj) => {
     if (tableName === 'CALENDAR') return new Calendar(obj)
+    if (tableName === 'PROJECT') return new Project(obj)
     return obj
+}
+
+const convertArrToObj = (arr, key) => {
+    if (!key) return
+    return arr.reduce((obj, el) => {
+        obj[el[key]] = el
+        return obj
+    }, {})
+}
+
+const tblKeyMap = {
+    CALENDAR: 'clndr_id',
+    PROJECT: 'proj_id',
 }
 
 class XerTable {
     constructor(name, labels, rows) {
         this.name = name
         this.labels = labels
-        this.rows = rows
+        this.rows = convertArrToObj(rows, tblKeyMap[name]) ?? rows
     }
-    print() {
-        console.log(this.name, `Entries: ${this.rows.length}`)
-    }
-}
-
-const analyzeTables = (tables) => {
-    // Object.values(tables.PROJECT.rows).forEach(proj => proj = new Project(proj))
-    for (let proj in tables.PROJECT.rows) {
-        tables.PROJECT.rows[proj] = new Project(tables.PROJECT.rows[proj])
-    }
-    return tables
 }
 
 const parseTableObjects = (file) =>{
@@ -59,7 +60,19 @@ const parseTableObjects = (file) =>{
 export default class ParseXer{
     constructor(file, name) {
         this.name = name
-        this.tables = parseTableObjects(file)
+        Object.assign(this, parseTableObjects(file))
+        this.#foo()
+    }
+    #foo() {
+        this.PROJWBS.rows.forEach(wbs => {
+            this.PROJECT.rows[wbs.proj_id].wbs.set(wbs.wbs_id, wbs)
+            if (wbs.proj_node_flag === 'Y') {
+                tables.PROJECT.rows[wbs.proj_id].name = wbs.wbs_name;
+            }
+        })
+        this.TASK.rows.forEach(task => {
+            this.PROJECT.rows[task.proj_id].addTask = new Task(task, this.PROJECT.rows[task.proj_id], this.CALENDAR.rows[task.clndr_id])
+        })
     }
     print() {
         console.log(this)
