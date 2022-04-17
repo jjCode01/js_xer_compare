@@ -1,5 +1,7 @@
 import { FLOAT } from "../main.js"
 import {budgetedCost, actualCost, thisPeriodCost, remainingCost, budgetedQty, actualQty, thisPeriodQty, remainingQty} from "../utilities.js"
+import Relationship from "./relationship.js"
+import Resource from "./resource.js"
 import Task from "./task.js"
 
 const MONTHNAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -54,6 +56,32 @@ export default class Project {
         if (task instanceof Task){
             this.tasks.set(task.task_id, task)
             this.#tasksByCode.set(task.task_code, task)
+        }
+    }
+
+    set addWbs(wbs) {
+        this.wbs.set(wbs.wbs_id, wbs)
+        if (wbs.proj_node_flag === 'Y') this.name = wbs.wbs_name;
+    }
+
+    set addRelationship(rel) {
+        if (rel instanceof Relationship) {
+            this.rels.push(rel);
+            this.relsById.set(rel.logicId, rel);
+            if (this.tasks.has(rel.task_id)) {
+                this.tasks.get(rel.task_id).predecessors.push(rel);
+            }
+            if (this.tasks.has(rel.pred_task_id)) {
+                this.tasks.get(rel.pred_task_id).successors.push(rel);
+            }
+        }
+    }
+
+    set addResource(rsrc) {
+        if (rsrc instanceof Resource) {
+            this.resources.push(rsrc)
+            this.resById.set(rsrc.resId, rsrc);
+            this.tasks.get(rsrc.task_id).resources.push(rsrc);
         }
     }
 

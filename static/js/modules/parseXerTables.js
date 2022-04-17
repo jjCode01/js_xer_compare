@@ -1,5 +1,7 @@
 import Calendar from "./calendar.js";
 import Project from "./project.js";
+import Relationship from "./relationship.js";
+import Resource from "./resource.js";
 import Task from "./task.js";
 
 const regExFindTable = /%T\t/gm;
@@ -27,8 +29,11 @@ const convertArrToObj = (arr, key) => {
 }
 
 const tblKeyMap = {
+    ACCOUNT: 'account_id',
     CALENDAR: 'clndr_id',
+    MEMOTYPE: 'memo_type_id',
     PROJECT: 'proj_id',
+    RSRC: 'rsrc_id',
 }
 
 class XerTable {
@@ -58,21 +63,44 @@ const parseTableObjects = (file) =>{
 }
 
 export default class ParseXer{
+    #tables
     constructor(file, name) {
         this.name = name
-        Object.assign(this, parseTableObjects(file))
-        this.#foo()
+        this.#tables = parseTableObjects(file)
+        this.#tables.PROJWBS.rows.forEach(wbs => this.PROJECT[wbs.proj_id].addWbs = wbs)
+        if ('TASK' in this.#tables) {
+            this.#tables.TASK.rows.forEach(task => {
+                this.PROJECT[task.proj_id].addTask = new Task(
+                    task, this.PROJECT[task.proj_id], this.CALENDAR[task.clndr_id]
+                )
+            })
+        }
+        if ('TASKPRED' in this.#tables) {
+            this.#tables.TASKPRED.rows.forEach(rel => {
+                const predTask = this.PROJECT[rel.pred_proj_id].tasks.get(rel.pred_task_id)
+                const succTask = this.PROJECT[rel.proj_id].tasks.get(rel.task_id)
+                this.PROJECT[rel.proj_id].addRelationship = new Relationship(rel, predTask, succTask)
+            })
+        }
+        if ('TASKRSRC' in this.#tables) {
+            this.#tables.TASKRSRC.rows.forEach(rsrc => {
+                if (!(rsrc.target_cost === 0 && rsrc.target_qty === 0)) {
+                    const task = this.PROJECT[rsrc.proj_id].tasks.get(rsrc.task_id);
+                    const account = this.#tables?.ACCOUNT?.rows[rsrc.acct_id]
+                    const resType = this.#tables?.RSRC?.rows[rsrc.rsrc_id]
+                    this.PROJECT[rsrc.proj_id].addResource = new Resource(rsrc, resType, task, account)
+                }
+            })
+        }
     }
-    #foo() {
-        this.PROJWBS.rows.forEach(wbs => {
-            this.PROJECT.rows[wbs.proj_id].wbs.set(wbs.wbs_id, wbs)
-            if (wbs.proj_node_flag === 'Y') {
-                tables.PROJECT.rows[wbs.proj_id].name = wbs.wbs_name;
-            }
-        })
-        this.TASK.rows.forEach(task => {
-            this.PROJECT.rows[task.proj_id].addTask = new Task(task, this.PROJECT.rows[task.proj_id], this.CALENDAR.rows[task.clndr_id])
-        })
+    get CALENDAR() {
+        return this.#tables.CALENDAR.rows
+    }
+    get PROJECT() {
+        return this.#tables.PROJECT.rows
+    }
+    get RSRC() {
+        return this.#tables?.RSRC?.rows
     }
     print() {
         console.log(this)
