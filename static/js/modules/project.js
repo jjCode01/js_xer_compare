@@ -1,5 +1,6 @@
 import { FLOAT } from "../main.js"
 import {budgetedCost, actualCost, thisPeriodCost, remainingCost, budgetedQty, actualQty, thisPeriodQty, remainingQty} from "../utilities.js"
+import Memo from "./memo.js"
 import Relationship from "./relationship.js"
 import Resource from "./resource.js"
 import Task from "./task.js"
@@ -43,6 +44,7 @@ export default class Project {
         this.relsById = new Map();
         this.resources = [];
         this.resById = new Map();
+        this.notes = new Map();
         this.start = this.last_recalc_date;
         this.lateEnd = this.scd_end_date;
         this.wbs = new Map();
@@ -82,6 +84,12 @@ export default class Project {
             this.resources.push(rsrc)
             this.resById.set(rsrc.resId, rsrc);
             this.tasks.get(rsrc.task_id).resources.push(rsrc);
+        }
+    }
+
+    set addNote(memo) {
+        if (memo instanceof Memo) {
+            this.notes.set(memo.id, memo)
         }
     }
 

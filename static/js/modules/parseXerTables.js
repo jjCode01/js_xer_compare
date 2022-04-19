@@ -1,4 +1,5 @@
 import Calendar from "./calendar.js";
+import Memo from "./memo.js";
 import Project from "./project.js";
 import Relationship from "./relationship.js";
 import Resource from "./resource.js";
@@ -92,6 +93,13 @@ export default class ParseXer{
                 }
             })
         }
+        if ('TASKMEMO' in this.#tables) {
+            this.#tables.TASKMEMO.rows.forEach(memo => {
+                const task = this.PROJECT[memo.proj_id].tasks.get(memo.task_id)
+                const memoType = this?.MEMOTYPE[memo.memo_type_id]
+                this.PROJECT[memo.proj_id].addNote = new Memo(memo, task, memoType)
+            })
+        }
     }
     get CALENDAR() {
         return this.#tables.CALENDAR.rows
@@ -101,6 +109,9 @@ export default class ParseXer{
     }
     get RSRC() {
         return this.#tables?.RSRC?.rows
+    }
+    get MEMOTYPE() {
+        return this.#tables?.MEMOTYPE?.rows
     }
     print() {
         console.log(this)
