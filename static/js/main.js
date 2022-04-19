@@ -26,9 +26,6 @@ const CHARTCOLOR = {
 
 export const getMemo = (memo, tbl) => tbl.TASKMEMO[memo.id]
 
-const getPrevLogic = rel => projects.previous.relsById.get(rel.logicId)
-const prevHasLogic = rel => projects.previous.relsById.has(rel.logicId)
-
 export const getPrevRes = res => {
     if (xerTables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
         return projects.previous.resById.get(res.resId)
@@ -391,10 +388,10 @@ function updateProjCard(name, value){
         taskChanges.type.data = ongoingTasks.filter(task => task.taskType !== projects.previous.getTask(task).taskType)
         updateElements(taskChanges)
 
-        logicChanges.added.data = projects.current.rels.filter(rel => !prevHasLogic(rel))
-        logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.relsById.has(rel.logicId))
-        logicChanges.revised.data = projects.current.rels.filter(rel => prevHasLogic(rel) && rel.lag !== getPrevLogic(rel).lag)
-        logicChanges.revised.prev = logicChanges.revised.data.map(rel => getPrevLogic(rel))
+        logicChanges.added.data = projects.current.rels.filter(rel => !projects.previous.hasLogic(rel))
+        logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.hasLogic(rel))
+        logicChanges.revised.data = projects.current.rels.filter(rel => projects.previous.hasLogic(rel) && rel.lag !== projects.previous.getLogic(rel).lag)
+        logicChanges.revised.prev = logicChanges.revised.data.map(rel => projects.previous.getLogic(rel))
 
         for (let a = logicChanges.added.data.length - 1; a >= 0; a--) {
             let addRel = logicChanges.added.data[a];

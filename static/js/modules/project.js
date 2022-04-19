@@ -108,6 +108,27 @@ export default class Project {
     get normalFloat() {return this.taskArray.filter(task => task.totalFloat > FLOAT.nearCritical && task.totalFloat < FLOAT.high)}
     get highFloat() {return this.taskArray.filter(task => task.totalFloat >= FLOAT.high)}
 
+    get scheduleDuration() {return (this.scd_end_date.getTime() - this.start.getTime()) / (1000 * 3600 * 24)}
+    get remScheduleDuration() {return (this.scd_end_date.getTime() - this.last_recalc_date.getTime()) / (1000 * 3600 * 24)}
+
+    get origDurSum() {return this.taskArray.reduce((od, task) => od += task.origDur, 0)}
+    get remDurSum() {return this.taskArray.reduce((rd, task) => rd += task.remDur, 0)}
+
+    get physPercentComp() {
+        const actDateTerm = (this.inProgress.length / 2 + this.completed.length) / this.tasks.size
+        const durTerm = (1 - this.remDurSum / this.origDurSum)
+        return (actDateTerm + durTerm) / 2
+    }
+    get schedPercentComp() {return 1 - this.remScheduleDuration / this.scheduleDuration}
+
+    get budgetCost() {return this.resources.reduce((a, r) => a + r.target_cost, 0.0)}
+    get actualCost() {return this.resources.reduce((a, r) => a + r.act_reg_cost + r.act_ot_cost, 0.0)}
+    get thisPeriodCost() {return this.resources.reduce((a, r) => a + r.act_this_per_cost, 0.0)}
+    get remainingCost() {return this.resources.reduce((a, r) => a + r.remain_cost, 0.0)}
+    get budgetQty() {return this.resources.reduce((a, r) => a + r.target_qty, 0.0)}
+    get actualQty() {return this.resources.reduce((a, r) => a + r.act_reg_qty + r.act_ot_qty, 0.0)}
+    get thisPeriodQty() {return this.resources.reduce((a, r) => a + r.act_this_per_qty, 0.0)}
+    get remainingQty() {return this.resources.reduce((a, r) => a + r.remain_qty, 0.0)}
 
     getTask(task) {
         if (task instanceof Task) return this.#tasksByCode.get(task.task_code)
@@ -120,12 +141,14 @@ export default class Project {
         if (task instanceof String) return this.#tasksByCode.has(task)
     }
 
+    getLogic(rel) {return this.relsById.get(rel.logicId)}
+    hasLogic(rel) {return this.relsById.has(rel.logicId)}
+
     deepAnalysis() {
-        const tasks = [...this.tasks.values()]
         this.months = getMonthIntervalObj(this);    
         const getMonthID = date => `${MONTHNAMES[date.getMonth()]}-${date.getFullYear()}`
     
-        tasks.forEach(task => {
+        this.taskArray.forEach(task => {
             const startMonth = getMonthID(task.start)
             const finishMonth = getMonthID(task.finish)
             if (!task.completed) this.months[finishMonth].earlyFinish += 1;
@@ -133,26 +156,6 @@ export default class Project {
             if (task.notStarted) this.months[startMonth].earlyStart += 1;
             if (task.completed) this.months[finishMonth].actualFinish += 1;
         })
-    
-        this.scheduleDuration = (this.scd_end_date.getTime() - this.start.getTime()) / (1000 * 3600 * 24)
-        this.remScheduleDuration = (this.scd_end_date.getTime() - this.last_recalc_date.getTime()) / (1000 * 3600 * 24)
-    
-        this.origDurSum = [...this.tasks.values()].reduce((od, task) => od += task.origDur, 0)
-        this.remDurSum = [...this.tasks.values()].reduce((rd, task) => rd += task.remDur, 0)
-    
-        const actDateTerm = (this.inProgress.length / 2 + this.completed.length) / this.tasks.size
-        const durTerm = (1 - this.remDurSum / this.origDurSum)
-        this.physPercentComp = (actDateTerm + durTerm) / 2
-        this.schedPercentComp = 1 - this.remScheduleDuration / this.scheduleDuration
-    
-        this.budgetCost = budgetedCost(this)
-        this.actualCost = actualCost(this)
-        this.thisPeriodCost = thisPeriodCost(this)
-        this.remainingCost = remainingCost(this)
-        this.budgetQty = budgetedQty(this)
-        this.actualQty = actualQty(this)
-        this.thisPeriodQty = thisPeriodQty(this)
-        this.remainingQty = remainingQty(this)
     }
     
 }
