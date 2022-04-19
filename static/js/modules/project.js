@@ -93,13 +93,21 @@ export default class Project {
         }
     }
 
-    get notStarted() {
-        return Array.from(this.tasks.values()).filter(task => task.notStarted)
-    }
+    get taskArray() {return Array.from(this.tasks.values())}
 
-    get inProgress() {
-        return Array.from(this.tasks.values()).filter(task => task.inProgress)
-    }
+    get notStarted() {return this.taskArray.filter(task => task.notStarted)}
+    get inProgress() {return this.taskArray.filter(task => task.inProgress)}
+    get completed() {return this.taskArray.filter(task => task.completed)}
+    get open() {return this.taskArray.filter(task => !task.completed)}
+
+    get milestones() {return this.taskArray.filter(task => task.isMilestone)}
+    
+    get longestPath() {return this.taskArray.filter(task => task.longestPath && !task.completed)}
+    get critical() {return this.taskArray.filter(task => task.totalFloat <= FLOAT.critical)}
+    get nearCritical() {return this.taskArray.filter(task => task.totalFloat > FLOAT.critical && task.totalFloat <= FLOAT.nearCritical)}
+    get normalFloat() {return this.taskArray.filter(task => task.totalFloat > FLOAT.nearCritical && task.totalFloat < FLOAT.high)}
+    get highFloat() {return this.taskArray.filter(task => task.totalFloat >= FLOAT.high)}
+
 
     getTask(task) {
         if (task instanceof Task) return this.#tasksByCode.get(task.task_code)
@@ -125,15 +133,6 @@ export default class Project {
             if (task.notStarted) this.months[startMonth].earlyStart += 1;
             if (task.completed) this.months[finishMonth].actualFinish += 1;
         })
-    
-        this.completed = tasks.filter(task => task.completed)
-        this.open = tasks.filter(task => !task.completed)
-        this.milestones = tasks.filter(task => task.isMilestone)
-        this.longestPath = tasks.filter(task => task.longestPath && !task.completed)
-        this.critical = tasks.filter(task => task.totalFloat <= FLOAT.critical)
-        this.nearCritical = tasks.filter(task => task.totalFloat > FLOAT.critical && task.totalFloat <= FLOAT.nearCritical)
-        this.normalFloat = tasks.filter(task => task.totalFloat > FLOAT.nearCritical && task.totalFloat < FLOAT.high)
-        this.highFloat = tasks.filter(task => task.totalFloat >= FLOAT.high)
     
         this.scheduleDuration = (this.scd_end_date.getTime() - this.start.getTime()) / (1000 * 3600 * 24)
         this.remScheduleDuration = (this.scd_end_date.getTime() - this.last_recalc_date.getTime()) / (1000 * 3600 * 24)
