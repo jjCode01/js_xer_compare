@@ -26,54 +26,6 @@ const CHARTCOLOR = {
 
 export const getMemo = (memo, tbl) => tbl.TASKMEMO[memo.id]
 
-export const getPrevRes = res => {
-    if (xerTables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
-        return projects.previous.resById.get(res.resId)
-    }
-    if (projects.previous.hasTask(res.task)) {
-        const t = projects.previous.getTask(res.task);
-        for (let i = 0; i < t.resources.length; i++) {
-            let cr = t.resources[i]
-            if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
-                return cr;
-            }
-        }
-    }
-    return undefined
-}
-
-const prevHasRes = res => {
-    if (xerTables.previous.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
-        return projects.previous.resById.has(res.resId)
-    }
-    if (projects.previous.hasTask(res.task)) {
-        const t = projects.previous.getTask(res.task);
-        for (let i = 0; i < t.resources.length; i++) {
-            let cr = t.resources[i]
-            if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
-                return true;
-            }
-        }
-    }
-    return false
-}
-
-const currHasRes = res => {
-    if (xerTables.current.hasOwnProperty('RSRC') && res.hasOwnProperty('resId')) {
-        return projects.current.resById.has(res.resId)
-    }
-    if (projects.current.hasTask(res.task)) {
-        const ct = projects.current.getTask(res.task)
-        for (let i = 0; i < ct.resources.length; i++) {
-            let cr = ct.resources[i]
-            if (cr.target_cost === res.target_cost && cr.target_qty === res.target_qty) {
-                return true;
-            }
-        }
-    }
-    return false
-}
-
 const updateElText = (id, value) => document.getElementById(id).textContent = value
 
 function updateProjCard(name, value){
@@ -223,8 +175,6 @@ function updateProjCard(name, value){
     }
 
     if (name === "current") {
-        // const currResources = projects.current.resources
-
         document.getElementById("sched-progress").style.width = `${util.formatPercent(projects.current.schedPercentComp)}`
         document.getElementById("phys-progress").style.width = `${util.formatPercent(projects.current.physPercentComp)}`
         if (projects.current.budgetCost) {
@@ -266,11 +216,8 @@ function updateProjCard(name, value){
         const currCalendars = [...Object.values(xerTables.current.CALENDAR)]
         const prevCalendars = [...Object.values(xerTables.previous.CALENDAR)]
 
-        const currTasks = [...projects.current.tasks.values()].sort(util.sortById)
-        const prevTasks = [...projects.previous.tasks.values()].sort(util.sortById)
-
-        const currResources = projects.current.resources
-        const prevResources = projects.previous.resources
+        const currTasks = projects.current.taskArray.sort(util.sortById)
+        const prevTasks = projects.previous.taskArray.sort(util.sortById)
 
         let ctxTotalFloatChart = document.getElementById('totalFloatChart');
         let totalFloatChart = new Chart(ctxTotalFloatChart, {
@@ -406,10 +353,12 @@ function updateProjCard(name, value){
         }
         updateElements(logicChanges)
 
-        resourceChanges.added.data = currResources.filter(res => !prevHasRes(res))
-        resourceChanges.deleted.data = prevResources.filter(res => !currHasRes(res))
-        resourceChanges.revisedCost.data = currResources.filter(res => prevHasRes(res) && res.target_cost !== getPrevRes(res).target_cost)
-        resourceChanges.revisedUnits.data = currResources.filter(res => prevHasRes(res) && res.target_qty !== getPrevRes(res).target_qty)
+        if ('RSRC' in xerTables.current && 'RSRC' in xerTables.previous) {
+            resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.hasResource(res))
+            resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.hasResource(res))
+            resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.hasResource(res) && res.target_cost !== projects.previous.getResource(res).target_cost)
+            resourceChanges.revisedUnits.data = projects.current.resources.filter(res => projects.previous.hasResource(res) && res.target_qty !== projects.previous.getResource(res).target_qty)
+        }
         updateElements(resourceChanges)
 
 	    const hasCalendar = (cal, table) => {

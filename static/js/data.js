@@ -1,4 +1,4 @@
-import {projects, xerTables, getPrevRes, getMemo} from "./main.js"
+import {projects, xerTables, getMemo} from "./main.js"
 import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance } from "./utilities.js";
 
 const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
@@ -370,7 +370,7 @@ export let resourceChanges = {
          ['Act ID', '', 'Activity Name', 'Resource', 'New Cost', 'Old Cost', 'Var'],
         function() {
             return this.data.map(res => {
-                const prevCost = getPrevRes(res).target_cost;
+                const prevCost = projects.previous.getResource(res).target_cost;
                 return [
                     res.task.task_code, statusImg(res.task), res.task.task_name,
                     res.rsrcName, formatCost(res.target_cost), formatCost(prevCost), 
@@ -384,7 +384,7 @@ export let resourceChanges = {
         ['Act ID', '', 'Activity Name', 'Resource', 'New Qty', 'Old Qty', 'Var'],
         function() {
             return this.data.map(res => {
-                const prevQty = getPrevRes(res).target_qty;
+                const prevQty = projects.previous.getResource(res).target_qty;
                 return [
                     res.task.task_code, statusImg(res.task), res.task.task_name, res.rsrcName, 
                     formatNumber(res.target_qty), formatNumber(prevQty), 

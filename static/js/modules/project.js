@@ -144,6 +144,9 @@ export default class Project {
     getLogic(rel) {return this.relsById.get(rel.logicId)}
     hasLogic(rel) {return this.relsById.has(rel.logicId)}
 
+    hasResource(res) {return this.resById.has(res.resId)}
+    getResource(res) {return this.resById.get(res.resId)}
+
     deepAnalysis() {
         this.months = getMonthIntervalObj(this);    
         const getMonthID = date => `${MONTHNAMES[date.getMonth()]}-${date.getFullYear()}`
