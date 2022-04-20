@@ -1,4 +1,4 @@
-import {projects, xerTables, getMemo} from "./main.js"
+import {projects, xerTables} from "./main.js"
 import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance } from "./utilities.js";
 
 const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
@@ -290,7 +290,7 @@ export let noteBookChanges = {
         ['Act ID', 'Act Name', 'Notebook', 'New Memo', 'Old Memo'],
         function() {
             return this.data.map(memo => [
-                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, memo.note, getMemo(memo, xerTables.previous).note
+                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, memo.note, xerTables.previous.getMemo(memo).note
             ])
         }
     ),

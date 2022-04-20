@@ -121,6 +121,7 @@ export const parseFile = (file, name) => {
                         let memTask = getTaskbyID(row.proj_id, row.task_id)
                         let memType = tables?.MEMOTYPE[row.memo_type_id]
                         let memo = new Memo(row, memTask, memType)
+                        tables.PROJECT[memo.proj_id].addNote = memo
                         tables.TASKMEMO[memo.id] = memo
                         break;
                 }

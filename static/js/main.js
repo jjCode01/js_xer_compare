@@ -2,6 +2,7 @@ import {parseFile} from "./parse.js"
 import {updates, constraintVariance, taskChanges, noteBookChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress} from "./data.js"
 import * as util from "./utilities.js"
 import ParsXer from "./modules/parseXerTables.js"
+import createTable from "./modules/createTable.js"
 
 export let xerTables = {
     current: {},
@@ -23,8 +24,6 @@ const CHARTCOLOR = {
     YELLOW: '255, 206, 86',
     RED: '255, 99, 132',
 }
-
-export const getMemo = (memo, tbl) => tbl.TASKMEMO[memo.id]
 
 const updateElText = (id, value) => document.getElementById(id).textContent = value
 
@@ -80,75 +79,6 @@ function updateProjCard(name, value){
             }
             updateElText(update.id, (update.data.length).toLocaleString())
         })
-    }
-
-    function createTable(id, title, labels, vals, foot=""){
-
-        const getAlign = name => {
-            const center = ['Assignments', 'Date', 'Dur', 'Finish', 'Float', 'Hrs', 'Lag', 'Link', 'Start']
-            const right = ['Cost', 'Qty', 'Var', 'Variance']
-            if (center.some(n => name.endsWith(n))) return 'center'
-            if (right.some(n => name.endsWith(n))) return 'right'
-            return 'left'
-        }
-
-        const getWrap = name => {
-            const normal = ['Name', 'Cal', 'WBS', 'Type', 'Resource', 'Constraint']
-            if (normal.some(n => name.endsWith(n))) return 'normal'
-            if (name.endsWith('Memo')) return 'pre-line'
-            return 'nowrap'
-        }
-
-	    const align = labels.map(getAlign)
-        const wrap = labels.map(getWrap)
-
-        let table = document.createElement("table");
-        let caption = document.createElement("caption")
-        caption.innerText = `${title}: ${vals.length}`
-        caption.id = id + '-table'
-        table.append(caption)
-        
-        let head = document.createElement("thead")
-        head.classList.add('no-break')
-        table.append(head)
-        let body = document.createElement("tbody")
-        table.append(body)
-	    let footer = document.createElement("tfoot")
-	    table.append(footer)
-
-        let row = head.insertRow(), cell;
-        row.classList.add('no-break')
-        labels.forEach((val, i) => {
-            cell = document.createElement("th");
-            cell.style.textAlign = align[i];
-            cell.style.whiteSpace = wrap[i];
-            cell.style.verticalAlign = 'bottom';
-            cell.innerText = val;
-            cell.classList.add('btm-border')
-            row.append(cell);
-        })
-
-        vals.forEach((task, r) => {
-            row = body.insertRow();
-            row.classList.add('no-break')
-            task.forEach((val, i) => {
-                cell = document.createElement("td");
-                cell.append(val);
-                cell.style.textAlign = align[i]
-                cell.style.whiteSpace = wrap[i];
-                cell.style.verticalAlign = 'top';
-                if (r % 2 !== 0) row.style.backgroundColor = '#e7e7e7';
-                row.append(cell);
-            })
-        })
-
-        row = footer.insertRow();
-        cell = document.createElement("td")
-        cell.colSpan = `${labels.length}`
-        cell.innerText = foot
-        cell.style.color = '#5f5f5f'
-        row.append(cell)
-        return table
     }
 
     function createPieChart(parent, chartLabel, dataLabels, data, colors) {
