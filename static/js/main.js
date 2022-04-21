@@ -363,9 +363,9 @@ function updateProjCard(name, value){
             })
         }
 
-        if ('TASKMEMO' in xerTables.previous) {
+        if (projects.previous.notes.size) {
             noteBookChanges.deleted.data = Array.from(projects.previous.notes.values()).filter(memo => {
-                return !projects.previous.notes.has(memo.id)
+                return !projects.current.notes.has(memo.id)
             })
         }
         updateElements(noteBookChanges)
