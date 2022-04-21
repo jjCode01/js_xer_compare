@@ -290,7 +290,8 @@ export let noteBookChanges = {
         ['Act ID', 'Act Name', 'Notebook', 'New Memo', 'Old Memo'],
         function() {
             return this.data.map(memo => [
-                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, memo.note, xerTables.previous.getMemo(memo).note
+                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, 
+                memo.note, projects.previous.notes.get(memo.id).note
             ])
         }
     ),
@@ -351,7 +352,7 @@ export let resourceChanges = {
         function() {
             return this.data.map(task => [
                 task.task.task_code, statusImg(task.task), task.task.task_name,
-                task.rsrcName, formatNumber(task.target_qty), formatCost(task.target_cost)
+                task.rsrc.rsrc_short_name, formatNumber(task.target_qty), formatCost(task.target_cost)
             ])
         }
     ),
@@ -361,7 +362,7 @@ export let resourceChanges = {
         function() {
             return this.data.map(task => [
                 task.task.task_code, statusImg(task.task), task.task.task_name,
-                task.rsrcName, formatNumber(task.target_qty), formatCost(task.target_cost)
+                task.rsrc?.rsrc_short_name, formatNumber(task.target_qty), formatCost(task.target_cost)
             ])
         }
     ),
@@ -373,7 +374,7 @@ export let resourceChanges = {
                 const prevCost = projects.previous.getResource(res).target_cost;
                 return [
                     res.task.task_code, statusImg(res.task), res.task.task_name,
-                    res.rsrcName, formatCost(res.target_cost), formatCost(prevCost), 
+                    res.rsrc?.rsrc_short_name, formatCost(res.target_cost), formatCost(prevCost), 
                     formatCost(res.target_cost - prevCost)
                 ]
             })
@@ -386,7 +387,7 @@ export let resourceChanges = {
             return this.data.map(res => {
                 const prevQty = projects.previous.getResource(res).target_qty;
                 return [
-                    res.task.task_code, statusImg(res.task), res.task.task_name, res.rsrcName, 
+                    res.task.task_code, statusImg(res.task), res.task.task_name, res.rsrc?.rsrc_short_name, 
                     formatNumber(res.target_qty), formatNumber(prevQty), 
                     formatVariance(res.target_qty - prevQty)
                 ]

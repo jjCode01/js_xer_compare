@@ -43,11 +43,7 @@ export default function createTable(id, title, labels, vals, foot=""){
     row.classList.add('no-break')
     labels.forEach((val, i) => {
         cell = newCell('th', align[i], wrap[i], val)
-        // cell = document.createElement("th");
-        // cell.style.textAlign = align[i];
-        // cell.style.whiteSpace = wrap[i];
         cell.style.verticalAlign = 'bottom';
-        // cell.innerText = val;
         cell.classList.add('btm-border')
         row.append(cell);
     })
@@ -57,10 +53,6 @@ export default function createTable(id, title, labels, vals, foot=""){
         row.classList.add('no-break')
         task.forEach((val, i) => {
             cell = newCell('td', align[i], wrap[i], val)
-            // cell = document.createElement("td");
-            // cell.append(val);
-            // cell.style.textAlign = align[i]
-            // cell.style.whiteSpace = wrap[i];
             cell.style.verticalAlign = 'top';
             if (r % 2 !== 0) row.style.backgroundColor = '#e7e7e7';
             row.append(cell);

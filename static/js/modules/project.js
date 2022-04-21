@@ -59,6 +59,9 @@ export default class Project {
             this.tasks.set(task.task_id, task)
             this.#tasksByCode.set(task.task_code, task)
         }
+        if (task.start < this.start) {
+            this.start = task.start;
+        }
     }
 
     set addWbs(wbs) {

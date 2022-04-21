@@ -283,7 +283,7 @@ function updateProjCard(name, value){
         }
         updateElements(logicChanges)
 
-        if ('RSRC' in xerTables.current && 'RSRC' in xerTables.previous) {
+        if (xerTables.current.RSRC && xerTables.previous.RSRC) {
             resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.hasResource(res))
             resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.hasResource(res))
             resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.hasResource(res) && res.target_cost !== projects.previous.getResource(res).target_cost)
@@ -349,31 +349,23 @@ function updateProjCard(name, value){
         })
         updateElements(constraintChanges)
 
-        if ('TASKMEMO' in xerTables.current) {
-            const currMemoArr = Object.values(xerTables.current.TASKMEMO)
+        if (projects.current.notes.size) {
+            const currMemoArr = Array.from(projects.current.notes.values())
             noteBookChanges.added.data = currMemoArr.filter(memo => {
-                return (
-                    !('TASKMEMO' in xerTables.previous) || 
-                    (memo.proj_id === projects.current.proj_id && !(memo.id in xerTables.previous.TASKMEMO))
-                )
+                return !projects.previous.notes.has(memo.id)
             })
 
             noteBookChanges.revised.data = currMemoArr.filter(memo => {
                 return (
-                    'TASKMEMO' in xerTables.previous && 
-                    memo.proj_id === projects.current.proj_id &&
-                    memo.id in xerTables.previous.TASKMEMO && 
-                    memo.note !== xerTables.previous.TASKMEMO[memo.id].note
+                    projects.previous.notes.has(memo.id) && 
+                    memo.note !== projects.previous.notes.get(memo.id).note
                 )
             })
         }
 
         if ('TASKMEMO' in xerTables.previous) {
-            noteBookChanges.deleted.data = Object.values(xerTables.previous.TASKMEMO).filter(memo => {
-                return (
-                    !('TASKMEMO' in xerTables.current) || 
-                    (memo.proj_id === projects.previous.proj_id && !(memo.id in xerTables.current.TASKMEMO))
-                )
+            noteBookChanges.deleted.data = Array.from(projects.previous.notes.values()).filter(memo => {
+                return !projects.previous.notes.has(memo.id)
             })
         }
         updateElements(noteBookChanges)
@@ -568,9 +560,10 @@ for (let i = 0; i < fileSelectors.length; i++) {
         let reader = new FileReader();
         let projSelector = document.getElementById(`${e.target.name}-project-selector`);
         reader.onload = (r) => {
-            xerTables[e.target.name] = parseFile(r.target.result, e.target.files[0].name);
-            const xer = new ParsXer(r.target.result, e.target.files[0].name)
-            xer.print()
+            // xerTables[e.target.name] = parseFile(r.target.result, e.target.files[0].name);
+            xerTables[e.target.name] = new ParsXer(r.target.result, e.target.files[0].name)
+            // const xer = new ParsXer(r.target.result, e.target.files[0].name)
+            // xer.print()
             updateProjList(xerTables[e.target.name].PROJECT, projSelector);
             if (Object.keys(xerTables[e.target.name].PROJECT).length > 1){
                 projSelector.classList.remove("hidden")
