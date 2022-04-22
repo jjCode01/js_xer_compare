@@ -1,7 +1,6 @@
-import {parseFile} from "./parse.js"
 import {updates, constraintVariance, taskChanges, noteBookChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress} from "./data.js"
 import * as util from "./utilities.js"
-import ParsXer from "./modules/parseXerTables.js"
+import ParseXer from "./modules/parseXerTables.js"
 import createTable from "./modules/createTable.js"
 
 export let xerTables = {
@@ -283,7 +282,7 @@ function updateProjCard(name, value){
         }
         updateElements(logicChanges)
 
-        if (xerTables.current.RSRC && xerTables.previous.RSRC) {
+        if (projects.current.RSRC && projects.previous.RSRC) {
             resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.hasResource(res))
             resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.hasResource(res))
             resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.hasResource(res) && res.target_cost !== projects.previous.getResource(res).target_cost)
@@ -399,6 +398,7 @@ function updateProjCard(name, value){
         }
         if (!projects.current.budgetCost && !projects.previous.budgetCost) {
             document.getElementById('cost-loading').style.display = "none";
+            document.getElementById('cost-progress').style.display = "none";
         }
         if (!projects.current.budgetQty && !projects.previous.budgetQty) {
             document.getElementById('resource-loading').style.display = "none";
@@ -561,9 +561,7 @@ for (let i = 0; i < fileSelectors.length; i++) {
         let projSelector = document.getElementById(`${e.target.name}-project-selector`);
         reader.onload = (r) => {
             // xerTables[e.target.name] = parseFile(r.target.result, e.target.files[0].name);
-            xerTables[e.target.name] = new ParsXer(r.target.result, e.target.files[0].name)
-            // const xer = new ParsXer(r.target.result, e.target.files[0].name)
-            // xer.print()
+            xerTables[e.target.name] = new ParseXer(r.target.result, e.target.files[0].name)
             updateProjList(xerTables[e.target.name].PROJECT, projSelector);
             if (Object.keys(xerTables[e.target.name].PROJECT).length > 1){
                 projSelector.classList.remove("hidden")
