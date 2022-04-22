@@ -1,4 +1,4 @@
-import {updates, constraintVariance, taskChanges, noteBookChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress} from "./data.js"
+import {updates, constraintVariance, taskChanges, noteBookChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress, wbsChanges} from "./data.js"
 import * as util from "./utilities.js"
 import ParseXer from "./modules/parseXerTables.js"
 import createTable from "./modules/createTable.js"
@@ -302,6 +302,19 @@ function updateProjCard(name, value){
 	    calendarChanges.deleted.data = prevCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, xerTables.current))
         updateElements(calendarChanges)
 
+        const currWbsArr = Array.from(projects.current.wbs.values())
+        const prevWbsArr = Array.from(projects.previous.wbs.values())
+        wbsChanges.added.data = currWbsArr.filter(wbs => !(wbs.proj_node_flag === 'Y') && !projects.previous.hasWbs(wbs))
+        wbsChanges.deleted.data = prevWbsArr.filter(wbs => !(wbs.proj_node_flag === 'Y') && !projects.current.hasWbs(wbs))
+        wbsChanges.revised.data = currWbsArr.filter(wbs => {
+            !(wbs.proj_node_flag === 'Y') && 
+            projects.previous.hasWbs(wbs) &&
+            wbs.wbs_name !== projects.previous.getWbs(wbs).wbs_name
+        })
+
+        updateElements(wbsChanges)
+
+
         constraintChanges.addedPrim.data = currTasks.filter(task => {
             projects.previous.hasTask(task) && 
             task.primeConstraint && 
@@ -398,7 +411,7 @@ function updateProjCard(name, value){
         }
         if (!projects.current.budgetCost && !projects.previous.budgetCost) {
             document.getElementById('cost-loading').style.display = "none";
-            document.getElementById('cost-progress').style.display = "none";
+            document.getElementById('cost-progress-row').style.display = "none";
         }
         if (!projects.current.budgetQty && !projects.previous.budgetQty) {
             document.getElementById('resource-loading').style.display = "none";

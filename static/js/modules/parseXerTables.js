@@ -68,7 +68,22 @@ export default class ParseXer{
     constructor(file, name) {
         this.name = name
         this.#tables = parseTableObjects(file)
-        this.#tables.PROJWBS.rows.forEach(wbs => this.PROJECT[wbs.proj_id].addWbs = wbs)
+        this.#tables.PROJWBS.rows.forEach(wbs => {
+            const proj = this.PROJECT[wbs.proj_id];
+            let id = [wbs.wbs_short_name];
+            let node = wbs;
+
+            while (true) {
+                if (!proj.wbs.has(node.parent_wbs_id) || 
+                    proj.wbs.get(node.parent_wbs_id).proj_node_flag === 'Y') break;
+
+                node = proj.wbs.get(node.parent_wbs_id);
+                id.unshift(node.wbs_short_name)
+            }
+            wbs.wbsID = id.join('.')
+            proj.addWbs = wbs
+
+        })
         if ('TASK' in this.#tables) {
             this.#tables.TASK.rows.forEach(task => {
                 this.PROJECT[task.proj_id].addTask = new Task(

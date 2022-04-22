@@ -48,6 +48,7 @@ export default class Project {
         this.start = this.last_recalc_date;
         this.lateEnd = this.scd_end_date;
         this.wbs = new Map();
+        this.wbsById = new Map();
         this.name = '';
     }
   
@@ -66,6 +67,7 @@ export default class Project {
 
     set addWbs(wbs) {
         this.wbs.set(wbs.wbs_id, wbs)
+        this.wbsById.set(wbs.wbsID, wbs)
         if (wbs.proj_node_flag === 'Y') this.name = wbs.wbs_name;
     }
 
@@ -149,6 +151,8 @@ export default class Project {
 
     hasResource(res) {return this.resById.has(res.resId)}
     getResource(res) {return this.resById.get(res.resId)}
+    hasWbs(node) {return this.wbsById.has(node.wbsID)}
+    getWbs(node) {return this.wbsById.get(node.wbsID)}
 
     getMemo(memo) {return this.notes.get(memo.id)}
 

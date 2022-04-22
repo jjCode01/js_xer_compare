@@ -396,6 +396,30 @@ export let resourceChanges = {
     ),
 }
 
+export let wbsChanges = {
+    added: new Change(
+        "wbs-added", "Added WBS Node",
+        ['WBS ID', 'WBS Name',],
+        function() {
+            return this.data.map(wbs => [wbs.wbsID, wbs.wbs_name,])
+        }
+    ),
+    deleted: new Change(
+        "wbs-deleted", "Deleted WBS Node",
+        ['WBS ID', 'WBS Name',],
+        function() {
+            return this.data.map(wbs => [wbs.wbsID, wbs.wbs_name,])
+        }
+    ),
+    revised: new Change(
+        "wbs-revised", "Revised WBS Name",
+        ['WBS ID', 'New WBS Name', 'Old WBS Name'],
+        function() {
+            return this.data.map(wbs => [wbs.wbsID, wbs.wbs_name, projects.previous.getWbs(wbs).wbs_name])
+        }
+    ),
+}
+
 export let calendarChanges = {
     added: new Change(
         "cal-added", "Added Calendar",
