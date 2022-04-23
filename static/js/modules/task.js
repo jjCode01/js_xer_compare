@@ -73,6 +73,15 @@ export default class Task {
         this.wbs = this.project.wbs.get(this.wbs_id);
         this.wbsStruct = [this.wbs];
     }
+    get budgetCost() {return this.resources.reduce((a, r) => a + r.target_cost, 0.0)}
+    get actualCost() {return this.resources.reduce((a, r) => a + r.act_reg_cost + r.act_ot_cost, 0.0)}
+    get thisPeriodCost() {return this.resources.reduce((a, r) => a + r.act_this_per_cost, 0.0)}
+    get remainingCost() {return this.resources.reduce((a, r) => a + r.remain_cost, 0.0)}
+    get budgetQty() {return this.resources.reduce((a, r) => a + r.target_qty, 0.0)}
+    get actualQty() {return this.resources.reduce((a, r) => a + r.act_reg_qty + r.act_ot_qty, 0.0)}
+    get thisPeriodQty() {return this.resources.reduce((a, r) => a + r.act_this_per_qty, 0.0)}
+    get remainingQty() {return this.resources.reduce((a, r) => a + r.remain_qty, 0.0)}
+    
     print(){
         console.log(`${this.task_code} - ${this.task_name}`);
     }

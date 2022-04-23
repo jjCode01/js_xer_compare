@@ -1,14 +1,8 @@
-import {findClosingParentheses, excelDateToJSDate} from "../utilities.js"
-
-const CALENDARTYPES = {
-    CA_Base: 'Global',
-    CA_Rsrc: 'Resource',
-    CA_Project: 'Project',
-}
+import { findClosingParentheses, excelDateToJSDate } from "../utilities.js"
+const CALENDARTYPES = {CA_Base: 'Global', CA_Rsrc: 'Resource', CA_Project: 'Project'}
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-// const REGEXSHIFT = /s\|[0-1][0-9]:[0-5][0-9]\|f\|[0-1][0-9]:[0-5][0-9]/g;
-const REGEXSHIFT = /([sf]\|[0-1][0-9]:[0-5][0-9]\|*){2}/g;
-const REGEXHOUR = /[0-1][0-9]:[0-5][0-9]/g;
+const REGEXSHIFT = /([sf]\|[01]\d:[0-5]\d\|*){2}/g;
+const REGEXHOUR = /[01]\d:[0-5]\d/g;
 
 const parseWorkShifts = (data) => {
     let workHours = Array.from(data.matchAll(REGEXSHIFT), m => m[0])
@@ -92,7 +86,10 @@ export default class Calendar {
         this.holidays = parseHolidays(this);
         this.exceptions = parseExceptions(this);
     }
-    print(){
+    isWorkDay(date) {
+        return this.week[date.getDay()].hours > 0
+    }
+    print() {
         console.log(`${this.clndr_name}`);
     }
 }

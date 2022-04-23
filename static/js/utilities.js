@@ -1,13 +1,3 @@
-export const budgetedCost = obj => obj?.resources?.reduce((a, r) => a + r.target_cost, 0.0) ?? 0.0;
-export const actualCost = obj => obj?.resources?.reduce((a, r) => a + r.act_reg_cost + r.act_ot_cost, 0.0) ?? 0.0;
-export const thisPeriodCost = obj => obj?.resources?.reduce((a, r) => a + r.act_this_per_cost, 0.0) ?? 0.0;
-export const remainingCost = obj => obj?.resources?.reduce((a, r) => a + r.remain_cost, 0.0) ?? 0.0;
-
-export const budgetedQty = obj => obj?.resources?.reduce((a, r) => a + r.target_qty, 0.0) ?? 0.0;
-export const actualQty = obj => obj?.resources?.reduce((a, r) => a + r.act_reg_qty + r.act_ot_qty, 0.0) ?? 0.0;
-export const thisPeriodQty = obj => obj?.resources?.reduce((a, r) => a + r.act_this_per_qty, 0.0) ?? 0.0;
-export const remainingQty = obj => obj?.resources?.reduce((a, r) => a + r.remain_qty, 0.0) ?? 0.0;
-
 export const formatDate = (dt, fullYear=true) => {
     if (dt instanceof Date && !isNaN(dt)) {
         const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -21,7 +11,6 @@ export const excelDateToJSDate = (date) => {
     const tempDate = new Date((date - 25568)*86400*1000);
     return new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), 0, 0, 0);
 }
-
 
 export const formatNumber = (num, min = 0, sign = 'never') => {
     const returnString = Intl.NumberFormat('en-US', {
@@ -77,8 +66,6 @@ export function sortByFinish(a, b){
 }
 
 export const sortById = (a, b) => (a.task_code > b.task_code) ? 1 : -1
-
-export const isWorkDay = (date, calendar) => calendar.week[date.getDay()].hours > 0
 
 export const findClosingParentheses = (data, start=0) => {
     let parenthesesCnt = 0;
