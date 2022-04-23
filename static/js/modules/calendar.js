@@ -1,20 +1,18 @@
 import { findClosingParentheses, excelDateToJSDate } from "../utilities.js"
 const CALENDARTYPES = {CA_Base: 'Global', CA_Rsrc: 'Resource', CA_Project: 'Project'}
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const REGEXWEEKDAYS = /(?<=DaysOfWeek\(\)\().+?(?=(\(0\|\|(VIEW|Exceptions)))/
+const REGEXWEEKDAYS2 = /(?<=0\|\|[1-7]\(\)).+?(?=(\(0\|\|([1-7]\(\)|VIEW|Exceptions)))/g
 const REGEXSHIFT = /([sf]\|[01]\d:[0-5]\d\|*){2}/g;
 const REGEXHOUR = /[01]\d:[0-5]\d/g;
+const REGEXHOL = /(?<=d\|)\d{5}(?=\)\(\))/g
 
-const parseWorkShifts = (data) => {
-    let workHours = Array.from(data.matchAll(REGEXSHIFT), m => m[0])
-    let shifts = [];
-    workHours.forEach(shift => {
-        let hours = Array.from(shift.matchAll(REGEXHOUR), m => m[0]);
-        for (let s = 0; s < hours.length; s += 2) {
-            shifts.push([hours[s], hours[s + 1]]);
-        }
-    })
-    return shifts
-}
+const reMatchArr = (str, regEx, func=x=>x) => Array.from(str.matchAll(regEx), m => func(m[0]))
+
+const parseWorkShifts = data => reMatchArr(data, REGEXSHIFT).reduce((arr, s) => {
+    arr.push(reMatchArr(s, REGEXHOUR))
+    return arr
+}, [])
 
 const newWorkDay = (dayName, shifts) => {
     return {
@@ -36,32 +34,20 @@ const newExceptionDay = (date, shifts) => {
     return workDay
 }
 
-const parseWorkWeek = cal => {
-    const searchFor = "DaysOfWeek()"
-    const start = cal.clndr_data.indexOf(searchFor) + searchFor.length;
-    const end = findClosingParentheses(cal.clndr_data, start);
-    const weekDayData = cal.clndr_data.substring(start, end).slice(1, -1).trim();
-    const weekDayDataArr = weekDayData.split(/[1-7]\(\)\(/g).slice(1);
-    const workWeek = weekDayDataArr.map((day, i) => newWorkDay(WEEKDAYS[i], parseWorkShifts(day)))
-    return workWeek;
-}
+const parseWorkWeek = cal => Array.from(
+    cal.clndr_data.matchAll(REGEXWEEKDAYS2), 
+    (m, i) => newWorkDay(WEEKDAYS[i], parseWorkShifts(m[0]))
+)
 
 const parseAllExceptionStrings = cal => {
-    if (!('clndr_data' in cal)) return undefined;	
-    const data = cal.clndr_data;
-    if (!data.includes('d|')) return []
-    return data.split(/\(d\|/g).slice(1);
+    return cal?.clndr_data.includes('d|') ? cal.clndr_data.split(/\(d\|/g).slice(1) : []
 }
 
 const parseHolidays = cal => {
-    const exceptions = parseAllExceptionStrings(cal)
-    if (!exceptions) return {}
-    let holidays = {}
-    exceptions.filter(e => !e.includes('s|')).forEach(e => {
-        const dt = excelDateToJSDate(e.slice(0, 5))
-        holidays[dt.getTime()] = dt;
-    })
-    return holidays;
+    return reMatchArr(cal.clndr_data, REGEXHOL, excelDateToJSDate).reduce((day, hol) => {
+        day[hol.getTime()] = hol;
+        return day
+    }, {})
 }
 
 const parseExceptions = cal => {
@@ -84,6 +70,7 @@ export default class Calendar {
         this.assignments = 0;
         this.week = parseWorkWeek(this);
         this.holidays = parseHolidays(this);
+        console.log(this.week)
         this.exceptions = parseExceptions(this);
     }
     isWorkDay(date) {
