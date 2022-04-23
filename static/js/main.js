@@ -316,7 +316,6 @@ function updateProjCard(name, value){
 
         updateElements(wbsChanges)
 
-
         constraintChanges.addedPrim.data = currTasks.filter(task => {
             projects.previous.hasTask(task) && 
             task.primeConstraint && 

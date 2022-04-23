@@ -116,19 +116,9 @@ export default class ParseXer{
             })
         }
     }
-    get CALENDAR() {
-        return this.#tables.CALENDAR.rows
-    }
-    get PROJECT() {
-        return this.#tables.PROJECT.rows
-    }
-    get RSRC() {
-        return this.#tables?.RSRC?.rows
-    }
-    get MEMOTYPE() {
-        return this.#tables?.MEMOTYPE?.rows
-    }
-    print() {
-        console.log(this)
-    }
+    get CALENDAR() {return this.#tables.CALENDAR.rows}
+    get PROJECT() {return this.#tables.PROJECT.rows}
+    get RSRC() {return this.#tables?.RSRC?.rows}
+    get MEMOTYPE() { return this.#tables?.MEMOTYPE?.rows}
+    print() {console.log(this)}
 }

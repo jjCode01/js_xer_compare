@@ -50,26 +50,18 @@ export default class Project {
         this.wbsById = new Map();
         this.name = '';
     }
-  
-    /**
-     * @param { Task } task
-     */
     set addTask(task) {
         if (task instanceof Task){
             this.tasks.set(task.task_id, task)
             this.#tasksByCode.set(task.task_code, task)
         }
-        if (task.start < this.start) {
-            this.start = task.start;
-        }
+        if (task.start < this.start) this.start = task.start;
     }
-
     set addWbs(wbs) {
         this.wbs.set(wbs.wbs_id, wbs)
         this.wbsById.set(wbs.wbsID, wbs)
         if (wbs.proj_node_flag === 'Y') this.name = wbs.wbs_name;
     }
-
     set addRelationship(rel) {
         if (rel instanceof Relationship) {
             this.rels.push(rel);
@@ -82,7 +74,6 @@ export default class Project {
             }
         }
     }
-
     set addResource(rsrc) {
         if (rsrc instanceof Resource) {
             this.resources.push(rsrc)
@@ -90,41 +81,32 @@ export default class Project {
             this.tasks.get(rsrc.task_id).resources.push(rsrc);
         }
     }
-
     set addNote(memo) {
         if (memo instanceof Memo) {
             this.notes.set(memo.id, memo)
         }
     }
-
     get taskArray() {return Array.from(this.tasks.values())}
-
     get notStarted() {return this.taskArray.filter(task => task.notStarted)}
     get inProgress() {return this.taskArray.filter(task => task.inProgress)}
     get completed() {return this.taskArray.filter(task => task.completed)}
     get open() {return this.taskArray.filter(task => !task.completed)}
-
     get milestones() {return this.taskArray.filter(task => task.isMilestone)}
-    
     get longestPath() {return this.taskArray.filter(task => task.longestPath && !task.completed)}
     get critical() {return this.taskArray.filter(task => task.totalFloat <= FLOAT.critical)}
     get nearCritical() {return this.taskArray.filter(task => task.totalFloat > FLOAT.critical && task.totalFloat <= FLOAT.nearCritical)}
     get normalFloat() {return this.taskArray.filter(task => task.totalFloat > FLOAT.nearCritical && task.totalFloat < FLOAT.high)}
     get highFloat() {return this.taskArray.filter(task => task.totalFloat >= FLOAT.high)}
-
     get scheduleDuration() {return (this.scd_end_date.getTime() - this.start.getTime()) / (1000 * 3600 * 24)}
     get remScheduleDuration() {return (this.scd_end_date.getTime() - this.last_recalc_date.getTime()) / (1000 * 3600 * 24)}
-
     get origDurSum() {return this.taskArray.reduce((od, task) => od += task.origDur, 0)}
     get remDurSum() {return this.taskArray.reduce((rd, task) => rd += task.remDur, 0)}
-
     get physPercentComp() {
         const actDateTerm = (this.inProgress.length / 2 + this.completed.length) / this.tasks.size
         const durTerm = (1 - this.remDurSum / this.origDurSum)
         return (actDateTerm + durTerm) / 2
     }
     get schedPercentComp() {return 1 - this.remScheduleDuration / this.scheduleDuration}
-
     get budgetCost() {return this.resources.reduce((a, r) => a + r.target_cost, 0.0)}
     get actualCost() {return this.resources.reduce((a, r) => a + r.act_reg_cost + r.act_ot_cost, 0.0)}
     get thisPeriodCost() {return this.resources.reduce((a, r) => a + r.act_this_per_cost, 0.0)}
