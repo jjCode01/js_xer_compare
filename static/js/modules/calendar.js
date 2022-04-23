@@ -1,11 +1,11 @@
-import { findClosingParentheses, excelDateToJSDate } from "../utilities.js"
+import { xlsToJSDate } from "../utilities.js"
 const CALENDARTYPES = {CA_Base: 'Global', CA_Rsrc: 'Resource', CA_Project: 'Project'}
 const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-const REGEXWEEKDAYS = /(?<=DaysOfWeek\(\)\().+?(?=(\(0\|\|(VIEW|Exceptions)))/
-const REGEXWEEKDAYS2 = /(?<=0\|\|[1-7]\(\)).+?(?=(\(0\|\|([1-7]\(\)|VIEW|Exceptions)))/g
+const REGEXWEEKDAYS = /(?<=0\|\|[1-7]\(\)).+?(?=(\(0\|\|([1-7]\(\)|VIEW|Exceptions)))/g
 const REGEXSHIFT = /([sf]\|[01]\d:[0-5]\d\|*){2}/g;
 const REGEXHOUR = /[01]\d:[0-5]\d/g;
 const REGEXHOL = /(?<=d\|)\d{5}(?=\)\(\))/g
+const REEXCEPT = /(?<=d\|)\d{5}\)\([^\)]{1}.+?\(\)\)\)/g
 
 const reMatchArr = (str, regEx, func=x=>x) => Array.from(str.matchAll(regEx), m => func(m[0]))
 
@@ -34,32 +34,21 @@ const newExceptionDay = (date, shifts) => {
     return workDay
 }
 
-const parseWorkWeek = cal => Array.from(
-    cal.clndr_data.matchAll(REGEXWEEKDAYS2), 
+const parseWorkWeek = data => Array.from(
+    data.matchAll(REGEXWEEKDAYS), 
     (m, i) => newWorkDay(WEEKDAYS[i], parseWorkShifts(m[0]))
 )
 
-const parseAllExceptionStrings = cal => {
-    return cal?.clndr_data.includes('d|') ? cal.clndr_data.split(/\(d\|/g).slice(1) : []
-}
+const parseHolidays = data => reMatchArr(data, REGEXHOL, xlsToJSDate).reduce((day, hol) => {
+    day[hol.getTime()] = hol;
+    return day
+}, {})
 
-const parseHolidays = cal => {
-    return reMatchArr(cal.clndr_data, REGEXHOL, excelDateToJSDate).reduce((day, hol) => {
-        day[hol.getTime()] = hol;
-        return day
-    }, {})
-}
-
-const parseExceptions = cal => {
-    const exceptions = parseAllExceptionStrings(cal)
-    if (!exceptions) return {}
-    let workExceptions = {};
-    exceptions.filter(e => e.includes('s|')).forEach(e => {
-        const dt = excelDateToJSDate(e.slice(0, 5));
-        workExceptions[dt.getTime()] = newExceptionDay(dt, parseWorkShifts(e))
-    })
-    return workExceptions;
-}
+const parseExceptions = data => reMatchArr(data, REEXCEPT).reduce((day, exc) => {
+    const dt = xlsToJSDate(exc.slice(0, 5))
+    day[dt.getTime()] = newExceptionDay(dt, parseWorkShifts(exc))
+    return day
+}, {})
 
 export default class Calendar {
     constructor(obj) {
@@ -68,10 +57,9 @@ export default class Calendar {
         this.type = CALENDARTYPES[this.clndr_type];
         this.id = (this.clndr_type === 'CA_Project') ? this.clndr_name : this.clndr_id;
         this.assignments = 0;
-        this.week = parseWorkWeek(this);
-        this.holidays = parseHolidays(this);
-        console.log(this.week)
-        this.exceptions = parseExceptions(this);
+        this.week = parseWorkWeek(this.clndr_data);
+        this.holidays = parseHolidays(this.clndr_data);
+        this.exceptions = parseExceptions(this.clndr_data);
     }
     isWorkDay(date) {
         return this.week[date.getDay()].hours > 0

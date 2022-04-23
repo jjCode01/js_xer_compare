@@ -7,7 +7,7 @@ export const formatDate = (dt, fullYear=true) => {
     return;
 }
 
-export const excelDateToJSDate = (date) => {
+export const xlsToJSDate = (date) => {
     const tempDate = new Date((date - 25568)*86400*1000);
     return new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), 0, 0, 0);
 }
