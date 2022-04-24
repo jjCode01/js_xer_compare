@@ -53,18 +53,26 @@ const parseExceptions = data => reMatchArr(data, REEXCEPT).reduce((day, exc) => 
 export default class Calendar {
     constructor(obj) {
         Object.assign(this, obj)
-        this.default = this.default_flag === 'Y';
-        this.type = CALENDARTYPES[this.clndr_type];
-        this.id = (this.clndr_type === 'CA_Project') ? this.clndr_name : this.clndr_id;
         this.assignments = 0;
         this.week = parseWorkWeek(this.clndr_data);
         this.holidays = parseHolidays(this.clndr_data);
         this.exceptions = parseExceptions(this.clndr_data);
     }
+    get default() {return this.default_flag === 'Y'}
+    get id() {return (this.clndr_type === 'CA_Project') ? this.clndr_name : this.clndr_id}
+    get type() {return CALENDARTYPES[this.clndr_type]}
     isWorkDay(date) {
-        return this.week[date.getDay()].hours > 0
+        return (
+            (this.week[date.getDay()].hours > 0 &&
+            !(date.getTime() in this.holidays)) ||
+            (date.getTime() in this.exceptions)
+        )
     }
     print() {
         console.log(`${this.clndr_name}`);
     }
+}
+
+Calendar.prototype.toString() = function() {
+    return `${this.clndr_name}`
 }
