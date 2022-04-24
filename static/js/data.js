@@ -25,6 +25,9 @@ class Change {
         this.getRows = getRowFunc;
         this.footer = footer;
     }
+    set add(item) {
+        this.data.push(item)
+    }
 }
 
 export let updates = {

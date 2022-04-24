@@ -40,14 +40,12 @@ const parseWorkWeek = data => Array.from(
 )
 
 const parseHolidays = data => reMatchArr(data, REGEXHOL, xlsToJSDate).reduce((day, hol) => {
-    day[hol.getTime()] = hol;
-    return day
+    return Object.defineProperty(day, hol.getTime(), {value: hol})
 }, {})
 
 const parseExceptions = data => reMatchArr(data, REEXCEPT).reduce((day, exc) => {
     const dt = xlsToJSDate(exc.slice(0, 5))
-    day[dt.getTime()] = newExceptionDay(dt, parseWorkShifts(exc))
-    return day
+    return Object.defineProperty(day, dt.getTime(), {value: newExceptionDay(dt, parseWorkShifts(exc))})
 }, {})
 
 export default class Calendar {
@@ -73,6 +71,6 @@ export default class Calendar {
     }
 }
 
-Calendar.prototype.toString() = function() {
+Calendar.prototype.toString = function() {
     return `${this.clndr_name}`
 }

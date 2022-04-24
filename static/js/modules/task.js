@@ -86,3 +86,7 @@ export default class Task {
         console.log(`${this.task_code} - ${this.task_name}`);
     }
 }
+
+Task.prototype.equals = function(other) {
+    return this.task_code === other.task_code
+}

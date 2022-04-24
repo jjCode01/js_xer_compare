@@ -150,5 +150,15 @@ export default class Project {
             if (task.completed) this.months[finishMonth].actualFinish += 1;
         })
     }
-    
+}
+
+Project.prototype.has = function(obj) {
+    if (obj instanceof Task) return this.hasTask(obj)
+    if (obj instanceof Resource) {
+        console.log(obj.resId, this.resById.has(obj.resId))
+        return this.hasResource(obj)
+    }
+    if (obj instanceof Relationship) return this.hasLogic(obj)
+    console.log(obj)
+    return false
 }

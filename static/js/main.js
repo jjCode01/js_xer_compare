@@ -229,44 +229,39 @@ function updateProjCard(name, value){
             document.getElementById('constraint-variance').append(table)
         }
 
-        updates.started.data = currTasks.filter(task => task.inProgress && projects.previous.getTask(task)?.notStarted).sort(util.sortByStart)
-        updates.finished.data = (currTasks.filter(task => task.completed && projects.previous.hasTask(task) && projects.previous.getTask(task).inProgress)).sort(util.sortByFinish)
-        updates.startFinish.data = (currTasks.filter(task => task.completed && projects.previous.hasTask(task) && projects.previous.getTask(task).notStarted)).sort(util.sortByFinish)
+        taskChanges.added.data = currTasks.filter(task => !projects.previous.has(task))
+        taskChanges.deleted.data = prevTasks.filter(task => !projects.current.has(task))
 
-        taskChanges.added.data = currTasks.filter(task => !projects.previous.hasTask(task))
-        taskChanges.deleted.data = prevTasks.filter(task => !projects.current.hasTask(task))
+	    const ongoingTasks = currTasks.filter(task => projects.previous.has(task))
 
-	    const ongoingTasks = currTasks.filter(task => projects.previous.hasTask(task))
-        taskChanges.name.data = ongoingTasks.filter(task => task.task_name !== projects.previous.getTask(task).task_name)
-        taskChanges.duration.data = ongoingTasks.filter(task => {
-            return (
-                !task.isLOE && 
-                ((task.origDur !== projects.previous.getTask(task).origDur) || 
-                (task.notStarted && task.origDur !== task.remDur && task.remDur !== projects.previous.getTask(task).remDur))
-            )
-	    })
-        taskChanges.calendar.data = ongoingTasks.filter(task => task.calendar.id !== projects.previous.getTask(task).calendar.id)
-        taskChanges.start.data = ongoingTasks.filter(task => {
-            return (
-                !task.notStarted && 
-                !projects.previous.getTask(task).notStarted && 
-                util.formatDate(task.start) !== util.formatDate(projects.previous.getTask(task).start)
-            )
-	    }).sort(util.sortByStart)
-        taskChanges.finish.data = ongoingTasks.filter(task => {
-            return (
-                task.completed && 
-                projects.previous.getTask(task).completed && 
-                util.formatDate(task.finish) !== util.formatDate(projects.previous.getTask(task).finish)
-            )
-	    }).sort(util.sortByFinish)
-        taskChanges.wbs.data = ongoingTasks.filter(task => task.wbs.wbsID !== projects.previous.getTask(task).wbs.wbsID)
-        taskChanges.type.data = ongoingTasks.filter(task => task.taskType !== projects.previous.getTask(task).taskType)
+        ongoingTasks.forEach(task => {
+            const prevTask = projects.previous.getTask(task)
+            if (task.inProgress && prevTask.notStarted) updates.started.add = task
+            if (task.completed && prevTask.inProgress) updates.finished.add = task
+            if (task.completed && prevTask.notStarted) updates.startFinish.add = task
+            if (task.task_name !== prevTask.task_name) taskChanges.name.add = task
+            if (task.calendar.id !== prevTask.calendar.id) taskChanges.calendar.add = task
+            if (task.wbs.wbsID !== prevTask.wbs.wbsID) taskChanges.wbs.add = task
+            if (task.taskType !== prevTask.taskType) taskChanges.type.add = task
+
+            if (!task.isLOE) {
+                if (task.origDur !== prevTask.origDur) taskChanges.duration.add = task
+                if (task.notStarted && task.origDur !== task.remDur && task.remDur != prevTask.remDur) {
+                    taskChanges.duration.add = task
+                }
+            }
+            if (!prevTask.notStarted && util.formatDate(task.start) !== util.formatDate(prevTask.start)) {
+                taskChanges.start.add = task
+            }
+            if (prevTask.completed && util.formatDate(task.finish) !== util.formatDate(prevTask.finish)) {
+                taskChanges.finish.add = task
+            }
+        })
         updateElements(taskChanges)
 
-        logicChanges.added.data = projects.current.rels.filter(rel => !projects.previous.hasLogic(rel))
-        logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.hasLogic(rel))
-        logicChanges.revised.data = projects.current.rels.filter(rel => projects.previous.hasLogic(rel) && rel.lag !== projects.previous.getLogic(rel).lag)
+        logicChanges.added.data = projects.current.rels.filter(rel => !projects.previous.has(rel))
+        logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.has(rel))
+        logicChanges.revised.data = projects.current.rels.filter(rel => projects.previous.has(rel) && rel.lag !== projects.previous.getLogic(rel).lag)
         logicChanges.revised.prev = logicChanges.revised.data.map(rel => projects.previous.getLogic(rel))
 
         for (let a = logicChanges.added.data.length - 1; a >= 0; a--) {
@@ -282,11 +277,11 @@ function updateProjCard(name, value){
         }
         updateElements(logicChanges)
 
-        if (projects.current.RSRC && projects.previous.RSRC) {
-            resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.hasResource(res))
-            resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.hasResource(res))
-            resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.hasResource(res) && res.target_cost !== projects.previous.getResource(res).target_cost)
-            resourceChanges.revisedUnits.data = projects.current.resources.filter(res => projects.previous.hasResource(res) && res.target_qty !== projects.previous.getResource(res).target_qty)
+        if (xerTables.current.RSRC && xerTables.previous.RSRC) {
+            resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.has(res))
+            resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.has(res))
+            resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_cost !== projects.previous.getResource(res).target_cost)
+            resourceChanges.revisedUnits.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_qty !== projects.previous.getResource(res).target_qty)
         }
         updateElements(resourceChanges)
 
