@@ -5,7 +5,7 @@ const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
 const statusImg = task => {
     let img = new Image(20, 10);
     if (!task) {
-	img.src = "./static/img/deleted.png";
+	    img.src = "./static/img/deleted.png";
         return img;
     }
     let postFix = (task.longestPath && !task.completed) ? '-lp.png' : '.png';
@@ -86,23 +86,23 @@ export let updates = {
     cost: new Change(
         "ud-cost", "Updated Actual Cost",
         [
-            'Act ID', 'Act Name', 'Status', 'Budgeted\r\nCost', 
-            'Actual\r\nCost', 'Prev\r\nActual\r\nCost', 'Var'
+            'Act ID', 'Act Name', 'Status', 'Budgeted Cost', 
+            'Actual Cost', 'Prev\r\nActual Cost', 'Var'
         ],
         function() {
             return this.data.map(task => [
-                task.task_code, task.task_name, task.status, formatCost(budgetedCost(task)), 
-                formatCost(actualCost(task)), formatCost(actualCost(projects.previous.getTask(task))), 
-                formatCost(actualCost(task) - actualCost(projects.previous.getTask(task)))
+                task.task_code, task.task_name, task.status, formatCost(task.budgetCost), 
+                formatCost(task.actualCost), formatCost(projects.previous.getTask(task).actualCost), 
+                formatCost(task.actualCost - projects.previous.getTask(task).actualCost)
             ])
         }
     ),
     regress: new Change(
         "ud-regress", "Regressive Updates",
         [
-            'Act ID', 'Act Name', 'Status', 'Prev\r\nStatus', 'Orig\r\nDur', 
-            'Rem\r\nDur', 'Prev\r\nRem\r\nDur', 'RD\r\nVar', '%\r\nComp', 
-            'Prev\r\n%\r\nComp', '%\r\nVar'
+            'Act ID', 'Act Name', 'Status', 'Prev\r\nStatus', 'Orig Dur', 
+            'Rem Dur', 'Prev\r\nRem Dur', 'RD Var', '% Comp', 
+            'Prev\r\n% Comp', '% Var'
         ],
         function() {
             return this.data.map(task => [
@@ -115,19 +115,6 @@ export let updates = {
             ])
         }
     )
-}
-
-const getCellVal = (label, data) => {
-    const labelMap = {
-        'Act ID': 'task_code',
-        'Act Name': 'task_name',
-        'Orig Dur': 'origDur',
-        'Start': 'start',
-        'Finish': 'finish',
-        '': function(d) {
-            return statusImg(d)
-        }
-    }
 }
 
 export let constraintVariance = {
