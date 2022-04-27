@@ -84,6 +84,7 @@ span{padding: 0 0.4em;}
 .grid{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
+    column-gap: 10%;
 }
 .outer-progress{
     min-width: 120px;

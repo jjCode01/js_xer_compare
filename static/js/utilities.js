@@ -7,6 +7,13 @@ export const formatDate = (dt, fullYear=true) => {
     return;
 }
 
+export const getWeekday = dt => {
+    const weekdays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    if (dt instanceof Date && !isNaN(dt)) {
+        return weekdays[dt.getDay()]
+    }
+}
+
 export const xlsToJSDate = (date) => {
     const tempDate = new Date((date - 25568)*86400*1000);
     return new Date(tempDate.getFullYear(), tempDate.getMonth(), tempDate.getDate(), 0, 0, 0);

@@ -66,9 +66,9 @@ function updateProjCard(name, value){
                 const valueEl = document.getElementById(update.id)
                 const labelEl = document.getElementById(`${update.id}-label`)
                 valueEl.style.cursor = 'pointer'
-                valueEl.style.fontWeight = 'bold'
+                // valueEl.style.fontWeight = 'bold'
                 labelEl.style.cursor = 'pointer'
-                labelEl.style.fontWeight = 'bold'
+                // labelEl.style.fontWeight = 'bold'
                 const table = createTable(update.id, update.title, update.columns, update.getRows(), update.footer ?? "");
                 revSec.append(table)
                 
@@ -306,9 +306,43 @@ function updateProjCard(name, value){
             }
             return false
         }
+        const getCalendar = (cal, table) => {
+            if (hasCalendar(cal, table)) {
+                if (!(cal.type === 'Project')) return table.CALENDAR[cal.clndr_id]
+                for (let c in table.CALENDAR) {
+                    if (table.CALENDAR[c].id === cal.id) return table.CALENDAR[c]
+                }
+            }
+            return
+        }
 
         calendarChanges.added.data = currCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, xerTables.previous))
 	    calendarChanges.deleted.data = prevCalendars.filter(cal => cal.assignments > 0 && !hasCalendar(cal, xerTables.current))
+        const ongoingCalendars = currCalendars.filter(cal => cal.assignments && hasCalendar(cal, xerTables.previous))
+        ongoingCalendars.forEach(cal => {
+            const prevCal = getCalendar(cal, xerTables.previous)
+            for (let hol in cal.holidays) {
+                if (!(hol in prevCal.holidays)) {
+                    calendarChanges.addedHoliday.add = {clndr_name: cal.clndr_name, type: cal.type, hol: cal.holidays[hol]}
+                }
+            }
+            for (let hol in prevCal.holidays) {
+                if (!(hol in cal.holidays)) {
+                    calendarChanges.deletedHoliday.add = {clndr_name: prevCal.clndr_name, type: prevCal.type, hol: prevCal.holidays[hol]}
+                }
+            }
+
+            for (let exc in cal.exceptions) {
+                if (!(exc in prevCal.exceptions)) {
+                    calendarChanges.addedException.add = {clndr_name: cal.clndr_name, type: cal.type, exc: cal.exceptions[exc]}
+                }
+            }
+            for (let exc in prevCal.exceptions) {
+                if (!(exc in cal.exceptions)) {
+                    calendarChanges.deletedException.add = {clndr_name: prevCal.clndr_name, type: prevCal.type, exc: prevCal.exceptions[exc].date}
+                }
+            }
+        })
         updateElements(calendarChanges)
 
         const currWbsArr = Array.from(projects.current.wbs.values())
