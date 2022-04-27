@@ -34,16 +34,16 @@ const newExceptionDay = (date, shifts) => {
     return workDay
 }
 
-const parseWorkWeek = data => Array.from(
-    data.matchAll(REGEXWEEKDAYS), 
+const parseWorkWeek = ({clndr_data}) => Array.from(
+    clndr_data.matchAll(REGEXWEEKDAYS), 
     (m, i) => newWorkDay(WEEKDAYS[i], parseWorkShifts(m[0]))
 )
 
-const parseHolidays = data => reMatchArr(data, REGEXHOL, xlsToJSDate).reduce((day, hol) => {
+const parseHolidays = ({clndr_data}) => reMatchArr(clndr_data, REGEXHOL, xlsToJSDate).reduce((day, hol) => {
     return Object.defineProperty(day, hol.getTime(), {value: hol})
 }, {})
 
-const parseExceptions = data => reMatchArr(data, REEXCEPT).reduce((day, exc) => {
+const parseExceptions = ({clndr_data}) => reMatchArr(clndr_data, REEXCEPT).reduce((day, exc) => {
     const dt = xlsToJSDate(exc.slice(0, 5))
     return Object.defineProperty(day, dt.getTime(), {value: newExceptionDay(dt, parseWorkShifts(exc))})
 }, {})
@@ -52,9 +52,9 @@ export default class Calendar {
     constructor(obj) {
         Object.assign(this, obj)
         this.assignments = 0;
-        this.week = parseWorkWeek(this.clndr_data);
-        this.holidays = parseHolidays(this.clndr_data);
-        this.exceptions = parseExceptions(this.clndr_data);
+        this.week = parseWorkWeek(this);
+        this.holidays = parseHolidays(this);
+        this.exceptions = parseExceptions(this);
     }
     get default() {return this.default_flag === 'Y'}
     get id() {return (this.clndr_type === 'CA_Project') ? this.clndr_name : this.clndr_id}
