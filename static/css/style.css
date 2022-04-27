@@ -81,6 +81,10 @@ span{padding: 0 0.4em;}
 }
 @page{margin: 0.4cm;}
 .flex{display: flex;}
+.grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
 .outer-progress{
     min-width: 120px;
     width: 100%;

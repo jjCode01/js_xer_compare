@@ -389,113 +389,174 @@
                                     </tbody>
                                 </table>          
                             </div>
-                            <div class="card no-break"> <!-- Schedule revisions -->
-                                <table style="width: 100%;">
-                                    <caption>Schedule Revisions Summary</caption>
-                                    <tbody>
+                            <div class="card no-break grid"> <!-- Schedule revisions -->
+                                <div id="rev-col-1">
+                                    <table>
+                                        <caption>Activity Revisions</caption>
                                         <tr>
                                             <td class="text-left" id="tk-added-label">Added Activities:</td>
                                             <td class="text-right" id="tk-added"></td>
-                                            <td></td><td></td>
-                                            <td class="text-left" id="rl-added-label">Added Relationships:</td>
-                                            <td class="text-right" id="rl-added"></td>
-                                            <td></td><td></td>
-                                            <td class="text-left" id="rs-added-label">Added Resources:</td>
-                                            <td class="text-right" id="rs-added"></td>
                                         </tr>
                                         <tr>
                                             <td class="text-left" id="tk-deleted-label">Deleted Activities:</td>
                                             <td class="text-right" id="tk-deleted"></td>
-                                            <td></td><td></td>
-                                            <td class="text-left" id="rl-deleted-label">Deleted Relationships:</td>
-                                            <td class="text-right" id="rl-deleted"></td>
-                                            <td></td><td></td>
-                                            <td class="text-left" id="rs-deleted-label">Deleted Resources:</td>
-                                            <td class="text-right" id="rs-deleted"></td>
-                            
                                         </tr>
                                         <tr>
-                                            <td class="text-left" id="tk-name-label">Name Changes:</td>
+                                            <td class="text-left" id="tk-name-label">Revised Activity Names:</td>
                                             <td class="text-right" id="tk-name"></td>
-                                            <td></td><td></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="tk-duration-label">Revised Durations:</td>
+                                            <td class="text-right" id="tk-duration"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="tk-start-label">Actual Start Changes:</td>
+                                            <td class="text-right" id="tk-start"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="tk-finish-label">Actual Finish Changes:</td>
+                                            <td class="text-right" id="tk-finish"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="tk-calendar-label">Revised Calendar:</td>
+                                            <td class="text-right" id="tk-calendar"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="tk-wbs-label">Revised WBS:</td>
+                                            <td class="text-right" id="tk-wbs"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="tk-type-label">Revised Activity Types:</td>
+                                            <td class="text-right" id="tk-type"></td>
+                                        </tr>
+                                    </table>
+                                    <table>
+                                        <caption>WBS Revisions</caption>
+                                        <tr>
+                                            <td class="text-left" id="wbs-added-label">Added WBS Nodes:</td>
+                                            <td class="text-right" id="wbs-added"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="wbs-deleted-label">Deleted WBS Nodes:</td>
+                                            <td class="text-right" id="wbs-deleted"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="wbs-revised-label">Revised WBS Names:</td>
+                                            <td class="text-right" id="wbs-revised"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div id="rev-col-2">
+                                    <table>
+                                        <caption>Logic Revisions</caption>
+                                        <tr>
+                                            <td class="text-left" id="rl-added-label">Added Relationships:</td>
+                                            <td class="text-right" id="rl-added"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="rl-deleted-label">Deleted Relationships:</td>
+                                            <td class="text-right" id="rl-deleted"></td>
+                                        </tr>
+                                        <tr>
                                             <td class="text-left" id="rl-revised-label">Revised Relationships:</td>
                                             <td class="text-right" id="rl-revised"></td>
-                                            <td></td><td></td>
+                                        </tr>
+                                    </table>
+                                    <table>
+                                        <caption>Resource Revisions</caption>
+                                        <tr>
+                                            <td class="text-left" id="rs-added-label">Added Resources:</td>
+                                            <td class="text-right" id="rs-added"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="rs-deleted-label">Deleted Resources:</td>
+                                            <td class="text-right" id="rs-deleted"></td>
+                                        </tr>
+                                        <tr>
                                             <td class="text-left" id="rs-cost-label">Budgeted Cost Changes:</td>
                                             <td class="text-right" id="rs-cost"></td>
                                         </tr>
                                         <tr>
-                                            <td class="text-left" id="tk-duration-label">Duration Changes:</td>
-                                            <td class="text-right" id="tk-duration"></td>
-                                            <td></td><td></td>
-                                            <td class="text-left" id="tk-start-label">Actual Start Changes:</td>
-                                            <td class="text-right" id="tk-start"></td>
-                                            <td></td><td></td>
                                             <td class="text-left" id="rs-units-label">Budgeted Qty Changes:</td>
                                             <td class="text-right" id="rs-units"></td>
                                         </tr>
+                                    </table>
+                                    <table>
+                                        <caption>Notebook Revisions</caption>
                                         <tr>
-                                            <td class="text-left" id="tk-type-label">Activity Type Changes:</td>
-                                            <td class="text-right" id="tk-type"></td>                                          
-                                            <td></td><td></td>
-                                            <td class="text-left" id="tk-finish-label">Actual Finish Changes:</td>
-                                            <td class="text-right" id="tk-finish"></td>
-                                            <td></td><td></td>
-                                            <td class="text-left" id="tk-wbs-label">WBS Assignment Changes:</td>
-                                            <td class="text-right" id="tk-wbs"></td>
-                                            
+                                            <td class="text-left" id="nb-added-label">Added Notebook Memos:</td>
+                                            <td class="text-right" id="nb-added"></td>
                                         </tr>
+                                        <tr>
+                                            <td class="text-left" id="nb-deleted-label">Deleted Notebook Memos:</td>
+                                            <td class="text-right" id="nb-deleted"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="nb-revised-label">Revised Notbook Memos:</td>
+                                            <td class="text-right" id="nb-revised"></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div id="rev-col-3">
+                                    <table>
+                                        <caption>Calendar Revisions</caption>
+                                        <tr>
+                                            <td class="text-left" id="cal-added-label">Added Calendars:</td>
+                                            <td class="text-right" id="cal-added"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="cal-deleted-label">Deleted Calendars:</td>
+                                            <td class="text-right" id="cal-deleted"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="cal-added-hol-label">Added Non-Work Day:</td>
+                                            <td class="text-right" id="cal-added-hol"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="cal-deleted-hol-label">Deleted Non-Work Day:</td>
+                                            <td class="text-right" id="cal-deleted-hol"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="cal-added-exept-label">Added Exeption Work Day:</td>
+                                            <td class="text-right" id="cal-added-exept"></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="text-left" id="cal-deleted-exept-label">Deleted Exeption Work Day:</td>
+                                            <td class="text-right" id="cal-deleted-exept"></td>
+                                        </tr>
+                                    </table>
+                                    <table>
+                                        <caption>Constraint Revisions</caption>
                                         <tr>
                                             <td class="text-left" id="cs-added-prim-label">Added Prime Constraints:</td>
                                             <td class="text-right" id="cs-added-prim"></td>
-                                            <td></td><td></td>
+                                        </tr>
+                                        <tr>
                                             <td class="text-left" id="cs-deleted-prim-label">Deleted Prime Constraints:</td>
                                             <td class="text-right" id="cs-deleted-prim"></td>
-                                            <td></td><td></td>
+                                        </tr>
+                                        <tr>
                                             <td class="text-left" id="cs-revised-prim-label">Revised Prime Constraints:</td>
                                             <td class="text-right" id="cs-revised-prim"></td>
                                         </tr>
                                         <tr>
                                             <td class="text-left" id="cs-added-sec-label">Added Second Constraints:</td>
                                             <td class="text-right" id="cs-added-sec"></td>
-                                            <td></td><td></td>
+                                        </tr>
+                                        <tr>
                                             <td class="text-left" id="cs-deleted-sec-label">Deleted Second Constraints:</td>
                                             <td class="text-right" id="cs-deleted-sec"></td>
-                                            <td></td><td></td>
+                                        </tr>
+                                        <tr>
                                             <td class="text-left" id="cs-revised-sec-label">Revised Second Constraints:</td>
                                             <td class="text-right" id="cs-revised-sec"></td>
                                         </tr>
-                                        <tr>
-                                            <td class="text-left" id="cal-added-label">Added Calendars:</td>
-                                            <td class="text-right" id="cal-added"></td>
-                                            <td class=""></td><td class=""></td>
-                                            <td class="text-left" id="cal-deleted-label">Deleted Calendars:</td>
-                                            <td class="text-right" id="cal-deleted"></td>
-                                            <td class=""></td><td class=""></td>
-                                            <td class="text-left" id="tk-calendar-label">Calendar Assignments:</td>
-                                            <td class="text-right" id="tk-calendar"></td>
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left" id="wbs-added-label">Added WBS Nodes:</td>
-                                            <td class="text-right" id="wbs-added"></td>
-                                            <td></td><td></td>
-                                            <td class="text-left" id="wbs-deleted-label">Deleted WBS Nodes:</td>
-                                            <td class="text-right" id="wbs-deleted"></td>
-                                            <td></td><td></td>
-                                            <td class="text-left" id="wbs-revised-label">Revised WBS Names:</td>
-                                            <td class="text-right" id="wbs-revised"></td>
-                                            
-                                        </tr>
-                                        <tr>
-                                            <td class="text-left btm-border" id="nb-added-label">Added Notebook Memos:</td>
-                                            <td class="text-right btm-border" id="nb-added"></td>
-                                            <td class=" btm-border"></td><td class=" btm-border"></td>
-                                            <td class="text-left btm-border" id="nb-deleted-label">Deleted Notebook Memos:</td>
-                                            <td class="text-right btm-border" id="nb-deleted"></td>
-                                            <td class=" btm-border"></td><td class=" btm-border"></td>
-                                            <td class="text-left btm-border" id="nb-revised-label">Revised Notbook Memos:</td>
-                                            <td class="text-right btm-border" id="nb-revised"></td>
-                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="card no-break">
+                                <table style="width: 100%;">
+                                    <tbody>
                                         <tr>
                                             <td colspan="8">
                                                 <img src="./static/img/complete.png" width="20px" height="10px" alt="Actual Work"><span>: Actual Work</span>
