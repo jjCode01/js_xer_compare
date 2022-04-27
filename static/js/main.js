@@ -256,6 +256,20 @@ function updateProjCard(name, value){
             if (prevTask.completed && util.formatDate(task.finish) !== util.formatDate(prevTask.finish)) {
                 taskChanges.finish.add = task
             }
+            if (task.primeConstraint && task.primeConstraint !== prevTask.primeConstraint) {
+                constraintChanges.addedPrim.add = task
+            }
+            if (task.secondConstraint && task.secondConstraint !== prevTask.secondConstraint) {
+                constraintChanges.addedSec.add = task
+            }
+            if (task.cstr_date && task.primeConstraint === prevTask.primeConstraint &&
+                task.cstr_date.getTime() !== prevTask.cstr_date.getTime()) {
+                    constraintChanges.revisedPrim.add = task
+            }
+            if (task.cstr_date2 && task.secondConstraint === prevTask.secondConstraint &&
+                task.cstr_date2.getTime() !== prevTask.cstr_date2.getTime()) {
+                    constraintChanges.revisedSec.add = task
+            }
         })
         updateElements(taskChanges)
 
@@ -310,49 +324,18 @@ function updateProjCard(name, value){
         })
 
         updateElements(wbsChanges)
-
-        constraintChanges.addedPrim.data = currTasks.filter(task => {
-            projects.previous.hasTask(task) && 
-            task.primeConstraint && 
-            task.primeConstraint !== projects.previous.getTask(task).primeConstraint
-        })
         constraintChanges.deletedPrim.data = prevTasks.filter(task => {
             return (
-                projects.current.hasTask(task) && 
+                projects.current.has(task) && 
                 task.primeConstraint && 
-                task.primeConstraint !== projects.previous.getTask(task).primeConstraint
-            )
-        })
-        constraintChanges.revisedPrim.data = currTasks.filter(task => {
-            return (
-                projects.previous.hasTask(task) && 
-                task.primeConstraint &&
-                task.cstr_date &&
-                task.primeConstraint === projects.previous.getTask(task).primeConstraint &&
-                task.cstr_date.getTime() !== projects.previous.getTask(task).cstr_date.getTime()
-            )
-        })
-        constraintChanges.addedSec.data = currTasks.filter(task => {
-            return (
-                projects.previous.hasTask(task) && 
-                task.secondConstraint && 
-                task.secondConstraint !== projects.previous.getTask(task).secondConstraint
+                task.primeConstraint !== projects.current.getTask(task).primeConstraint
             )
         })
         constraintChanges.deletedSec.data = prevTasks.filter(task => {
             return (
-                projects.current.hasTask(task) && 
+                projects.current.has(task) && 
                 task.secondConstraint && 
-                task.secondConstraint !== projects.previous.getTask(task).secondConstraint
-            )
-        })
-        constraintChanges.revisedSec.data = currTasks.filter(task => {
-            return (
-                projects.previous.hasTask(task) && 
-                task.secondConstraint &&
-                task.cstr_date2 &&
-                task.secondConstraint === projects.previous.getTask(task).secondConstraint &&
-                task.cstr_date2.getTime() !== projects.previous.getTask(task).cstr_date2.getTime()
+                task.secondConstraint !== projects.current.getTask(task).secondConstraint
             )
         })
         updateElements(constraintChanges)
