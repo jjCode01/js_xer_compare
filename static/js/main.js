@@ -1,4 +1,5 @@
-import {updates, constraintVariance, taskChanges, noteBookChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress, wbsChanges} from "./data.js"
+import {updates, constraintVariance, noteBookChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress, wbsChanges} from "./data.js"
+import { taskChanges } from "./data/taskChanges.js"
 import * as util from "./utilities.js"
 import ParseXer from "./modules/parseXerTables.js"
 import createTable from "./modules/createTable.js"
@@ -61,6 +62,7 @@ function updateProjCard(name, value){
     function updateElements(obj) {
 	    const revSec = document.getElementById('revisions-sec')
         Object.values(obj).forEach(update => {
+            console.log(obj)
             
             if (update.data.length) {
                 const valueEl = document.getElementById(update.id)
@@ -236,39 +238,39 @@ function updateProjCard(name, value){
 
         ongoingTasks.forEach(task => {
             const prevTask = projects.previous.get(task)
-            if (task.inProgress && prevTask.notStarted) updates.started.add = task
-            if (task.completed && prevTask.inProgress) updates.finished.add = task
-            if (task.completed && prevTask.notStarted) updates.startFinish.add = task
-            if (task.task_name !== prevTask.task_name) taskChanges.name.add = task
-            if (task.calendar.id !== prevTask.calendar.id) taskChanges.calendar.add = task
-            if (task.wbs.wbsId !== prevTask.wbs.wbsId) taskChanges.wbs.add = task
-            if (task.taskType !== prevTask.taskType) taskChanges.type.add = task
+            if (task.inProgress && prevTask.notStarted) updates.started.add = {curr: task}
+            if (task.completed && prevTask.inProgress) updates.finished.add = {curr: task}
+            if (task.completed && prevTask.notStarted) updates.startFinish.add = {curr: task}
+            if (task.task_name !== prevTask.task_name) taskChanges.name.add = {curr: task, prev: prevTask}
+            if (task.calendar.id !== prevTask.calendar.id) taskChanges.calendar.add = {curr: task, prev: prevTask}
+            if (task.wbs.wbsId !== prevTask.wbs.wbsId) taskChanges.wbs.add = {curr: task, prev: prevTask}
+            if (task.taskType !== prevTask.taskType) taskChanges.type.add = {curr: task, prev: prevTask}
 
             if (!task.isLOE) {
-                if (task.origDur !== prevTask.origDur) taskChanges.duration.add = task
+                if (task.origDur !== prevTask.origDur) taskChanges.duration.add = {curr: task, prev: prevTask}
                 if (task.notStarted && task.origDur !== task.remDur && task.remDur != prevTask.remDur) {
-                    taskChanges.duration.add = task
+                    taskChanges.duration.add = {curr: task, prev: prevTask}
                 }
             }
             if (!prevTask.notStarted && util.formatDate(task.start) !== util.formatDate(prevTask.start)) {
-                taskChanges.start.add = task
+                taskChanges.start.add = {curr: task, prev: prevTask}
             }
             if (prevTask.completed && util.formatDate(task.finish) !== util.formatDate(prevTask.finish)) {
-                taskChanges.finish.add = task
+                taskChanges.finish.add = {curr: task, prev: prevTask}
             }
             if (task.primeConstraint && task.primeConstraint !== prevTask.primeConstraint) {
-                constraintChanges.addedPrim.add = task
+                constraintChanges.addedPrim.add = {curr: task, prev: prevTask}
             }
             if (task.secondConstraint && task.secondConstraint !== prevTask.secondConstraint) {
-                constraintChanges.addedSec.add = task
+                constraintChanges.addedSec.add = {curr: task, prev: prevTask}
             }
             if (task.cstr_date && task.primeConstraint === prevTask.primeConstraint &&
                 task.cstr_date.getTime() !== prevTask.cstr_date.getTime()) {
-                    constraintChanges.revisedPrim.add = task
+                    constraintChanges.revisedPrim.add = {curr: task, prev: prevTask}
             }
             if (task.cstr_date2 && task.secondConstraint === prevTask.secondConstraint &&
                 task.cstr_date2.getTime() !== prevTask.cstr_date2.getTime()) {
-                    constraintChanges.revisedSec.add = task
+                    constraintChanges.revisedSec.add = {curr: task, prev: prevTask}
             }
         })
         updateElements(taskChanges)
@@ -321,25 +323,49 @@ function updateProjCard(name, value){
         const ongoingCalendars = currCalendars.filter(cal => cal.assignments && hasCalendar(cal, xerTables.previous))
         ongoingCalendars.forEach(cal => {
             const prevCal = getCalendar(cal, xerTables.previous)
-            for (let hol in cal.holidays) {
-                if (!(hol in prevCal.holidays)) {
-                    calendarChanges.addedHoliday.add = {clndr_name: cal.clndr_name, type: cal.type, hol: cal.holidays[hol]}
+            for (let h in cal.holidays) {
+                if (!(h in prevCal.holidays)) {
+                    calendarChanges.addedHoliday.add = {
+                        curr: {
+                            clndr_name: cal.clndr_name, 
+                            type: cal.type, 
+                            hol: cal.holidays[h]
+                        }
+                    }
                 }
             }
-            for (let hol in prevCal.holidays) {
-                if (!(hol in cal.holidays)) {
-                    calendarChanges.deletedHoliday.add = {clndr_name: prevCal.clndr_name, type: prevCal.type, hol: prevCal.holidays[hol]}
+            for (let h in prevCal.holidays) {
+                if (!(h in cal.holidays)) {
+                    calendarChanges.deletedHoliday.add = {
+                        curr: {
+                            clndr_name: prevCal.clndr_name, 
+                            type: prevCal.type, 
+                            hol: prevCal.holidays[h]
+                        }
+                    }
                 }
             }
 
-            for (let exc in cal.exceptions) {
-                if (!(exc in prevCal.exceptions)) {
-                    calendarChanges.addedException.add = {clndr_name: cal.clndr_name, type: cal.type, exc: cal.exceptions[exc]}
+            for (let e in cal.exceptions) {
+                if (!(e in prevCal.exceptions)) {
+                    calendarChanges.addedException.add = {
+                        curr: {
+                            clndr_name: cal.clndr_name, 
+                            type: cal.type, 
+                            exc: cal.exceptions[e]
+                        }
+                    }
                 }
             }
-            for (let exc in prevCal.exceptions) {
-                if (!(exc in cal.exceptions)) {
-                    calendarChanges.deletedException.add = {clndr_name: prevCal.clndr_name, type: prevCal.type, exc: prevCal.exceptions[exc].date}
+            for (let e in prevCal.exceptions) {
+                if (!(e in cal.exceptions)) {
+                    calendarChanges.deletedException.add = {
+                        curr: {
+                            clndr_name: prevCal.clndr_name, 
+                            type: prevCal.type, 
+                            exc: prevCal.exceptions[e].date
+                        }
+                    }
                 }
             }
         })

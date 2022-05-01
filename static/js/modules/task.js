@@ -1,3 +1,4 @@
+
 const STATUSTYPES = {
     TK_NotStart: 'Not Started',
     TK_Active: 'In Progress',
@@ -82,6 +83,14 @@ export default class Task {
     get thisPeriodQty() {return this.resources.reduce((a, r) => a + r.act_this_per_qty, 0.0)}
     get remainingQty() {return this.resources.reduce((a, r) => a + r.remain_qty, 0.0)}
     
+    get img(){
+        let img = new Image(20, 10);
+        let post = (this.longestPath && !this.completed) ? '-lp.png' : '.png';
+        let pre = this.isMilestone ? 'ms-' : '';
+        img.src = "./static/js/modules/img/" + `${pre}${this.status_code}${post}`
+        return img;
+    }
+
     print(){
         console.log(`${this.task_code} - ${this.task_name}`);
     }
@@ -89,4 +98,17 @@ export default class Task {
 
 Task.prototype.equals = function(other) {
     return this.task_code === other.task_code
+}
+
+export function statusImg(task) {
+    let img = new Image(20, 10);
+    if (!task || !(task instanceof Task)) {
+        img.src = "./img/deleted.png";
+        return img;
+    }
+    let postFix = (task.longestPath && !task.completed) ? '-lp.png' : '.png';
+    let preFix = task.isMilestone ? 'ms-' : '';
+    let imgName = task.notStarted ? `${preFix}open${postFix}` : (task.inProgress ? `${preFix}active${postFix}` : `${preFix}complete${postFix}`);
+    img.src = "./img/" + imgName;
+    return img;
 }

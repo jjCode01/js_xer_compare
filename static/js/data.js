@@ -1,3 +1,4 @@
+import Change from "./data/change.js";
 import { projects, xerTables } from "./main.js"
 import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance, getWeekday } from "./utilities.js";
 
@@ -13,21 +14,6 @@ const statusImg = task => {
     let imgName = task.notStarted ? `${preFix}open${postFix}` : (task.inProgress ? `${preFix}active${postFix}` : `${preFix}complete${postFix}`);
     img.src = "./static/img/" + imgName;
     return img;
-}
-
-class Change {
-    constructor(id, title, columns, getRowFunc, footer = "") {
-        this.id = id;
-        this.title = title;
-        this.columns = columns;
-        this.data = [];
-        this.prev = [];
-        this.getRows = getRowFunc;
-        this.footer = footer;
-    }
-    set add(item) {
-        this.data.push(item)
-    }
 }
 
 export let updates = {
@@ -144,116 +130,6 @@ export let constraintVariance = {
             ]
         })
     }
-}
-
-export let taskChanges = {
-    added: new Change(
-        "tk-added", "Added Activities",
-        ['Act ID', '', 'Act Name', 'Orig Dur', 'Start', 'Finish'],
-        function() {
-            return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, task.origDur, 
-                formatDate(task.start, false), formatDate(task.finish, false)
-            ])
-        }
-    ),
-    deleted: new Change(
-        "tk-deleted", "Deleted Activities",
-        ['Act ID', '', 'Act Name', 'Orig Dur', 'Start', 'Finish'],
-        function() {
-            return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, task.origDur, 
-                formatDate(task.start, false), formatDate(task.finish, false)
-            ])
-        }
-    ),
-    name: new Change(
-        "tk-name", "Revised Activity Names",
-        ['Act ID', '', 'Act Name', 'Prev Name'],
-        function() {
-            return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, projects.previous.getTask(task).task_name
-            ])
-        }
-    ),
-    duration: new Change(
-        "tk-duration", "Revised Durations",
-        ['Act ID', '', 'Act Name', 'New Dur', 'Old Dur', 'Var'],
-        function() {
-            return this.data.map(task => {
-		let prevTask = projects.previous.getTask(task)
-		let currDur = task.origDur
-		let prevDur = prevTask.origDur
-		let remDurChange = false
-		if (task.notStarted && task.origDur !== task.remDur) {
-		    currDur = task.remDur
-		    prevDur = prevTask.remDur
-		    remDurChange = true
-		}
-		return [
-                    task.task_code,
-		    statusImg(task),
-		    task.task_name,
-		    `${formatNumber(currDur)}${remDurChange ? '*' : ""}`, 
-                    formatNumber(prevDur), 
-                    formatVariance(currDur - prevDur)
-            	]
-	    })
-        },
-        '* Change to Remaining Duration'
-    ),
-    calendar: new Change(
-        "tk-calendar", "Revised Activity Calendars",
-        ['Act ID', '', 'Act Name', 'New Cal', 'Old Cal'],
-        function() {
-            return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, task.calendar.clndr_name, 
-                projects.previous.getTask(task).calendar.clndr_name 
-            ])
-        }
-    ),
-    start: new Change(
-        "tk-start", "Revised Actual Starts",
-        ['Act ID', '', 'Act Name', 'New Start', 'Old Start', 'Var'],
-        function() {
-            return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, formatDate(task.start, false), 
-                formatDate(projects.previous.getTask(task).start, false), 
-                formatVariance(dateVariance(task.start, projects.previous.getTask(task).start))
-            ])
-        }
-    ),
-    finish: new Change(
-        "tk-finish", "Revised Actual Finishes",
-        ['Act ID', '', 'Act Name', 'New Finish', 'Old Finish', 'Var'],
-        function() {
-            return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, formatDate(task.finish, false), 
-                formatDate(projects.previous.getTask(task).finish, false), 
-                formatVariance(dateVariance(task.finish, projects.previous.getTask(task).finish))
-            ])
-        }
-    ),
-    wbs: new Change(
-        "tk-wbs", "Revised WBS Assignment",
-        ['Act ID', '', 'Act Name', 'New WBS', 'Old WBS'],
-        function() {
-            return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, task.wbs.wbsId, 
-                projects.previous.getTask(task).wbs.wbsId
-            ])
-        }
-    ),
-    type: new Change(
-        "tk-type", "Revised Activity Type",
-        ['Act ID', '', 'Act Name', 'New Type', 'Old Type'],
-        function() {
-            return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, task.taskType, 
-                projects.previous.getTask(task).taskType
-            ])
-        }
-    ),
 }
 
 export let noteBookChanges = {
