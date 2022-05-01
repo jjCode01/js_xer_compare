@@ -3,6 +3,7 @@ import Memo from "./memo.js"
 import Relationship from "./relationship.js"
 import Resource from "./resource.js"
 import Task from "./task.js"
+import WbsNode from "./wbs.js"
 
 const MONTHNAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
@@ -59,7 +60,7 @@ export default class Project {
     }
     set addWbs(wbs) {
         this.wbs.set(wbs.wbs_id, wbs)
-        this.wbsById.set(wbs.wbsID, wbs)
+        this.wbsById.set(wbs.wbsId, wbs)
         if (wbs.proj_node_flag === 'Y') this.name = wbs.wbs_name;
     }
     set addRelationship(rel) {
@@ -132,8 +133,8 @@ export default class Project {
 
     hasResource(res) {return this.resById.has(res.resId)}
     getResource(res) {return this.resById.get(res.resId)}
-    hasWbs(node) {return this.wbsById.has(node.wbsID)}
-    getWbs(node) {return this.wbsById.get(node.wbsID)}
+    hasWbs(node) {return this.wbsById.has(node.wbsId)}
+    getWbs(node) {return this.wbsById.get(node.wbsId)}
 
     getMemo(memo) {return this.notes.get(memo.id)}
 
@@ -156,6 +157,7 @@ Project.prototype.has = function(obj) {
     if (obj instanceof Task) return this.hasTask(obj)
     if (obj instanceof Resource) return this.hasResource(obj)
     if (obj instanceof Relationship) return this.hasLogic(obj)
+    if (obj instanceof WbsNode) return this.wbsById.has(obj.wbsId)
     console.log(obj)
     return false
 }

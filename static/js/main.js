@@ -347,12 +347,12 @@ function updateProjCard(name, value){
 
         const currWbsArr = Array.from(projects.current.wbs.values())
         const prevWbsArr = Array.from(projects.previous.wbs.values())
-        wbsChanges.added.data = currWbsArr.filter(wbs => !(wbs.proj_node_flag === 'Y') && !projects.previous.hasWbs(wbs))
-        wbsChanges.deleted.data = prevWbsArr.filter(wbs => !(wbs.proj_node_flag === 'Y') && !projects.current.hasWbs(wbs))
+        wbsChanges.added.data = currWbsArr.filter(wbs => !wbs.isProjectNode && !projects.previous.has(wbs))
+        wbsChanges.deleted.data = prevWbsArr.filter(wbs => !wbs.isProjectNode && !projects.current.has(wbs))
         wbsChanges.revised.data = currWbsArr.filter(wbs => {
             return (
-                !(wbs.proj_node_flag === 'Y') && 
-                projects.previous.hasWbs(wbs) &&
+                !wbs.isProjectNode && 
+                projects.previous.has(wbs) &&
                 wbs.wbs_name !== projects.previous.getWbs(wbs).wbs_name
             )
         })

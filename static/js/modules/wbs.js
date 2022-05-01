@@ -11,8 +11,8 @@ export default class WbsNode {
     get parentNode() {
         if (
             this.project.wbs.has(node.parent_wbs_id) && 
-            !this.projectj.wbs.get(node.parent_wbs_id).isProjectNode
-        ) return this.projectj.wbs.get(node.parent_wbs_id)
+            !this.project.wbs.get(node.parent_wbs_id).isProjectNode
+        ) return this.project.wbs.get(node.parent_wbs_id)
     }
 
     get wbsId() {
@@ -21,11 +21,10 @@ export default class WbsNode {
 
         while (true) {
             if (!this.project.wbs.has(node.parent_wbs_id) || 
-            this.projectj.wbs.get(node.parent_wbs_id).isProjectNode) break;
+            this.project.wbs.get(node.parent_wbs_id).isProjectNode) break;
 
             node = this.project.wbs.get(node.parent_wbs_id);
             id.unshift(node.wbs_short_name)
-            console.log(this.wbs_short_name, id)
         }
         return id.join('.')
     }

@@ -1,4 +1,4 @@
-import {projects, xerTables} from "./main.js"
+import { projects, xerTables } from "./main.js"
 import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance, getWeekday } from "./utilities.js";
 
 const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
