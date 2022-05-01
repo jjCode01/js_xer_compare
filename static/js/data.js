@@ -239,8 +239,8 @@ export let taskChanges = {
         ['Act ID', '', 'Act Name', 'New WBS', 'Old WBS'],
         function() {
             return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name, task.wbs.wbsID, 
-                projects.previous.getTask(task).wbs.wbsID
+                task.task_code, statusImg(task), task.task_name, task.wbs.wbsId, 
+                projects.previous.getTask(task).wbs.wbsId
             ])
         }
     ),
@@ -391,21 +391,21 @@ export let wbsChanges = {
         "wbs-added", "Added WBS Node",
         ['WBS ID', 'WBS Name',],
         function() {
-            return this.data.map(wbs => [wbs.wbsID, wbs.wbs_name,])
+            return this.data.map(wbs => [wbs.wbsId, wbs.wbs_name,])
         }
     ),
     deleted: new Change(
         "wbs-deleted", "Deleted WBS Node",
         ['WBS ID', 'WBS Name',],
         function() {
-            return this.data.map(wbs => [wbs.wbsID, wbs.wbs_name,])
+            return this.data.map(wbs => [wbs.wbsId, wbs.wbs_name,])
         }
     ),
     revised: new Change(
         "wbs-revised", "Revised WBS Name",
         ['WBS ID', 'New WBS Name', 'Old WBS Name'],
         function() {
-            return this.data.map(wbs => [wbs.wbsID, wbs.wbs_name, projects.previous.getWbs(wbs).wbs_name])
+            return this.data.map(wbs => [wbs.wbsId, wbs.wbs_name, projects.previous.getWbs(wbs).wbs_name])
         }
     ),
 }

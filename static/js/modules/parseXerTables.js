@@ -4,6 +4,7 @@ import Project from "./project.js";
 import Relationship from "./relationship.js";
 import Resource from "./resource.js";
 import Task from "./task.js";
+import WbsNode from "./wbs.js";
 
 const regExFindTable = /%T\t/gm;
 
@@ -70,19 +71,7 @@ export default class ParseXer{
         this.#tables = parseTableObjects(file)
         this.#tables.PROJWBS.rows.forEach(wbs => {
             const proj = this.PROJECT[wbs.proj_id];
-            let id = [wbs.wbs_short_name];
-            let node = wbs;
-
-            while (true) {
-                if (!proj.wbs.has(node.parent_wbs_id) || 
-                    proj.wbs.get(node.parent_wbs_id).proj_node_flag === 'Y') break;
-
-                node = proj.wbs.get(node.parent_wbs_id);
-                id.unshift(node.wbs_short_name)
-            }
-            wbs.wbsID = id.join('.')
-            proj.addWbs = wbs
-
+            proj.addWbs = new WbsNode(wbs, proj)
         })
         if ('TASK' in this.#tables) {
             this.#tables.TASK.rows.forEach(task => {

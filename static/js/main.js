@@ -241,7 +241,7 @@ function updateProjCard(name, value){
             if (task.completed && prevTask.notStarted) updates.startFinish.add = task
             if (task.task_name !== prevTask.task_name) taskChanges.name.add = task
             if (task.calendar.id !== prevTask.calendar.id) taskChanges.calendar.add = task
-            if (task.wbs.wbsID !== prevTask.wbs.wbsID) taskChanges.wbs.add = task
+            if (task.wbs.wbsId !== prevTask.wbs.wbsId) taskChanges.wbs.add = task
             if (task.taskType !== prevTask.taskType) taskChanges.type.add = task
 
             if (!task.isLOE) {
