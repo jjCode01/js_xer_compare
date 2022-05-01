@@ -35,11 +35,11 @@ const getMonthIntervalObj = proj => {
 }
 
 export default class Project {
-    #tasksByCode
+    // #tasksByCode
     constructor(obj) {
         Object.assign(this, obj)
         this.tasks = new Map();
-        this.#tasksByCode = new Map()
+        this.tasksByCode = new Map()
         this.rels = [];
         this.relsById = new Map();
         this.resources = [];
@@ -54,7 +54,7 @@ export default class Project {
     set addTask(task) {
         if (task instanceof Task){
             this.tasks.set(task.task_id, task)
-            this.#tasksByCode.set(task.task_code, task)
+            this.tasksByCode.set(task.task_code, task)
         }
         if (task.start < this.start) this.start = task.start;
     }
@@ -118,14 +118,14 @@ export default class Project {
     get remainingQty() {return this.resources.reduce((a, r) => a + r.remain_qty, 0.0)}
 
     getTask(task) {
-        if (task instanceof Task) return this.#tasksByCode.get(task.task_code)
-        if (task instanceof String) return this.#tasksByCode.get(task)
+        if (task instanceof Task) return this.tasksByCode.get(task.task_code)
+        if (task instanceof String) return this.tasksByCode.get(task)
         return
     }
 
     hasTask(task) {
-        if (task instanceof Task) return this.#tasksByCode.has(task.task_code)
-        if (task instanceof String) return this.#tasksByCode.has(task)
+        if (task instanceof Task) return this.tasksByCode.has(task.task_code)
+        if (task instanceof String) return this.tasksByCode.has(task)
     }
 
     getLogic(rel) {return this.relsById.get(rel.logicId)}
@@ -154,10 +154,18 @@ export default class Project {
 }
 
 Project.prototype.has = function(obj) {
-    if (obj instanceof Task) return this.hasTask(obj)
-    if (obj instanceof Resource) return this.hasResource(obj)
-    if (obj instanceof Relationship) return this.hasLogic(obj)
+    if (obj instanceof Task) return this.tasksByCode.has(obj.task_code)
+    if (obj instanceof Resource) return this.resById.has(obj.resId)
+    if (obj instanceof Relationship) return this.relsById.has(obj.logicId)
     if (obj instanceof WbsNode) return this.wbsById.has(obj.wbsId)
     console.log(obj)
     return false
+}
+Project.prototype.get = function(obj) {
+    if (obj instanceof Task) return this.tasksByCode.get(obj.task_code)
+    if (obj instanceof Resource) return this.resById.get(obj.resId)
+    if (obj instanceof Relationship) return this.relsById.get(obj.logicId)
+    if (obj instanceof WbsNode) return this.wbsById.get(obj.wbsId)
+    console.log(obj)
+    return
 }

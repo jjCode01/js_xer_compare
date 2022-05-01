@@ -235,7 +235,7 @@ function updateProjCard(name, value){
 	    const ongoingTasks = currTasks.filter(task => projects.previous.has(task))
 
         ongoingTasks.forEach(task => {
-            const prevTask = projects.previous.getTask(task)
+            const prevTask = projects.previous.get(task)
             if (task.inProgress && prevTask.notStarted) updates.started.add = task
             if (task.completed && prevTask.inProgress) updates.finished.add = task
             if (task.completed && prevTask.notStarted) updates.startFinish.add = task
@@ -275,8 +275,8 @@ function updateProjCard(name, value){
 
         logicChanges.added.data = projects.current.rels.filter(rel => !projects.previous.has(rel))
         logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.has(rel))
-        logicChanges.revised.data = projects.current.rels.filter(rel => projects.previous.has(rel) && rel.lag !== projects.previous.getLogic(rel).lag)
-        logicChanges.revised.prev = logicChanges.revised.data.map(rel => projects.previous.getLogic(rel))
+        logicChanges.revised.data = projects.current.rels.filter(rel => projects.previous.has(rel) && rel.lag !== projects.previous.get(rel).lag)
+        logicChanges.revised.prev = logicChanges.revised.data.map(rel => projects.previous.get(rel))
 
         for (let a = logicChanges.added.data.length - 1; a >= 0; a--) {
             let addRel = logicChanges.added.data[a];
@@ -294,8 +294,8 @@ function updateProjCard(name, value){
         if (xerTables.current.RSRC && xerTables.previous.RSRC) {
             resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.has(res))
             resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.has(res))
-            resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_cost !== projects.previous.getResource(res).target_cost)
-            resourceChanges.revisedUnits.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_qty !== projects.previous.getResource(res).target_qty)
+            resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_cost !== projects.previous.get(res).target_cost)
+            resourceChanges.revisedUnits.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_qty !== projects.previous.get(res).target_qty)
         }
         updateElements(resourceChanges)
 
@@ -353,7 +353,7 @@ function updateProjCard(name, value){
             return (
                 !wbs.isProjectNode && 
                 projects.previous.has(wbs) &&
-                wbs.wbs_name !== projects.previous.getWbs(wbs).wbs_name
+                wbs.wbs_name !== projects.previous.get(wbs).wbs_name
             )
         })
 
@@ -362,14 +362,14 @@ function updateProjCard(name, value){
             return (
                 projects.current.has(task) && 
                 task.primeConstraint && 
-                task.primeConstraint !== projects.current.getTask(task).primeConstraint
+                task.primeConstraint !== projects.current.get(task).primeConstraint
             )
         })
         constraintChanges.deletedSec.data = prevTasks.filter(task => {
             return (
                 projects.current.has(task) && 
                 task.secondConstraint && 
-                task.secondConstraint !== projects.current.getTask(task).secondConstraint
+                task.secondConstraint !== projects.current.get(task).secondConstraint
             )
         })
         updateElements(constraintChanges)
