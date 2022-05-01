@@ -132,36 +132,6 @@ export let constraintVariance = {
     }
 }
 
-export let noteBookChanges = {
-    added: new Change(
-        "nb-added", "Added Notebook Memos",
-        ['Act ID', 'Act Name', 'Notebook', 'Memo'],
-        function() {
-            return this.data.map(memo => [
-                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, memo.note,
-            ])
-        }
-    ),
-    deleted: new Change(
-        "nb-deleted", "Deleted Notebook Memos",
-        ['Act ID', 'Act Name', 'Notebook', 'Memo'],
-        function() {
-            return this.data.map(memo => [
-                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, memo.note,
-            ])
-        }
-    ),
-    revised: new Change(
-        "nb-revised", "Revised Notebook Memos",
-        ['Act ID', 'Act Name', 'Notebook', 'New Memo', 'Old Memo'],
-        function() {
-            return this.data.map(memo => [
-                memo.task.task_code, memo.task.task_name, memo.noteBook.memo_type, 
-                memo.note, projects.previous.notes.get(memo.id).note
-            ])
-        }
-    ),
-}
 
 export let logicChanges = {
     added: new Change(

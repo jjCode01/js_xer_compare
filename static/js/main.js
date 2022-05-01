@@ -1,5 +1,6 @@
-import {updates, constraintVariance, noteBookChanges, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress, wbsChanges} from "./data.js"
+import {updates, constraintVariance, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress, wbsChanges} from "./data.js"
 import { taskChanges } from "./data/taskChanges.js"
+import { noteBookChanges } from "./data/noteBookChanges.js"
 import * as util from "./utilities.js"
 import ParseXer from "./modules/parseXerTables.js"
 import createTable from "./modules/createTable.js"
@@ -61,9 +62,7 @@ function updateProjCard(name, value){
 
     function updateElements(obj) {
 	    const revSec = document.getElementById('revisions-sec')
-        Object.values(obj).forEach(update => {
-            console.log(obj)
-            
+        Object.values(obj).forEach(update => {            
             if (update.data.length) {
                 const valueEl = document.getElementById(update.id)
                 const labelEl = document.getElementById(`${update.id}-label`)
@@ -402,16 +401,26 @@ function updateProjCard(name, value){
 
         if (projects.current.notes.size) {
             const currMemoArr = Array.from(projects.current.notes.values())
-            noteBookChanges.added.data = currMemoArr.filter(memo => {
-                return !projects.previous.notes.has(memo.id)
+            // noteBookChanges.added.data = currMemoArr.filter(memo => {
+            //     return !projects.previous.notes.has(memo.id)
+            // })
+            currMemoArr.forEach(memo => {
+                if (!projects.previous.notes.has(memo.id)) {
+                    noteBookChanges.added.add = {curr: memo}
+                } else {
+                    const prevMemo = projects.previous.notes.get(memo.id)
+                    if (memo.note !== prevMemo.note) {
+                        noteBookChanges.revised.add = {curr: memo, prev: prevMemo}
+                    }
+                }
             })
 
-            noteBookChanges.revised.data = currMemoArr.filter(memo => {
-                return (
-                    projects.previous.notes.has(memo.id) && 
-                    memo.note !== projects.previous.notes.get(memo.id).note
-                )
-            })
+            // noteBookChanges.revised.data = currMemoArr.filter(memo => {
+            //     return (
+            //         projects.previous.notes.has(memo.id) && 
+            //         memo.note !== projects.previous.notes.get(memo.id).note
+            //     )
+            // })
         }
 
         if (projects.previous.notes.size) {
