@@ -160,13 +160,16 @@ export let logicChanges = {
             ])
         }
     ),
-    revised: new Change(
-        "rl-revised", "Revised Relationships",
-        [
+    revised: {
+        id: "rl-revised", 
+        title: "Revised Relationships",
+        columns: [
             'Pred ID', '', 'Predecessor Name', 
             'Succ ID', '', 'Successor Name', 'New\r\nLink:Lag', 'Old\r\nLink:Lag'
         ],
-        function() {
+        data: [],
+        prev: [],
+        getRows: function() {
             return this.data.map((task, i) => {
                 return [
                     task.predTask.task_code, statusImg(task.predTask), task.predTask.task_name, 
@@ -175,7 +178,7 @@ export let logicChanges = {
                 ]
             })
         }
-    ),
+    },
 }
 
 export let resourceChanges = {
@@ -300,6 +303,32 @@ export let calendarChanges = {
             return this.data.map(cal => [cal.clndr_name, cal.type, getWeekday(cal.exc), formatDate(cal.exc)])
         }
     ),
+//    addedException: new Change(
+//        "cal-added-exception", "Added Calendar Exceptions",
+//        ['Calendar', 'Type', 'Exception Date', 'Exception Hrs', 'Normal Hrs', 'Variance'],
+//        function() {
+//            return this.data.map(cal => {
+//                return [
+//                    cal.clndr_name, cal.type, '', '', '', ''
+//                ]
+//            })
+//        }
+//    ),
+//    deletedException: {
+//        id: "cal-deleted-exception",
+//        title: "Deleted Calendar Exceptions",
+//        columns: [
+//            'Calendar', 'Type', 'Exception Date', 'Exception Hrs', 'Normal Hrs', 'Variance'
+//        ],
+//        data: [],
+//        getRows: function() {
+//            return this.data.map(cal => {
+//                return [
+//                    cal.clndr_name, cal.type, '', '', '', ''
+//                ]
+//            })
+//        }
+//    },
 }
 
 export let constraintChanges = {

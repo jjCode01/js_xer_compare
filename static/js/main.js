@@ -4,6 +4,7 @@ import { noteBookChanges } from "./data/noteBookChanges.js"
 import * as util from "./utilities.js"
 import ParseXer from "./modules/parseXerTables.js"
 import createTable from "./modules/createTable.js"
+import Change from "./data/change.js"
 
 export let xerTables = {
     current: {},
@@ -62,22 +63,20 @@ function updateProjCard(name, value){
 
     function updateElements(obj) {
 	    const revSec = document.getElementById('revisions-sec')
-        Object.values(obj).forEach(update => {            
+        Object.values(obj).forEach(update => {
+            update.update()
             if (update.data.length) {
                 const valueEl = document.getElementById(update.id)
                 const labelEl = document.getElementById(`${update.id}-label`)
                 valueEl.style.cursor = 'pointer'
-                // valueEl.style.fontWeight = 'bold'
+                valueEl.style.fontWeight = 'bold'
                 labelEl.style.cursor = 'pointer'
-                // labelEl.style.fontWeight = 'bold'
-                const table = createTable(update.id, update.title, update.columns, update.getRows(), update.footer ?? "");
+                const table = update.table;
                 revSec.append(table)
                 
                 valueEl.addEventListener("click", () => table.scrollIntoView({ behavior: 'smooth'}))
-                // labelEl.addEventListener("click", () => location.href=`#${update.id}-table`)
                 labelEl.addEventListener("click", () => table.scrollIntoView({ behavior: 'smooth'}))
             }
-            updateElText(update.id, (update.data.length).toLocaleString())
         })
     }
 
@@ -276,7 +275,12 @@ function updateProjCard(name, value){
 
         logicChanges.added.data = projects.current.rels.filter(rel => !projects.previous.has(rel))
         logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.has(rel))
-        logicChanges.revised.data = projects.current.rels.filter(rel => projects.previous.has(rel) && rel.lag !== projects.previous.get(rel).lag)
+        // logicChanges.revised.data = projects.current.rels.filter(rel => projects.previous.has(rel) && rel.lag !== projects.previous.get(rel).lag)
+        projects.current.rels.forEach((rel, i) => {
+            if (projects.previous.has(rel) && rel.lag !== projects.previous.get(rel).lag) {
+                logicChanges.revised.add = {curr: rel, prev: projects.previous.get(rel)}
+            }
+        })
         logicChanges.revised.prev = logicChanges.revised.data.map(rel => projects.previous.get(rel))
 
         for (let a = logicChanges.added.data.length - 1; a >= 0; a--) {
