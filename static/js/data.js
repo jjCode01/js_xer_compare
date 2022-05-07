@@ -132,57 +132,6 @@ export let constraintVariance = {
     }
 }
 
-export let resourceChanges = {
-    added: new Change(
-        "rs-added", "Added Resources",
-        ['Act ID', '', 'Activity Name', 'Resource', 'Qty', 'Cost'],
-        function() {
-            return this.data.map(task => [
-                task.task.task_code, statusImg(task.task), task.task.task_name,
-                task.rsrc.rsrc_short_name, formatNumber(task.target_qty), formatCost(task.target_cost)
-            ])
-        }
-    ),
-    deleted: new Change(
-        "rs-deleted", "Deleted Resources",
-        ['Act ID', '', 'Activity Name', 'Resource', 'Qty', 'Cost'],
-        function() {
-            return this.data.map(task => [
-                task.task.task_code, statusImg(task.task), task.task.task_name,
-                task.rsrc?.rsrc_short_name, formatNumber(task.target_qty), formatCost(task.target_cost)
-            ])
-        }
-    ),
-    revisedCost: new Change(
-        "rs-cost", "Revised Resource Budgeted Cost",
-         ['Act ID', '', 'Activity Name', 'Resource', 'New Cost', 'Old Cost', 'Var'],
-        function() {
-            return this.data.map(res => {
-                const prevCost = projects.previous.getResource(res).target_cost;
-                return [
-                    res.task.task_code, statusImg(res.task), res.task.task_name,
-                    res.rsrc?.rsrc_short_name, formatCost(res.target_cost), formatCost(prevCost), 
-                    formatCost(res.target_cost - prevCost)
-                ]
-            })
-        }
-    ),
-    revisedUnits: new Change(
-        "rs-units", "Revised Resource Budgeted Quantity",
-        ['Act ID', '', 'Activity Name', 'Resource', 'New Qty', 'Old Qty', 'Var'],
-        function() {
-            return this.data.map(res => {
-                const prevQty = projects.previous.getResource(res).target_qty;
-                return [
-                    res.task.task_code, statusImg(res.task), res.task.task_name, res.rsrc?.rsrc_short_name, 
-                    formatNumber(res.target_qty), formatNumber(prevQty), 
-                    formatVariance(res.target_qty - prevQty)
-                ]
-            })
-        }
-    ),
-}
-
 export let wbsChanges = {
     added: new Change(
         "wbs-added", "Added WBS Node",
