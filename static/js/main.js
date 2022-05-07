@@ -273,10 +273,10 @@ function updateProjCard(name, value){
         })
         updateElements(taskChanges)
 
-        logicChanges.added.data = projects.current.rels.filter(rel => !projects.previous.has(rel))
+        // logicChanges.added.data = projects.current.rels.filter(rel => !projects.previous.has(rel))
         logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.has(rel))
-        // logicChanges.revised.data = projects.current.rels.filter(rel => projects.previous.has(rel) && rel.lag !== projects.previous.get(rel).lag)
         projects.current.rels.forEach((rel, i) => {
+            if (!projects.previous.has(rel)) logicChanges.added.add = {curr: rel}
             if (projects.previous.has(rel) && rel.lag !== projects.previous.get(rel).lag) {
                 logicChanges.revised.add = {curr: rel, prev: projects.previous.get(rel)}
             }
