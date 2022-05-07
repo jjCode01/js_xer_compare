@@ -132,52 +132,6 @@ export let constraintVariance = {
     }
 }
 
-
-export let logicChanges = {
-    added: new Change(
-        "rl-added", "Added Relationships",
-        [
-            'Pred ID', '', 'Predecessor Name', 
-            'Succ ID', '', 'Successor Name', 'Link', 'Lag'
-        ],
-        function() {
-            return this.data.map(task => [
-                task.predTask.task_code, statusImg(task.predTask), task.predTask.task_name, 
-                task.succTask.task_code, statusImg(task.succTask), task.succTask.task_name, task.link, task.lag 
-            ])
-        }
-    ),
-    deleted: new Change(
-        "rl-deleted", "Deleted Relationships",
-        [
-            'Pred ID', '', 'Predecessor Name', 
-            'Succ ID', '', 'Successor Name', 'Link', 'Lag'
-        ],
-        function() {
-            return this.data.map(task => [
-                task.predTask.task_code, statusImg(projects.current.getTask(task.predTask)), task.predTask.task_name, 
-                task.succTask.task_code, statusImg(projects.current.getTask(task.succTask)), task.succTask.task_name, task.link, task.lag 
-            ])
-        }
-    ),
-    revised: new Change(
-        "rl-revised", "Revised Relationships",
-        [
-            'Pred ID', '', 'Predecessor Name', 
-            'Succ ID', '', 'Successor Name', 'New\r\nLink:Lag', 'Old\r\nLink:Lag'
-        ],
-        function() {
-            return this.data.map((task, i) => {
-                return [
-                    task.predTask.task_code, statusImg(task.predTask), task.predTask.task_name, 
-                    task.succTask.task_code, statusImg(task.succTask), task.succTask.task_name, 
-                    `${task.link}:${task.lag}`, `${this.prev[i].link}:${this.prev[i].lag}` 
-                ]
-            })
-        }
-    ),
-}
-
 export let resourceChanges = {
     added: new Change(
         "rs-added", "Added Resources",

@@ -1,10 +1,11 @@
-import {updates, constraintVariance, logicChanges, resourceChanges, calendarChanges, constraintChanges, plannedProgress, wbsChanges} from "./data.js"
+import { updates, constraintVariance, resourceChanges, calendarChanges, constraintChanges, plannedProgress, wbsChanges } from "./data.js"
 import { taskChanges } from "./data/taskChanges.js"
+import { logicChanges } from "./data/logicChanges.js"
 import { noteBookChanges } from "./data/noteBookChanges.js"
 import * as util from "./utilities.js"
 import ParseXer from "./modules/parseXerTables.js"
 import createTable from "./modules/createTable.js"
-import Change from "./data/change.js"
+// import Change from "./data/change.js"
 
 export let xerTables = {
     current: {},
