@@ -1,12 +1,12 @@
-import { updates, constraintVariance, calendarChanges, constraintChanges, plannedProgress, wbsChanges } from "./data.js"
+import { updates, constraintVariance, constraintChanges, plannedProgress, wbsChanges } from "./data.js"
 import { taskChanges } from "./data/taskChanges.js"
 import { logicChanges } from "./data/logicChanges.js"
 import { resourceChanges } from "./data/resourceChanges.js"
+import { calendarChanges } from "./data/calendarChanges.js"
 import { noteBookChanges } from "./data/noteBookChanges.js"
 import * as util from "./utilities.js"
 import ParseXer from "./modules/parseXerTables.js"
 import createTable from "./modules/createTable.js"
-// import Change from "./data/change.js"
 
 export let xerTables = {
     current: {},
@@ -252,10 +252,10 @@ function updateProjCard(name, value){
                     taskChanges.duration.add = {curr: task, prev: prevTask}
                 }
             }
-            if (!prevTask.notStarted && util.formatDate(task.start) !== util.formatDate(prevTask.start)) {
+            if (task.task_type !== 'TT_FinMile' && !prevTask.notStarted && util.formatDate(task.start) !== util.formatDate(prevTask.start)) {
                 taskChanges.start.add = {curr: task, prev: prevTask}
             }
-            if (prevTask.completed && util.formatDate(task.finish) !== util.formatDate(prevTask.finish)) {
+            if (task.task_type !== 'TT_Mile' && prevTask.completed && util.formatDate(task.finish) !== util.formatDate(prevTask.finish)) {
                 taskChanges.finish.add = {curr: task, prev: prevTask}
             }
             if (task.primeConstraint && task.primeConstraint !== prevTask.primeConstraint) {
@@ -299,10 +299,21 @@ function updateProjCard(name, value){
         updateElements(logicChanges)
 
         if (xerTables.current.RSRC && xerTables.previous.RSRC) {
-            resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.has(res))
+            // resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.has(res))
             resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.has(res))
-            resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_cost !== projects.previous.get(res).target_cost)
-            resourceChanges.revisedUnits.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_qty !== projects.previous.get(res).target_qty)
+            // resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_cost !== projects.previous.get(res).target_cost)
+            // resourceChanges.revisedUnits.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_qty !== projects.previous.get(res).target_qty)
+            
+            projects.current.resources.forEach(res => {
+                if (projects.previous.has(res)) {
+                    let prev = projects.previous.get(res)
+                    if (res.target_cost !== prev.target_cost) resourceChanges.revisedCost.add = {curr: res, prev: prev}
+                    if (res.target_qty !== prev.target_qty) resourceChanges.revisedUnits.add = {curr: res, prev: prev}
+                } else {
+                    resourceChanges.added.add = res
+                }
+            })
+        
         }
         updateElements(resourceChanges)
 
