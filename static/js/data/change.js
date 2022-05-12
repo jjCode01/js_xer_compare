@@ -33,7 +33,7 @@ export default class Change {
 
         let row = head.insertRow(), cell;
         this.columns.forEach((val, i) => {
-            cell = newCell('th', align[i], wrap[i], val)
+            cell = newCell('th', align[i], 'pre', val)
             cell.style.verticalAlign = 'bottom';
             cell.classList.add('btm-border')
             row.append(cell);

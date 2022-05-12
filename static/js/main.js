@@ -112,17 +112,17 @@ function updateProjCard(name, value){
             document.getElementById("cost-progress").style.width = `${util.formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
         }
 
-	    updateElText('current-not-started-per', util.formatPercent(projects.current.notStarted.length / projects.current.tasks.size))
-        updateElText('current-in-progress-per', util.formatPercent(projects.current.inProgress.length / projects.current.tasks.size))
-        updateElText('current-complete-per', util.formatPercent(projects.current.completed.length / projects.current.tasks.size))
+	    // updateElText('current-not-started-per', util.formatPercent(projects.current.notStarted.length / projects.current.tasks.size))
+        // updateElText('current-in-progress-per', util.formatPercent(projects.current.inProgress.length / projects.current.tasks.size))
+        // updateElText('current-complete-per', util.formatPercent(projects.current.completed.length / projects.current.tasks.size))
 
-        let ctxActivityStatus = document.getElementById('activityStatusChart');
-	    let activityStatusChart = createPieChart(
-            ctxActivityStatus, '# of Activities',
-            ['In Progress', 'Complete', 'Not Started'],
-            [projects.current.inProgress.length, projects.current.completed.length, projects.current.notStarted.length,],
-            [`rgba(${CHARTCOLOR.GREEN}, 1)`, `rgba(${CHARTCOLOR.BLUE}, 1)`, `rgba(${CHARTCOLOR.RED}, 1)`,]
-	    )
+        // let ctxActivityStatus = document.getElementById('activityStatusChart');
+	    // let activityStatusChart = createPieChart(
+        //     ctxActivityStatus, '# of Activities',
+        //     ['In Progress', 'Complete', 'Not Started'],
+        //     [projects.current.inProgress.length, projects.current.completed.length, projects.current.notStarted.length,],
+        //     [`rgba(${CHARTCOLOR.GREEN}, 1)`, `rgba(${CHARTCOLOR.BLUE}, 1)`, `rgba(${CHARTCOLOR.RED}, 1)`,]
+	    // )
 
         let ctxCostLoading = document.getElementById('costLoadingChart');
         let costLoadingChart = createPieChart(
@@ -149,6 +149,71 @@ function updateProjCard(name, value){
 
         const currTasks = projects.current.taskArray.sort(util.sortById)
         const prevTasks = projects.previous.taskArray.sort(util.sortById)
+
+        let ctxStatusChart = document.getElementById('activityStatusChart');
+        let statusChart = new Chart(ctxStatusChart, {
+            type: 'bar',
+            data: {
+                labels: ['Current', 'Previous'],
+                datasets: [
+                    {
+                        label: 'Complete',
+                        data: [
+                            projects.current.completed.length, // / projects.current.taskArray.length,
+                            projects.previous.completed.length, // / projects.previous.taskArray.length, 
+                        ],
+                        backgroundColor: [`rgba(${CHARTCOLOR.BLUE}, 0.9)`],
+                        borderColor: [`rgba(${CHARTCOLOR.BLUE}, 1)`],
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'In Progress',
+                        data: [
+                            projects.current.inProgress.length, // / projects.current.taskArray.length,
+                            projects.previous.inProgress.length, // / projects.previous.taskArray.length,
+                        ],
+                        backgroundColor: [`rgba(${CHARTCOLOR.GREEN}, 0.9)`],
+                        borderColor: [`rgba(${CHARTCOLOR.GREEN}, 1)`], 
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Not Started',
+                        data: [
+                            projects.current.notStarted.length, // / projects.current.taskArray.length, 
+                            projects.previous.notStarted.length, // / projects.previous.taskArray.length,
+
+                        ],
+                        backgroundColor: [`rgba(${CHARTCOLOR.RED}, 0.9)`],
+                        borderColor: [`rgba(${CHARTCOLOR.RED}, 1)`],
+                        borderWidth: 1,
+                    },
+                    
+                ]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                },
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                      stacked: true,
+                    //   ticks: {
+                    //     callback: function(value, index, ticks) {
+                    //         return value * 100 + '%';
+                    //     }
+                    //     }
+                    },
+                    y: {
+                      stacked: true,
+                      
+                    },
+                },
+                maintainAspectRatio: false
+            }
+        });
 
         let ctxTotalFloatChart = document.getElementById('totalFloatChart');
         let totalFloatChart = new Chart(ctxTotalFloatChart, {

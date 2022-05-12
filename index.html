@@ -170,7 +170,7 @@
                                         </table>
                                     </div>
                                     <div class="card"> <!-- Activity Status -->
-                                        <table>
+                                        <!-- <table>
                                             <caption>Activity Status</caption>
                                             <tbody>
                                                 <tr>
@@ -210,7 +210,7 @@
                                                     <td id="tasks-var" class="text-right no-wrap border-top "></td>
                                                 </tr>
                                             <tbody></tbody>
-                                        </table>
+                                        </table> -->
                                     </div>
                                     
                                 </div>
@@ -230,6 +230,52 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class="card"> <!-- Activity Status -->
+                                <table>
+                                    <caption>Activity Status</caption>
+                                    <tbody>
+                                        <tr>
+                                            <th class="text-left btm-border col-6-5em">Status</th>
+                                            <th class="text-right btm-border">Current</th>
+                                            <!-- <th class="text-right btm-border">%</th> -->
+                                            <th class="text-right btm-border">Previous</th>
+                                            <th class="text-right btm-border col-3em ">Diff</th>
+                                            <th class="text-center btm-border">Status Chart (Activity Counts)</th>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-red">Not Started:</td>
+                                            <td id="current-not-started" class="text-right no-wrap"></td>
+                                            <!-- <td id="current-not-started-per" class="text-right no-wrap"></td> -->
+                                            <td id="previous-not-started" class="text-right no-wrap "></td>
+                                            <td id="not-started-var" class="text-right no-wrap "></td>
+                                            <td class="horiz-chart no-wrap" rowspan="5"><canvas id="activityStatusChart"></canvas></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-green">In Progress:</td>
+                                            <td id="current-in-progress" class="text-right no-wrap"></td>
+                                            <!-- <td id="current-in-progress-per" class="text-right no-wrap"></td> -->
+                                            <td id="previous-in-progress" class="text-right no-wrap "></td>
+                                            <td id="in-progress-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap chart-blue">Completed:</td>
+                                            <td id="current-complete" class="text-right no-wrap"></td>
+                                            <!-- <td id="current-complete-per" class="text-right no-wrap"></td> -->
+                                            <td id="previous-complete" class="text-right no-wrap "></td>
+                                            <td id="complete-var" class="text-right no-wrap "></td>
+                                        </tr>
+                                        <tr>
+                                            <td class="no-wrap border-top">Total:</td>
+                                            <td id="current-tasks" class="text-right no-wrap border-top"></td>
+                                            <!-- <td class="text-right no-wrap border-top"></td> -->
+                                            <td id="previous-tasks" class="text-right no-wrap border-top "></td>
+                                            <td id="tasks-var" class="text-right no-wrap border-top "></td>
+                                        </tr>
+                                        <tr><td></td></tr>
+                                        <tr><td></td></tr>
+                                    <tbody></tbody>
+                                </table>
+                            </div>
                             <div id="float-table" class="card">
                                 <table>
                                     <caption>Activity Total Float</caption>
@@ -239,7 +285,7 @@
                                             <th class="text-right btm-border">Current</th>
                                             <th class="text-right btm-border">Previous</th>
                                             <th class="text-right btm-border col-3em ">Diff</th>
-                                            <th class="text-center btm-border">Float Chart</th>
+                                            <th class="text-center btm-border">Float Chart (% of Open Activities)</th>
                                         </tr>
                                         <tr>
                                             <td class="no-wrap chart-red">Critical (TF < 1):</td>

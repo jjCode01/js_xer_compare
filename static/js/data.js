@@ -111,7 +111,7 @@ export let constraintVariance = {
     title: "Finish On or Before Constraint Trending",
     columns: [
         'Act ID', '', 'Act Name', 'Constraint',
-        'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Finish\r\nVariance'
+        'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Variance'
     ],
     data: [],
     getRows: function() {

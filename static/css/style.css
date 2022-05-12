@@ -120,7 +120,7 @@ span{padding: 0 0.4em;}
 .horiz-chart {
     width: 500px;
     height: 100px;
-    padding: 0.25em 0.25em 0.25em 2em;
+    padding: 0.1em 0.25em 0.25em 2em;
 }
 .chart-red{background-color: var(--chart-red); border-radius: 3px;}
 .chart-yellow{background-color: var(--chart-yellow); border-radius: 3px;}
@@ -138,7 +138,7 @@ span{padding: 0 0.4em;}
 .text-right{text-align: right;}
 .col-3em{width: 3em;}
 .col-5em{width: 4em;}
-.col-6-5em{width: 7em;}
+.col-6-5em{width: 10em;}
 .width-8em{width: 6.5em}
 .width-10em{width: 8.5em;}
 .width-max{width: 100%;}

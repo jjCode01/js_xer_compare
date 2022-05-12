@@ -42,7 +42,7 @@ export default function createTable(id, title, labels, vals, foot=""){
     let row = head.insertRow(), cell;
     row.classList.add('no-break')
     labels.forEach((val, i) => {
-        cell = newCell('th', align[i], wrap[i], val)
+        cell = newCell('th', align[i], 'pre', val)
         cell.style.verticalAlign = 'bottom';
         cell.classList.add('btm-border')
         row.append(cell);
