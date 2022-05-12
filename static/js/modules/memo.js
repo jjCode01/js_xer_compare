@@ -7,7 +7,7 @@ const parseMemo = memo => {
     memoStr = memoStr.replace(/<LI>\s*/g, '\u2022 ')
     memoStr = memoStr.replace(/<!*\/*[A-Z]+.*?>/g, '')
     memoStr = memoStr.replace(/^[^\S\r\n]+(?=\S)/gm, '') // trim leading spaces
-    memoStr = memoStr.replace(/&nbsp;\/\s*/g, ' ')
+    memoStr = memoStr.replace(/&nbsp;\s*/g, ' ') // replace non-breakable spaces
     return memoStr
 }
 
