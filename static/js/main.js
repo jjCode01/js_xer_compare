@@ -6,7 +6,6 @@ import { calendarChanges } from "./data/calendarChanges.js"
 import { noteBookChanges } from "./data/noteBookChanges.js"
 import * as util from "./utilities.js"
 import ParseXer from "./modules/parseXerTables.js"
-// import createTable from "./modules/createTable.js"
 
 export let xerTables = {
     current: {},

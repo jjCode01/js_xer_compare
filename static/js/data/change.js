@@ -41,7 +41,6 @@ export default class Change {
 
         this.getRows().forEach((task, r) => {
             row = body.insertRow();
-            // row.classList.add('no-break')
             task.forEach((val, i) => {
                 cell = newCell('td', align[i], wrap[i], val)
                 cell.style.verticalAlign = 'top';
