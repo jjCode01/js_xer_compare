@@ -106,15 +106,13 @@ export let updates = {
     )
 }
 
-export let constraintVariance = {
-    id: "cnst-var",
-    title: "Finish On or Before Constraint Trending",
-    columns: [
+export let constraintVariance = new Change(
+    "cnst-var", "Finish Constraint Trending",
+    [
         'Act ID', '', 'Act Name', 'Constraint',
         'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Variance'
     ],
-    data: [],
-    getRows: function() {
+    function() {
         return this.data.map(task => {
             if (projects.previous.hasTask(task)) {
                 return [
@@ -130,7 +128,7 @@ export let constraintVariance = {
             ]
         })
     }
-}
+)
 
 export let wbsChanges = {
     added: new Change(

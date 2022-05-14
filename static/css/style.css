@@ -21,10 +21,12 @@
 }
 html, body {
     color: var(--dark-txt);
+
 }
 body {
     margin: 0 auto;
     padding: 10px 1em;
+    /* counter-increment: page; */
 }
 h2, h3{
     font-size: 1.2rem;
@@ -71,7 +73,7 @@ td{padding: 0.3em 0.6em;}
 span{padding: 0 0.4em;}
 .card{margin-top: 0.75em;}
 @media print {
-    body{    overflow:visible;  } 
+    body {overflow:visible;} 
     .card {page-break-before: auto }
     .break {page-break-before: always }
     .no-break{page-break-inside: avoid;}
@@ -79,7 +81,7 @@ span{padding: 0 0.4em;}
     th{page-break-after: avoid; page-break-inside: avoid;}
     .caption{page-break-inside: avoid; page-break-after: avoid;}
 }
-@page{margin: 0.4cm;}
+
 .flex{display: flex;}
 .grid{
     display: grid;
@@ -88,7 +90,7 @@ span{padding: 0 0.4em;}
 }
 .outer-progress{
     min-width: 120px;
-    width: 100%;
+    width: 275px;
     background-color: #ebebeb;
     box-shadow: var(--shadow-small);
     padding: 0;
@@ -120,7 +122,7 @@ span{padding: 0 0.4em;}
 .horiz-chart {
     width: 500px;
     height: 100px;
-    padding: 0.1em 0.25em 0.25em 2em;
+    padding: 0.1em 0.25em 0.25em;
 }
 .chart-red{background-color: var(--chart-red); border-radius: 3px;}
 .chart-yellow{background-color: var(--chart-yellow); border-radius: 3px;}
@@ -138,7 +140,7 @@ span{padding: 0 0.4em;}
 .text-right{text-align: right;}
 .col-3em{width: 3em;}
 .col-5em{width: 4em;}
-.col-6-5em{width: 10em;}
+.col-6-5em{width: 10.2em;}
 .width-8em{width: 6.5em}
 .width-10em{width: 8.5em;}
 .width-max{width: 100%;}

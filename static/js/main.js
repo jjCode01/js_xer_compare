@@ -6,7 +6,7 @@ import { calendarChanges } from "./data/calendarChanges.js"
 import { noteBookChanges } from "./data/noteBookChanges.js"
 import * as util from "./utilities.js"
 import ParseXer from "./modules/parseXerTables.js"
-import createTable from "./modules/createTable.js"
+// import createTable from "./modules/createTable.js"
 
 export let xerTables = {
     current: {},
@@ -143,6 +143,7 @@ function updateProjCard(name, value){
 
     if (name === "previous") {
         document.getElementById('title').innerText = `Schedule Comparison - ${projects.current.proj_short_name} vs ${projects.previous.proj_short_name}`
+        document.getElementById('pageFooter').innerText = `Schedule Comparison - ${projects.current.proj_short_name} vs ${projects.previous.proj_short_name}`
 
         const currCalendars = [...Object.values(xerTables.current.CALENDAR)]
         const prevCalendars = [...Object.values(xerTables.previous.CALENDAR)]
@@ -292,8 +293,9 @@ function updateProjCard(name, value){
 
         constraintVariance.data = currTasks.filter(task => task.primeConstraint === "Finish on or Before")
         if (constraintVariance.data.length) {
-            const table = createTable(constraintVariance.id, constraintVariance.title, constraintVariance.columns, constraintVariance.getRows());
-            document.getElementById('constraint-variance').append(table)
+            // const table = createTable(constraintVariance.id, constraintVariance.title, constraintVariance.columns, constraintVariance.getRows());
+            // document.getElementById('constraint-variance').append(table)
+            document.getElementById('constraint-variance').append(constraintVariance.table)
         }
 
         taskChanges.added.data = currTasks.filter(task => !projects.previous.has(task))
@@ -693,6 +695,8 @@ analyzeButton.addEventListener("click", (e) => {
     document.getElementById("upload").style.display = 'none';
     document.getElementById("general").style.display = 'initial';
     document.getElementById('revisions-sec').style.display = 'initial';
+    document.getElementById('legend').style.display = 'initial';
+    // document.getElementById('pageFooter').style.counterIncrement = 'page';
 })
 
 const isEmptyObj = obj => Object.keys(obj).length === 0;
