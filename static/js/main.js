@@ -292,9 +292,8 @@ function updateProjCard(name, value){
         });
 
         constraintVariance.data = currTasks.filter(task => task.primeConstraint === "Finish on or Before")
+        constraintVariance.prev = currTasks.map(task => projects.previous.get(task))
         if (constraintVariance.data.length) {
-            // const table = createTable(constraintVariance.id, constraintVariance.title, constraintVariance.columns, constraintVariance.getRows());
-            // document.getElementById('constraint-variance').append(table)
             document.getElementById('constraint-variance').append(constraintVariance.table)
         }
 
@@ -342,7 +341,6 @@ function updateProjCard(name, value){
         })
         updateElements(taskChanges)
 
-        // logicChanges.added.data = projects.current.rels.filter(rel => !projects.previous.has(rel))
         logicChanges.deleted.data = projects.previous.rels.filter(rel => !projects.current.has(rel))
         projects.current.rels.forEach((rel, i) => {
             if (!projects.previous.has(rel)) logicChanges.added.add = {curr: rel}

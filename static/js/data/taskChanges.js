@@ -1,6 +1,5 @@
 import Change from "./change.js"
 import { formatDate, formatNumber, formatVariance, dateVariance } from "../utilities.js"
-import { projects } from "../main.js"
 
 const cols = ['Act ID', '', 'Act Name']
 const row = (task) => [task.task_code, task.img, task.task_name]
@@ -30,8 +29,8 @@ export let taskChanges = {
         "tk-name", "Revised Activity Names",
         [...cols, 'Prev Name'],
         function() {
-            return this.data.map(task => [
-                ...row(task), projects.previous.get(task).task_name
+            return this.data.map((task, i) => [
+                ...row(task), this.prev[i].task_name
             ])
         }
     ),
@@ -39,23 +38,23 @@ export let taskChanges = {
         "tk-duration", "Revised Durations",
         [...cols, 'New Dur', 'Old Dur', 'Var'],
         function() {
-            return this.data.map(task => {
-		let prevTask = projects.previous.get(task)
-		let currDur = task.origDur
-		let prevDur = prevTask.origDur
-		let remDurChange = false
-		if (task.notStarted && task.origDur !== task.remDur) {
-		    currDur = task.remDur
-		    prevDur = prevTask.remDur
-		    remDurChange = true
-		}
-		return [
-            ...row(task),
-		    `${formatNumber(currDur)}${remDurChange ? '*' : ""}`, 
+            return this.data.map((task, i) => {
+                let prevTask = this.prev[i]
+                let currDur = task.origDur
+                let prevDur = prevTask.origDur
+                let remDurChange = false
+                if (task.notStarted && task.origDur !== task.remDur) {
+                    currDur = task.remDur
+                    prevDur = prevTask.remDur
+                    remDurChange = true
+                }
+                return [
+                    ...row(task),
+                    `${formatNumber(currDur)}${remDurChange ? '*' : ""}`, 
                     formatNumber(prevDur), 
                     formatVariance(currDur - prevDur)
-            	]
-	    })
+                ]
+            })
         },
         '* Change to Remaining Duration'
     ),
@@ -63,9 +62,9 @@ export let taskChanges = {
         "tk-calendar", "Revised Activity Calendars",
         [...cols, 'New Cal', 'Old Cal'],
         function() {
-            return this.data.map(task => [
+            return this.data.map((task, i) => [
                 ...row(task), task.calendar.clndr_name, 
-                projects.previous.get(task).calendar.clndr_name 
+                this.prev[i].calendar.clndr_name 
             ])
         }
     ),
@@ -73,10 +72,10 @@ export let taskChanges = {
         "tk-start", "Revised Actual Starts",
         [...cols, 'New Start', 'Old Start', 'Var'],
         function() {
-            return this.data.map(task => [
+            return this.data.map((task, i) => [
                 ...row(task), formatDate(task.start, false), 
-                formatDate(projects.previous.get(task).start, false), 
-                formatVariance(dateVariance(task.start, projects.previous.get(task).start))
+                formatDate(this.prev[i].start, false), 
+                formatVariance(dateVariance(task.start, this.prev[i].start))
             ])
         }
     ),
@@ -84,10 +83,10 @@ export let taskChanges = {
         "tk-finish", "Revised Actual Finishes",
         [...cols, 'New Finish', 'Old Finish', 'Var'],
         function() {
-            return this.data.map(task => [
+            return this.data.map((task, i) => [
                 ...row(task), formatDate(task.finish, false), 
-                formatDate(projects.previous.get(task).finish, false), 
-                formatVariance(dateVariance(task.finish, projects.previous.get(task).finish))
+                formatDate(this.prev[i].finish, false), 
+                formatVariance(dateVariance(task.finish, this.prev[i].finish))
             ])
         }
     ),
@@ -95,9 +94,8 @@ export let taskChanges = {
         "tk-wbs", "Revised WBS Assignment",
         [...cols, 'New WBS', 'Old WBS'],
         function() {
-            return this.data.map(task => [
-                ...row(task), task.wbs.wbsId, 
-                projects.previous.get(task).wbs.wbsId
+            return this.data.map((task, i) => [
+                ...row(task), task.wbs.wbsId, this.prev[i].wbs.wbsId
             ])
         }
     ),
@@ -105,9 +103,8 @@ export let taskChanges = {
         "tk-type", "Revised Activity Type",
         [...cols, 'New Type', 'Old Type'],
         function() {
-            return this.data.map(task => [
-                ...row(task), task.taskType, 
-                projects.previous.get(task).taskType
+            return this.data.map((task, i) => [
+                ...row(task), task.taskType, this.prev[i].taskType
             ])
         }
     ),

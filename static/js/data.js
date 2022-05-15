@@ -1,5 +1,4 @@
 import Change from "./data/change.js";
-import { projects } from "./main.js"
 import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance, getWeekday } from "./utilities.js";
 
 export let updates = {
@@ -35,58 +34,57 @@ export let updates = {
     ),
     percent: new Change(
         "ud-percent", "Updated Percent Completes",
-        ['Act ID', 'Act Name', 'Status', 'Percent\r\nType', '% Comp', 'Prev\r\n% Comp', 'Var'],
+        ['Act ID', '', 'Act Name', 'Percent\r\nType', '% Comp', 'Prev\r\n% Comp', 'Var'],
         function() {
-            return this.data.map(task => [
-                task.task_code, task.task_name, task.status, task.percentType, 
-                formatPercent(task.percent), formatPercent(projects.previous.get(task).percent), 
-                formatPercent(task.percent - projects.previous.get(task).percent, 'always')
+            return this.data.map((task, i) => [
+                task.task_code, task.img, task.task_name, task.percentType, 
+                formatPercent(task.percent), formatPercent(this.prev[i].percent), 
+                formatPercent(task.percent - this.prev[i].percent, 'always')
             ])
         }
     ),
     duration: new Change(
         "ud-duration", "Updated Remaining Durations",
         [
-            'Act ID', 'Act Name', 'Status', 'Orig\r\nDur', 
-            'Rem\r\nDur', 'Prev\r\nRem\r\nDur', 'Var'
+            'Act ID', '', 'Act Name', 'Orig Dur', 
+            'Rem Dur', 'Prev\r\nRem Dur', 'Var'
         ],
         function() {
-            return this.data.map(task => [
-                task.task_code, task.task_name, task.status, formatNumber(task.origDur), 
-                formatNumber(task.remDur), formatNumber(projects.previous.get(task).remDur), 
-                formatVariance(task.remDur - projects.previous.get(task).remDur)
+            return this.data.map((task, i) => [
+                task.task_code, task.img, task.task_name, formatNumber(task.origDur), 
+                formatNumber(task.remDur), formatNumber(this.prev[i].remDur), 
+                formatVariance(task.remDur - this.prev[i].remDur)
             ])
         }
     ),
     cost: new Change(
         "ud-cost", "Updated Actual Cost",
         [
-            'Act ID', 'Act Name', 'Status', 'Budgeted Cost', 
+            'Act ID', '', 'Act Name', 'Budgeted Cost', 
             'Actual Cost', 'Prev\r\nActual Cost', 'Var'
         ],
         function() {
-            return this.data.map(task => [
-                task.task_code, task.task_name, task.status, formatCost(task.budgetCost), 
-                formatCost(task.actualCost), formatCost(projects.previous.get(task).actualCost), 
-                formatCost(task.actualCost - projects.previous.get(task).actualCost)
+            return this.data.map((task, i) => [
+                task.task_code, task.img, task.task_name, formatCost(task.budgetCost), 
+                formatCost(task.actualCost), formatCost(this.prev[i].actualCost), 
+                formatCost(task.actualCost - this.prev[i].actualCost)
             ])
         }
     ),
     regress: new Change(
         "ud-regress", "Regressive Updates",
         [
-            'Act ID', 'Act Name', 'Status', 'Prev\r\nStatus', 'Orig Dur', 
+            'Act ID', '', 'Act Name', 'Orig Dur', 
             'Rem Dur', 'Prev\r\nRem Dur', 'RD Var', '% Comp', 
             'Prev\r\n% Comp', '% Var'
         ],
         function() {
-            return this.data.map(task => [
-                task.task_code, task.task_name, task.status, 
-                projects.previous.get(task).status, task.origDur, 
-                task.remDur, projects.previous.get(task).remDur, 
-                formatVariance(task.remDur - projects.previous.get(task).remDur),
-                formatPercent(task.percent), formatPercent(projects.previous.get(task).percent), 
-                formatPercent(task.percent - projects.previous.get(task).percent, 'always')
+            return this.data.map((task, i) => [
+                task.task_code, task.img, task.task_name, task.origDur, 
+                task.remDur, this.prev[i].remDur, 
+                formatVariance(task.remDur - this.prev[i].remDur),
+                formatPercent(task.percent), formatPercent(this.prev[i].percent), 
+                formatPercent(task.percent - this.prev[i].percent, 'always')
             ])
         }
     )
@@ -99,18 +97,20 @@ export let constraintVariance = new Change(
         'Current\r\nFinish', 'Float', 'Previous\r\nFinish', 'Variance'
     ],
     function() {
-        return this.data.map(task => {
-            if (projects.previous.has(task)) {
-                return [
-                    task.task_code, task.img, task.task_name, formatDate(task.cstr_date, false), 
-                    formatDate(task.finish, false), formatVariance(task.totalFloat), 
-                    formatDate(projects.previous.get(task).finish, false),
-                    formatVariance(dateVariance(projects.previous.get(task).finish, task.finish))
-                ]
-            }
+        return this.data.map((task, i) => {
+            // if (projects.previous.has(task)) {
+            //     return [
+            //         task.task_code, task.img, task.task_name, formatDate(task.cstr_date, false), 
+            //         formatDate(task.finish, false), formatVariance(task.totalFloat), 
+            //         formatDate(projects.previous.get(task).finish, false),
+            //         formatVariance(dateVariance(projects.previous.get(task).finish, task.finish))
+            //     ]
+            // }
             return [
                 task.task_code, task.img, task.task_name, formatDate(task.cstr_date, false), 
-                formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A", "N/A"
+                formatDate(task.finish, false), formatVariance(task.totalFloat), 
+                formatDate(this.prev[i].finish, false) ?? "N/A", 
+                formatVariance(dateVariance(this.prev[i].finish, task.finish)) ?? "N/A"
             ]
         })
     }
@@ -123,7 +123,7 @@ export let constraintChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, task.img, task.task_name,
-                task.primeConstraint, formatDate(task.cstr_date)
+                task.primeConstraint, formatDate(task.cstr_date) ?? ""
             ])
         }
     ),
@@ -133,7 +133,7 @@ export let constraintChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, task.img, task.task_name,
-                task.secondConstraint, formatDate(task.cstr_date2)
+                task.secondConstraint, formatDate(task.cstr_date2) ?? ""
             ])
         }
     ),
@@ -143,7 +143,7 @@ export let constraintChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, task.img, task.task_name,
-                task.primeConstraint, formatDate(task.cstr_date)
+                task.primeConstraint, formatDate(task.cstr_date) ?? ""
             ])
         }
     ),
@@ -153,7 +153,7 @@ export let constraintChanges = {
         function() {
             return this.data.map(task => [
                 task.task_code, task.img, task.task_name,
-                task.secondConstraint, formatDate(task.cstr_date2)
+                task.secondConstraint, formatDate(task.cstr_date2) ?? ""
             ])
         }
     ),
@@ -161,12 +161,11 @@ export let constraintChanges = {
         "cs-revised-prim", "Revised Primary Constraint Dates",
         ['Act ID', '', 'Activity Name', 'Constraint', 'New Date', 'Old Date', 'Var'],
         function() {
-            return this.data.map(task => {
-                const prevDate = projects.previous.get(task).cstr_date
-                const variance = dateVariance(task.cstr_date, prevDate) ?? "N/A"
+            return this.data.map((task, i) => {
+                const variance = dateVariance(task.cstr_date, this.prev[i].cstr_date) ?? "N/A"
                 return [
                     task.task_code, task.img, task.task_name, task.primeConstraint, 
-                    formatDate(task.cstr_date), formatDate(projects.previous.get(task).cstr_date), 
+                    formatDate(task.cstr_date), formatDate(this.prev[i].cstr_date), 
                     formatVariance(variance)
                 ]
             })
@@ -176,12 +175,11 @@ export let constraintChanges = {
         "cs-revised-sec", "Revised Secondary Constraint Dates",
         ['Act ID', '', 'Activity Name', 'Constraint', 'New Date', 'Old Date', 'Var'],
         function() {
-            return this.data.map(task => {
-                const prevDate = projects.previous.get(task).cstr_date2
-                const variance = dateVariance(task.cstr_date2, prevDate) ?? "N/A"
+            return this.data.map((task, i) => {
+                const variance = dateVariance(task.cstr_date2, this.prev[i].cstr_date2) ?? "N/A"
                 return [
                     task.task_code, task.img, task.task_name, task.secondConstraint, 
-                    formatDate(task.cstr_date2), formatDate(projects.previous.get(task).cstr_date2), 
+                    formatDate(task.cstr_date2), formatDate(this.prev[i].cstr_date2), 
                     formatVariance(variance)
                 ]
             })
@@ -242,21 +240,19 @@ let openEnds = {
 let dateWarnings = {
     start: new Change(
         "inv-start", "Activities With Actual Start on or After Data Date",
-        ['Act ID', 'Activity Name', 'Status', 'Actual\r\nStart', 'Data\r\nData'],
+        ['Act ID', 'Activity Name', 'Status', 'Actual\r\nStart',],
         function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.start), 
-                formatDate(projects.current.last_recalc_date)
             ])
         }
     ),
     finish: new Change(
         "inv-finish", "Activities With Actual Finish on or After Data Date",
-        ['Act ID', 'Activity Name', 'Status', 'Actual\r\nFinish', 'Data\r\nData'],
+        ['Act ID', 'Activity Name', 'Status', 'Actual\r\nFinish',],
         function() {
             return this.data.map(task => [
                 task.task_code, task.task_name, task.status, formatDate(task.finish), 
-                formatDate(projects.current.last_recalc_date)
             ])
         }
     ),
