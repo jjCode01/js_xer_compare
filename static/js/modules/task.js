@@ -32,18 +32,8 @@ const CONSTRAINTTYPES = {
     CS_MSOB: 'Start On or Before',
 }
 
-const calcPercent = task => {
-    if (task.notStarted) return 0.0;
-    const pt = {
-        CP_Phys: task.phys_complete_pct / 100,
-        CP_Drtn: (task.remDur >= task.origDur) ? 0 : 1 - task.remDur / task.origDur,
-        CP_Units: 1 - (task.act_work_qty + task.act_equip_qty) / (task.target_work_qty = task.target_equip_qty)
-    }
-    return pt[task.complete_pct_type];
-}
-
 export default class Task {
-    constructor(obj, proj, cal) {
+    constructor(obj, calendar) {
         Object.assign(this, obj)
         this.notStarted = this.status_code === 'TK_NotStart'
         this.inProgress = this.status_code === 'TK_Active';
@@ -68,10 +58,9 @@ export default class Task {
         this.primeConstraint = CONSTRAINTTYPES[this.cstr_type];
         this.secondConstraint = CONSTRAINTTYPES[this.cstr_type2];
         this.percent = calcPercent(this);
-        this.project = proj;
-        this.calendar = cal;
+        this.calendar = calendar;
 	    this.calendar.assignments += 1;
-        this.wbs = this.project.wbs.get(this.wbs_id);
+        this.wbs = undefined;
         this.wbsStruct = [this.wbs];
     }
     get budgetCost() {return this.resources.reduce((a, r) => a + r.target_cost, 0.0)}
@@ -111,4 +100,14 @@ export function statusImg(task) {
     let imgName = task.notStarted ? `${preFix}open${postFix}` : (task.inProgress ? `${preFix}active${postFix}` : `${preFix}complete${postFix}`);
     img.src = "./img/" + imgName;
     return img;
+}
+
+const calcPercent = task => {
+    if (task.notStarted) return 0.0;
+    const pt = {
+        CP_Phys: task.phys_complete_pct / 100,
+        CP_Drtn: (task.remDur >= task.origDur) ? 0 : 1 - task.remDur / task.origDur,
+        CP_Units: 1 - (task.act_work_qty + task.act_equip_qty) / (task.target_work_qty = task.target_equip_qty)
+    }
+    return pt[task.complete_pct_type];
 }

@@ -21,19 +21,6 @@ class MonthData {
     }
 }
 
-const getMonthIntervalObj = proj => {
-    let months = {};
-    let endDate = proj.scd_end_date.getTime() > proj.lateEnd.getTime() ? proj.scd_end_date : proj.lateEnd;
-    for (let y = proj.start.getFullYear(); y <= endDate.getFullYear(); y++) {
-        let m = y === proj.start.getFullYear() ? proj.start.getMonth() : 0;
-        let lastMonth = y === endDate.getFullYear() ? endDate.getMonth() : 11;
-        for (; m <= lastMonth; m++){
-            months[`${MONTHNAMES[m]}-${y}`] = new MonthData()
-        }
-    }
-    return months;
-}
-
 export default class Project {
     // #tasksByCode
     constructor(obj) {
@@ -51,17 +38,18 @@ export default class Project {
         this.wbsById = new Map();
         this.name = '';
     }
-    set addTask(task) {
-        if (task instanceof Task){
-            this.tasks.set(task.task_id, task)
-            this.tasksByCode.set(task.task_code, task)
-        }
-        if (task.start < this.start) this.start = task.start;
-    }
     set addWbs(wbs) {
         this.wbs.set(wbs.wbs_id, wbs)
         this.wbsById.set(wbs.wbsId, wbs)
         if (wbs.proj_node_flag === 'Y') this.name = wbs.wbs_name;
+    }
+    set addTask(task) {
+        if (task instanceof Task){
+            task.wbs = this.wbs.get(task.wbs_id)
+            this.tasks.set(task.task_id, task)
+            this.tasksByCode.set(task.task_code, task)
+        }
+        if (task.start < this.start) this.start = task.start;
     }
     set addRelationship(rel) {
         if (rel instanceof Relationship) {
@@ -117,25 +105,6 @@ export default class Project {
     get thisPeriodQty() {return this.resources.reduce((a, r) => a + r.act_this_per_qty, 0.0)}
     get remainingQty() {return this.resources.reduce((a, r) => a + r.remain_qty, 0.0)}
 
-    getTask(task) {
-        if (task instanceof Task) return this.tasksByCode.get(task.task_code)
-        if (task instanceof String) return this.tasksByCode.get(task)
-        return
-    }
-
-    hasTask(task) {
-        if (task instanceof Task) return this.tasksByCode.has(task.task_code)
-        if (task instanceof String) return this.tasksByCode.has(task)
-    }
-
-    getLogic(rel) {return this.relsById.get(rel.logicId)}
-    hasLogic(rel) {return this.relsById.has(rel.logicId)}
-
-    hasResource(res) {return this.resById.has(res.resId)}
-    getResource(res) {return this.resById.get(res.resId)}
-    hasWbs(node) {return this.wbsById.has(node.wbsId)}
-    getWbs(node) {return this.wbsById.get(node.wbsId)}
-
     getMemo(memo) {return this.notes.get(memo.id)}
 
     deepAnalysis() {
@@ -168,4 +137,17 @@ Project.prototype.get = function(obj) {
     if (obj instanceof WbsNode) return this.wbsById.get(obj.wbsId)
     console.log(obj)
     return
+}
+
+const getMonthIntervalObj = proj => {
+    let months = {};
+    let endDate = proj.scd_end_date.getTime() > proj.lateEnd.getTime() ? proj.scd_end_date : proj.lateEnd;
+    for (let y = proj.start.getFullYear(); y <= endDate.getFullYear(); y++) {
+        let m = y === proj.start.getFullYear() ? proj.start.getMonth() : 0;
+        let lastMonth = y === endDate.getFullYear() ? endDate.getMonth() : 11;
+        for (; m <= lastMonth; m++){
+            months[`${MONTHNAMES[m]}-${y}`] = new MonthData()
+        }
+    }
+    return months;
 }
