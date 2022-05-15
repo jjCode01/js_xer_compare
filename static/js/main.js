@@ -112,18 +112,6 @@ function updateProjCard(name, value){
             document.getElementById("cost-progress").style.width = `${util.formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
         }
 
-	    // updateElText('current-not-started-per', util.formatPercent(projects.current.notStarted.length / projects.current.tasks.size))
-        // updateElText('current-in-progress-per', util.formatPercent(projects.current.inProgress.length / projects.current.tasks.size))
-        // updateElText('current-complete-per', util.formatPercent(projects.current.completed.length / projects.current.tasks.size))
-
-        // let ctxActivityStatus = document.getElementById('activityStatusChart');
-	    // let activityStatusChart = createPieChart(
-        //     ctxActivityStatus, '# of Activities',
-        //     ['In Progress', 'Complete', 'Not Started'],
-        //     [projects.current.inProgress.length, projects.current.completed.length, projects.current.notStarted.length,],
-        //     [`rgba(${CHARTCOLOR.GREEN}, 1)`, `rgba(${CHARTCOLOR.BLUE}, 1)`, `rgba(${CHARTCOLOR.RED}, 1)`,]
-	    // )
-
         let ctxCostLoading = document.getElementById('costLoadingChart');
         let costLoadingChart = createPieChart(
             ctxCostLoading, 'Cost Loading',
@@ -193,24 +181,12 @@ function updateProjCard(name, value){
             },
             options: {
                 plugins: {
-                    legend: {
-                        display: false,
-                    }
+                    legend: {display: false,}
                 },
                 indexAxis: 'y',
                 scales: {
-                    x: {
-                      stacked: true,
-                    //   ticks: {
-                    //     callback: function(value, index, ticks) {
-                    //         return value * 100 + '%';
-                    //     }
-                    //     }
-                    },
-                    y: {
-                      stacked: true,
-                      
-                    },
+                    x: {stacked: true,},
+                    y: {stacked: true,},
                 },
                 maintainAspectRatio: false
             }
@@ -268,9 +244,7 @@ function updateProjCard(name, value){
             },
             options: {
                 plugins: {
-                    legend: {
-                        display: false,
-                    }
+                    legend: {display: false,}
                 },
                 indexAxis: 'y',
                 scales: {
@@ -282,10 +256,7 @@ function updateProjCard(name, value){
                         }
                         }
                     },
-                    y: {
-                      stacked: true,
-                      
-                    },
+                    y: {stacked: true,},
                 },
                 maintainAspectRatio: false
             }
@@ -301,7 +272,6 @@ function updateProjCard(name, value){
         taskChanges.deleted.data = prevTasks.filter(task => !projects.current.has(task))
 
 	    const ongoingTasks = currTasks.filter(task => projects.previous.has(task))
-
         ongoingTasks.forEach(task => {
             const prevTask = projects.previous.get(task)
             if (task.inProgress && prevTask.notStarted) updates.started.add = {curr: task}
@@ -364,10 +334,7 @@ function updateProjCard(name, value){
         updateElements(logicChanges)
 
         if (xerTables.current.RSRC && xerTables.previous.RSRC) {
-            // resourceChanges.added.data = projects.current.resources.filter(res => !projects.previous.has(res))
             resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.has(res))
-            // resourceChanges.revisedCost.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_cost !== projects.previous.get(res).target_cost)
-            // resourceChanges.revisedUnits.data = projects.current.resources.filter(res => projects.previous.has(res) && res.target_qty !== projects.previous.get(res).target_qty)
             
             projects.current.resources.forEach(res => {
                 if (projects.previous.has(res)) {
@@ -483,9 +450,6 @@ function updateProjCard(name, value){
 
         if (projects.current.notes.size) {
             const currMemoArr = Array.from(projects.current.notes.values())
-            // noteBookChanges.added.data = currMemoArr.filter(memo => {
-            //     return !projects.previous.notes.has(memo.id)
-            // })
             currMemoArr.forEach(memo => {
                 if (!projects.previous.notes.has(memo.id)) {
                     noteBookChanges.added.add = {curr: memo}
@@ -496,13 +460,6 @@ function updateProjCard(name, value){
                     }
                 }
             })
-
-            // noteBookChanges.revised.data = currMemoArr.filter(memo => {
-            //     return (
-            //         projects.previous.notes.has(memo.id) && 
-            //         memo.note !== projects.previous.notes.get(memo.id).note
-            //     )
-            // })
         }
 
         if (projects.previous.notes.size) {
@@ -624,9 +581,7 @@ function updateProjCard(name, value){
             },
             options: {
                 scales: {
-                    y: {
-                        beginAtZero: true
-                    }
+                    y: {beginAtZero: true}
                 },
                 maintainAspectRatio: false
             }
@@ -694,7 +649,6 @@ analyzeButton.addEventListener("click", (e) => {
     document.getElementById("general").style.display = 'initial';
     document.getElementById('revisions-sec').style.display = 'initial';
     document.getElementById('legend').style.display = 'initial';
-    // document.getElementById('pageFooter').style.counterIncrement = 'page';
 })
 
 const isEmptyObj = obj => Object.keys(obj).length === 0;
@@ -705,7 +659,6 @@ for (let i = 0; i < fileSelectors.length; i++) {
         let reader = new FileReader();
         let projSelector = document.getElementById(`${e.target.name}-project-selector`);
         reader.onload = (r) => {
-            // xerTables[e.target.name] = parseFile(r.target.result, e.target.files[0].name);
             xerTables[e.target.name] = new ParseXer(r.target.result, e.target.files[0].name)
             updateProjList(xerTables[e.target.name].PROJECT, projSelector);
             if (Object.keys(xerTables[e.target.name].PROJECT).length > 1){
