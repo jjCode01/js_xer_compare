@@ -1,20 +1,6 @@
 import Change from "./data/change.js";
-import { projects, xerTables } from "./main.js"
+import { projects } from "./main.js"
 import { formatDate, formatVariance, formatPercent, formatCost, formatNumber, dateVariance, getWeekday } from "./utilities.js";
-
-const checkLongestPath = task => task.longestPath ? '\u2611' : '\u2610';
-const statusImg = task => {
-    let img = new Image(20, 10);
-    if (!task) {
-	    img.src = "./static/img/deleted.png";
-        return img;
-    }
-    let postFix = (task.longestPath && !task.completed) ? '-lp.png' : '.png';
-    let preFix = task.isMilestone ? 'ms-' : '';
-    let imgName = task.notStarted ? `${preFix}open${postFix}` : (task.inProgress ? `${preFix}active${postFix}` : `${preFix}complete${postFix}`);
-    img.src = "./static/img/" + imgName;
-    return img;
-}
 
 export let updates = {
     started: new Change(
@@ -116,14 +102,14 @@ export let constraintVariance = new Change(
         return this.data.map(task => {
             if (projects.previous.has(task)) {
                 return [
-                    task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
+                    task.task_code, task.img, task.task_name, formatDate(task.cstr_date, false), 
                     formatDate(task.finish, false), formatVariance(task.totalFloat), 
                     formatDate(projects.previous.get(task).finish, false),
                     formatVariance(dateVariance(projects.previous.get(task).finish, task.finish))
                 ]
             }
             return [
-                task.task_code, statusImg(task), task.task_name, formatDate(task.cstr_date, false), 
+                task.task_code, task.img, task.task_name, formatDate(task.cstr_date, false), 
                 formatDate(task.finish, false), formatVariance(task.totalFloat), "N/A", "N/A"
             ]
         })
@@ -160,7 +146,7 @@ export let constraintChanges = {
         ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
         function() {
             return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name,
+                task.task_code, task.img, task.task_name,
                 task.primeConstraint, formatDate(task.cstr_date)
             ])
         }
@@ -170,7 +156,7 @@ export let constraintChanges = {
         ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
         function() {
             return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name,
+                task.task_code, task.img, task.task_name,
                 task.secondConstraint, formatDate(task.cstr_date2)
             ])
         }
@@ -180,7 +166,7 @@ export let constraintChanges = {
         ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
         function() {
             return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name,
+                task.task_code, task.img, task.task_name,
                 task.primeConstraint, formatDate(task.cstr_date)
             ])
         }
@@ -190,7 +176,7 @@ export let constraintChanges = {
         ['Act ID', '', 'Activity Name', 'Constraint', 'Date'],
         function() {
             return this.data.map(task => [
-                task.task_code, statusImg(task), task.task_name,
+                task.task_code, task.img, task.task_name,
                 task.secondConstraint, formatDate(task.cstr_date2)
             ])
         }
@@ -203,7 +189,7 @@ export let constraintChanges = {
                 const prevDate = projects.previous.get(task).cstr_date
                 const variance = dateVariance(task.cstr_date, prevDate) ?? "N/A"
                 return [
-                    task.task_code, statusImg(task), task.task_name, task.primeConstraint, 
+                    task.task_code, task.img, task.task_name, task.primeConstraint, 
                     formatDate(task.cstr_date), formatDate(projects.previous.get(task).cstr_date), 
                     formatVariance(variance)
                 ]
@@ -218,7 +204,7 @@ export let constraintChanges = {
                 const prevDate = projects.previous.get(task).cstr_date2
                 const variance = dateVariance(task.cstr_date2, prevDate) ?? "N/A"
                 return [
-                    task.task_code, statusImg(task), task.task_name, task.secondConstraint, 
+                    task.task_code, task.img, task.task_name, task.secondConstraint, 
                     formatDate(task.cstr_date2), formatDate(projects.previous.get(task).cstr_date2), 
                     formatVariance(variance)
                 ]

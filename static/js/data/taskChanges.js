@@ -31,7 +31,7 @@ export let taskChanges = {
         [...cols, 'Prev Name'],
         function() {
             return this.data.map(task => [
-                ...row(task), projects.previous.getTask(task).task_name
+                ...row(task), projects.previous.get(task).task_name
             ])
         }
     ),
@@ -40,7 +40,7 @@ export let taskChanges = {
         [...cols, 'New Dur', 'Old Dur', 'Var'],
         function() {
             return this.data.map(task => {
-		let prevTask = projects.previous.getTask(task)
+		let prevTask = projects.previous.get(task)
 		let currDur = task.origDur
 		let prevDur = prevTask.origDur
 		let remDurChange = false
@@ -65,7 +65,7 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 ...row(task), task.calendar.clndr_name, 
-                projects.previous.getTask(task).calendar.clndr_name 
+                projects.previous.get(task).calendar.clndr_name 
             ])
         }
     ),
@@ -75,8 +75,8 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 ...row(task), formatDate(task.start, false), 
-                formatDate(projects.previous.getTask(task).start, false), 
-                formatVariance(dateVariance(task.start, projects.previous.getTask(task).start))
+                formatDate(projects.previous.get(task).start, false), 
+                formatVariance(dateVariance(task.start, projects.previous.get(task).start))
             ])
         }
     ),
@@ -86,8 +86,8 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 ...row(task), formatDate(task.finish, false), 
-                formatDate(projects.previous.getTask(task).finish, false), 
-                formatVariance(dateVariance(task.finish, projects.previous.getTask(task).finish))
+                formatDate(projects.previous.get(task).finish, false), 
+                formatVariance(dateVariance(task.finish, projects.previous.get(task).finish))
             ])
         }
     ),
@@ -97,7 +97,7 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 ...row(task), task.wbs.wbsId, 
-                projects.previous.getTask(task).wbs.wbsId
+                projects.previous.get(task).wbs.wbsId
             ])
         }
     ),
@@ -107,7 +107,7 @@ export let taskChanges = {
         function() {
             return this.data.map(task => [
                 ...row(task), task.taskType, 
-                projects.previous.getTask(task).taskType
+                projects.previous.get(task).taskType
             ])
         }
     ),
