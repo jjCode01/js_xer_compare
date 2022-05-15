@@ -1,7 +1,9 @@
 export default class WbsNode {
+    #id
     constructor(obj, project) {
         Object.assign(this, obj)
         this.project = project
+        this.#id = undefined
     }
 
     get isProjectNode() {
@@ -16,6 +18,7 @@ export default class WbsNode {
     }
 
     get wbsId() {
+        if (this.#id) return this.#id
         let id = [this.wbs_short_name];
         let node = this;
 
@@ -26,6 +29,7 @@ export default class WbsNode {
             node = this.project.wbs.get(node.parent_wbs_id);
             id.unshift(node.wbs_short_name)
         }
-        return id.join('.')
+        this.#id = id.join('.')
+        return this.#id
     }
 }
