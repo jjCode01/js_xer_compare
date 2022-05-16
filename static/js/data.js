@@ -109,8 +109,8 @@ export let constraintVariance = new Change(
             return [
                 task.task_code, task.img, task.task_name, formatDate(task.cstr_date, false), 
                 formatDate(task.finish, false), formatVariance(task.totalFloat), 
-                formatDate(this.prev[i].finish, false) ?? "N/A", 
-                formatVariance(dateVariance(this.prev[i].finish, task.finish)) ?? "N/A"
+                formatDate(this.prev[i]?.finish, false) ?? "N/A", 
+                formatVariance(dateVariance(this.prev[i]?.finish, task.finish)) ?? "N/A"
             ]
         })
     }

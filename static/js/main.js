@@ -263,7 +263,7 @@ function updateProjCard(name, value){
         });
 
         constraintVariance.data = currTasks.filter(task => task.primeConstraint === "Finish on or Before")
-        constraintVariance.prev = currTasks.map(task => projects.previous.get(task))
+        constraintVariance.prev = constraintVariance.data.map(task => projects.previous.get(task))
         if (constraintVariance.data.length) {
             document.getElementById('constraint-variance').append(constraintVariance.table)
         }
