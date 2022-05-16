@@ -19,7 +19,7 @@ export let wbsChanges = {
         "wbs-revised", "Revised WBS Name",
         ['WBS ID', 'New WBS Name', 'Old WBS Name'],
         function() {
-            return this.data.map(wbs => [wbs.wbsId, wbs.wbs_name, projects.previous.get(wbs).wbs_name])
+            return this.data.map((wbs, i) => [wbs.wbsId, wbs.wbs_name, this.prev[i].wbs_name])
         }
     ),
 }
