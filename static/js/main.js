@@ -419,17 +419,9 @@ function updateProjCard(name, value){
         })
         updateElements(calendarChanges)
 
-        // const currWbsArr = Array.from(projects.current.wbs.values())
         const prevWbsArr = Array.from(projects.previous.wbs.values())
-        // wbsChanges.added.data = currWbsArr.filter(wbs => !wbs.isProjectNode && !projects.previous.has(wbs))
         wbsChanges.deleted.data = prevWbsArr.filter(wbs => !wbs.isProjectNode && !projects.current.has(wbs))
-        // wbsChanges.revised.data = currWbsArr.filter(wbs => {
-        //     return (
-        //         !wbs.isProjectNode && 
-        //         projects.previous.has(wbs) &&
-        //         wbs.wbs_name !== projects.previous.get(wbs).wbs_name
-        //     )
-        // })
+
         for (let wbs of Array.from(projects.current.wbs.values())) {
             if (wbs.isProjectNode) break;
 
