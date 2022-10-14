@@ -18,9 +18,9 @@ export default class WbsNode {
     }
 
     get wbsId() {
-        if (this.#id) return this.#id
         if (this.isProjectNode) return ''
-        
+        if (this.#id) return this.#id
+
         let id = [this.wbs_short_name];
         let node = this;
 
