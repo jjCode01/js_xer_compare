@@ -2,8 +2,8 @@ import Change from "./change.js"
 import { formatNumber, formatCost, formatVariance } from "../utilities.js"
 import { projects } from "../main.js"
 
-const cols = ['Act ID', '', 'Activity Name', 'Resource']
-const row = res => [res.task.task_code, res.task.img, res.task.task_name, res.rsrc.rsrc_short_name,]
+const cols = ['Act ID', '', 'Activity Name', 'Resource', 'Account']
+const row = res => [res.task.task_code, res.task.img, res.task.task_name, res.rsrc.rsrc_short_name, res.account?.acct_name ?? '-']
 
 export let resourceChanges = {
     added: new Change(

@@ -7,7 +7,7 @@ import Task from "./task.js";
 import WbsNode from "./wbs.js";
 
 const tblKeyMap = {
-    ACCOUNT: 'account_id',
+    ACCOUNT: 'acct_id',
     CALENDAR: 'clndr_id',
     MEMOTYPE: 'memo_type_id',
     PROJECT: 'proj_id',
@@ -24,9 +24,11 @@ class XerTable {
 
 export default class ParseXer{
     #tables
+    #accounts
     constructor(file, name) {
         this.name = name
         this.#tables = parseTableObjects(file)
+        this.#accounts = new Map()
         this.PROJWBS?.forEach(wbs => {
             const proj = this.PROJECT[wbs.proj_id];
             proj.addWbs = new WbsNode(wbs, proj)
@@ -39,6 +41,9 @@ export default class ParseXer{
             const succTask = this.PROJECT[rel.proj_id].tasks.get(rel.task_id)
             this.PROJECT[rel.proj_id].addRelationship = new Relationship(rel, predTask, succTask)
         })
+        // this.ACCOUNT?.forEach(acct => {
+        //     this.#accounts.set(acct.acct_id, acct)
+        // })
         this.TASKRSRC?.forEach(rsrc => {
             if (rsrc.target_cost !== 0 || rsrc.target_qty !== 0) {
                 const task = this.PROJECT[rsrc.proj_id].tasks.get(rsrc.task_id);
@@ -57,6 +62,7 @@ export default class ParseXer{
     get PROJECT() { return this.#tables?.PROJECT.rows }
     get PROJWBS() { return this.#tables.PROJWBS.rows }
     get RSRC() { return this.#tables?.RSRC?.rows }
+    // get ACCOUNT() { return this.#tables?.ACCOUNT?.rows }
     get MEMOTYPE() { return this.#tables?.MEMOTYPE?.rows }
     get TASK() { return this.#tables?.TASK?.rows }
     get TASKMEMO() { return this.#tables?.TASKMEMO?.rows }

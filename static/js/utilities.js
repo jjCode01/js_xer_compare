@@ -45,7 +45,7 @@ export const formatVariance = (num) => {
     }).format(num)
 }
 
-export const formatCost = cost => formatNumber(cost, 2)
+export const formatCost = cost => '$' + formatNumber(cost, 2)
 
 export const formatPercent = (value, sign="auto") => {
     if (isNaN(value)) return "N/A"

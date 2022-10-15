@@ -9,5 +9,7 @@ export default class Resource {
     get atCompletionCost() {return this.actualCost + this.remain_cost}
     get earnedValue() {return this.task.percent * this.target_cost}
     get name() {return this?.rsrc?.rsrc_short_name ?? "unknown"}
-    get resId() {return `${this.task.task_code}|${this.name}|${this.account?.acct_short_name ?? ""}`}
+    get resId() {
+        return `${this.task.task_code}|${this.name}|${this.account?.acct_short_name ?? ""}|${this.target_cost}|${this.target_qty}`
+    }
 }

@@ -336,20 +336,18 @@ function updateProjCard(name, value){
         }
         updateElements(logicChanges)
 
-        if (xerTables.current.RSRC && xerTables.previous.RSRC) {
-            resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.has(res))
+        resourceChanges.deleted.data = projects.previous.resources.filter(res => !projects.current.has(res)).sort(r => r.task.task_code)
             
-            projects.current.resources.forEach(res => {
-                if (projects.previous.has(res)) {
-                    let prev = projects.previous.get(res)
-                    if (res.target_cost !== prev.target_cost) resourceChanges.revisedCost.add = {curr: res, prev: prev}
-                    if (res.target_qty !== prev.target_qty) resourceChanges.revisedUnits.add = {curr: res, prev: prev}
-                } else {
-                    resourceChanges.added.add = res
-                }
-            })
+        projects.current.resources.forEach(res => {
+            if (projects.previous.has(res)) {
+                let prev = projects.previous.get(res)
+                if (res.target_cost !== prev.target_cost) resourceChanges.revisedCost.add = {curr: res, prev: prev}
+                if (res.target_qty !== prev.target_qty) resourceChanges.revisedUnits.add = {curr: res, prev: prev}
+            } else {
+                resourceChanges.added.add = res
+            }
+        })
         
-        }
         updateElements(resourceChanges)
 
 	    const hasCalendar = (cal, table) => {
