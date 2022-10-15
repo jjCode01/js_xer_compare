@@ -107,9 +107,12 @@ function updateProjCard(name, value){
 
     if (name === "current") {
         document.getElementById("sched-progress").style.width = `${util.formatPercent(projects.current.schedPercentComp)}`
+        document.getElementById("sched-progress").ariaValueNow = `${util.formatPercent(projects.current.schedPercentComp)}`
         document.getElementById("phys-progress").style.width = `${util.formatPercent(projects.current.physPercentComp)}`
+        document.getElementById("phys-progress").ariaValueNow = `${util.formatPercent(projects.current.physPercentComp)}`
         if (projects.current.budgetCost) {
             document.getElementById("cost-progress").style.width = `${util.formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
+            document.getElementById("cost-progress").ariaValueNow = `${util.formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
         }
 
         let ctxCostLoading = document.getElementById('costLoadingChart');

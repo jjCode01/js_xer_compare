@@ -1,4 +1,4 @@
-:root{
+*/:root{
     --dark-back: #091D34;
     --light-back: #F7F7F7;
     --light-txt: #ffffff;
@@ -9,10 +9,10 @@
     --progress-blue: rgba(54, 162, 235, 1);
     --shadow: 0 1px 4px 2px rgba(216, 216, 216, 0.5);
     --shadow-small: inset 0 0 0.24em 0.12em rgba(207, 207, 207, 0.5);
-    --chart-red:rgba(255, 99, 132, 0.7);
-    --chart-yellow: rgba(255, 206, 86, 0.7);
-    --chart-blue: rgba(54, 162, 235, 0.7);
-    --chart-green: rgba(113, 194, 92, 0.7);
+    --chart-red:rgba(255, 99, 132, 0.9);
+    --chart-yellow: rgba(255, 206, 86, 0.9);
+    --chart-blue: rgba(54, 162, 235, 0.9);
+    --chart-green: rgba(113, 194, 92, 0.9);
 }
 * {
     margin: 0;
@@ -26,7 +26,6 @@ html, body {
 body {
     margin: 0 auto;
     padding: 10px 1em;
-    /* counter-increment: page; */
 }
 h2, h3{
     font-size: 1.2rem;
@@ -91,10 +90,6 @@ span{padding: 0 0.4em;}
 .outer-progress{
     min-width: 120px;
     width: 275px;
-    background-color: #ebebeb;
-    box-shadow: var(--shadow-small);
-    padding: 0;
-    border-radius: 3px;
 }
 .inner-progress{
     width: 1px;
@@ -147,3 +142,23 @@ span{padding: 0 0.4em;}
 select, button, input[type="submit"], input::file-selector-button{
     padding: 0.3em 0.5em;
 }
+
+@-webkit-keyframes progress-bar-stripes{0%{background-position-x:1rem}}
+@keyframes progress-bar-stripes{0%{background-position-x:1rem}}
+.progress{
+    --bs-progress-height:1rem;
+    --bs-progress-font-size:0.75rem;
+    --bs-progress-bg:#e9ecef;
+    --bs-progress-border-radius:0.175rem;
+    --bs-progress-box-shadow:inset 0 1px 2px rgba(0, 0, 0, 0.075);
+    --bs-progress-bar-color:#fff;
+    --bs-progress-bar-bg:rgba(54, 162, 235, 1);
+    --bs-progress-bar-transition:width 0.6s ease;
+    display:flex;
+    height:var(--bs-progress-height);
+    overflow:hidden;font-size:var(--bs-progress-font-size);background-color:var(--bs-progress-bg);border-radius:var(--bs-progress-border-radius)}
+.progress-bar{display:flex;flex-direction:column;justify-content:center;overflow:hidden;color:var(--bs-progress-bar-color);text-align:center;white-space:nowrap;background-color:var(--bs-progress-bar-bg);transition:var(--bs-progress-bar-transition)}
+@media (prefers-reduced-motion:reduce){.progress-bar{transition:none}}
+.progress-bar-striped{background-image:linear-gradient(45deg,rgba(255,255,255,.15) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.15) 50%,rgba(255,255,255,.15) 75%,transparent 75%,transparent);background-size:var(--bs-progress-height) var(--bs-progress-height)}
+.progress-bar-animated{-webkit-animation:1s linear infinite progress-bar-stripes;animation:1s linear infinite progress-bar-stripes}
+@media (prefers-reduced-motion:reduce){.progress-bar-animated{-webkit-animation:none;animation:none}}

@@ -40,7 +40,7 @@
                                 <label for="current-file-selector" class="caption">Select Current XER</label>
                                 <div class="pad-10px">
                                     <input type="file" name="current" id="current-file-selector" accept=".xer" class="xer margin-top-5px" required>
-                                    <select name="current" id="current-project-selector" class="width-100 margin-top-10px hidden">
+                                    <select title="Current Project Selector" name="current" id="current-project-selector" class="width-100 margin-top-10px hidden">
                                     </select>
                                 </div>
                             </div>
@@ -48,7 +48,7 @@
                                 <label for="previous-file-selector" class="caption">Select Previous XER</label>
                                 <div class="pad-10px">
                                     <input type="file" name="previous" id="previous-file-selector" accept=".xer" class="xer margin-top-5px" required>
-                                    <select name="previous" id="previous-project-selector" class="width-100 margin-top-10px hidden">
+                                    <select title="Previous Project Selector" name="previous" id="previous-project-selector" class="width-100 margin-top-10px hidden">
                                     </select>
                                 </div>
                             </div>
@@ -108,7 +108,7 @@
                             <div class="">
                                 <div class="flex" style="justify-content: space-evenly;">
                                     <div class="card"> <!-- Current Project -->
-                                        <table>
+                                        <table aria-label="Current Project">
                                             <thead>
                                                 <tr>
                                                     <th class="btm-border" style="font-size: 1.2rem;">Current Project</th>
@@ -126,7 +126,7 @@
                                     </div>
                                     <div style="width: 20px; text-align: center; font-size: 1.5rem; padding: 0.5em 1.0em;">VS</div>
                                     <div class="card"> <!-- Previous Project -->
-                                        <table>
+                                        <table aria-label="Previous Project">
                                             <thead>
                                                 <tr>
                                                     <th class=" btm-border" style="font-size: 1.2rem;">Previous Project</th>
@@ -145,7 +145,7 @@
                             <div class="flex" style="justify-content: space-between;">
                                 <div>
                                     <div class="card"> <!-- Project Dates -->
-                                        <table>
+                                        <table aria-label="Project Dates Table">
                                             <caption>Project Dates</caption>
                                             <thead>
                                                 <tr>
@@ -184,7 +184,7 @@
                                         </table>
                                     </div>
                                     <div id="progress-table" class="card"> <!-- Progress -->
-                                        <table>
+                                        <table aria-label="Progress Table">
                                             <caption>Progress</caption>
                                             <thead>
                                                 <tr>
@@ -201,21 +201,60 @@
                                                     <td id="current-schedule-per" class="text-right no-wrap"></td>
                                                     <td id="previous-schedule-per" class="text-right no-wrap "></td>
                                                     <td id="schedule-per-var" class="text-right no-wrap "></td>
-                                                    <td class="outer-progress"><div id="sched-progress" class="inner-progress"></div></td>
+                                                    <td class="outer-progress">
+                                                        <div class="progress" style="height: 15px;">
+                                                            <div 
+                                                                id="sched-progress"
+                                                                title="Schedule Duration Progress"
+                                                                class="progress-bar"
+                                                                role="progressbar"
+                                                                aria-valuenow="0"
+                                                                aria-valuemin="0"
+                                                                aria-valuemax="100"
+                                                                style="width: 0%">
+                                                            </div>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 <tr>
                                                     <td class="no-wrap">Physical:</td>
                                                     <td id="current-physical-per" class="text-right no-wrap"></td>
                                                     <td id="previous-physical-per" class="text-right no-wrap "></td>
                                                     <td id="physical-per-var" class="text-right no-wrap "></td>
-                                                    <td class="outer-progress"><div id="phys-progress" class="inner-progress"></div></td>
+                                                    <td class="outer-progress">
+                                                        <div class="progress" style="height: 15px;">
+                                                            <div 
+                                                                id="phys-progress"
+                                                                title="Schedule Physical Progress"
+                                                                class="progress-bar"
+                                                                role="progressbar"
+                                                                aria-valuenow="0"
+                                                                aria-valuemin="0"
+                                                                aria-valuemax="100"
+                                                                style="width: 0%">
+                                                            </div>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                                 <tr id="cost-progress-row">
                                                     <td class="no-wrap">Cost:</td>
                                                     <td id="current-cost-per" class="text-right no-wrap"></td>
                                                     <td id="previous-cost-per" class="text-right no-wrap "></td>
                                                     <td id="cost-per-var" class="text-right no-wrap "></td>
-                                                    <td class="outer-progress"><div id="cost-progress" class="inner-progress"></div></td>
+                                                    <td class="outer-progress">
+                                                        <div class="progress" style="height: 15px;">
+                                                            <div 
+                                                                id="cost-progress"
+                                                                title="Schedule Cost Progress"
+                                                                class="progress-bar"
+                                                                role="progressbar"
+                                                                aria-valuenow="0"
+                                                                aria-valuemin="0"
+                                                                aria-valuemax="100"
+                                                                style="width: 0%">
+                                                            </div>
+                                                        </div>
+                                                    </td>
                                                 </tr>
                                             </tbody>
                                         </table>
