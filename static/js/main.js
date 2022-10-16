@@ -543,6 +543,14 @@ function updateProjCard(name, value){
 
         updateElText('start-period', util.formatDate(projects.previous.last_recalc_date))
         updateElText('end-period', util.formatDate(projects.current.last_recalc_date))
+        let plannedDates = plannedProgress.earlyStart + plannedProgress.earlyFinish
+        let actualDates = plannedProgress.actualStart + plannedProgress.actualFinish
+        if (plannedDates === 0){
+            updateElText('performance-score', 'N/A')
+        }
+        else {
+            updateElText('performance-score', `${(actualDates / plannedDates * 100).toFixed(1)}%`)
+        }
 
         let ctxStartFinishProgress = document.getElementById('startFinishChart');
         let startFinishChart = new Chart(ctxStartFinishProgress, {
