@@ -426,7 +426,6 @@ function updateProjCard(name, value){
         Array.from(projects.current.wbs.values()).forEach(wbs => {
             if (!wbs.isProjectNode) {
                 const prevWbs = projects.previous.get(wbs)
-                console.log("Previous", prevWbs)
                 if (!prevWbs) {
                     wbsChanges.added.add = {curr: wbs};
                 }

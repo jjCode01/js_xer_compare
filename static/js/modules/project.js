@@ -127,7 +127,6 @@ Project.prototype.has = function(obj) {
     if (obj instanceof Resource) return this.resById.has(obj.resId)
     if (obj instanceof Relationship) return this.relsById.has(obj.logicId)
     if (obj instanceof WbsNode) return this.wbsById.has(obj.wbsId)
-    console.log(obj)
     return false
 }
 Project.prototype.get = function(obj) {
@@ -135,7 +134,6 @@ Project.prototype.get = function(obj) {
     if (obj instanceof Resource) return this.resById.get(obj.resId)
     if (obj instanceof Relationship) return this.relsById.get(obj.logicId)
     if (obj instanceof WbsNode) return this.wbsById.get(obj.wbsId)
-    console.log(obj)
     return
 }
 
