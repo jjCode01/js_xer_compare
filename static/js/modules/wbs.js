@@ -26,7 +26,9 @@ export default class WbsNode {
 
         while (true) {
             if (!this.project.wbs.has(node.parent_wbs_id) || 
-            this.project.wbs.get(node.parent_wbs_id).isProjectNode) break;
+            this.project.wbs.get(node.parent_wbs_id).isProjectNode) {
+                break;
+            }
 
             node = this.project.wbs.get(node.parent_wbs_id);
             id.unshift(node.wbs_short_name)

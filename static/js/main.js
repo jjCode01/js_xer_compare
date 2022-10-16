@@ -423,19 +423,20 @@ function updateProjCard(name, value){
         const prevWbsArr = Array.from(projects.previous.wbs.values())
         wbsChanges.deleted.data = prevWbsArr.filter(wbs => !wbs.isProjectNode && !projects.current.has(wbs))
 
-        for (let wbs of Array.from(projects.current.wbs.values())) {
-            if (wbs.isProjectNode) break;
-
-            const prevWbs = projects.previous.get(wbs)
-            if (!prevWbs) {
-                wbsChanges.added.add = {curr: wbs};
-                break;
+        Array.from(projects.current.wbs.values()).forEach(wbs => {
+            if (!wbs.isProjectNode) {
+                const prevWbs = projects.previous.get(wbs)
+                console.log("Previous", prevWbs)
+                if (!prevWbs) {
+                    wbsChanges.added.add = {curr: wbs};
+                }
+                else {
+                    if (prevWbs.wbs_name !== wbs.wbs_name) {
+                        wbsChanges.revised.add = {curr: wbs, prev: prevWbs}
+                    }
+                }
             }
-
-            if (prevWbs.wbs_name !== wbs.wbs_name) {
-                wbsChanges.revised.add = {curr: wbs, prev: prevWbs}
-            }
-        }
+        })
 
         updateElements(wbsChanges)
         constraintChanges.deletedPrim.data = prevTasks.filter(task => {
