@@ -28,6 +28,7 @@ export default class ParseXer{
     constructor(file, name) {
         this.name = name
         this.#tables = parseTableObjects(file)
+
         this.PROJWBS?.forEach(wbs => {
             if (!wbs.isProjectNode) {
                 wbs.parent = this.#tables.PROJWBS.rows[wbs.parent_wbs_id]
@@ -43,7 +44,6 @@ export default class ParseXer{
                 while (true) {
                     node = node.parent;
                     if (!node) {
-                        console.log(oldNode)
                         break
                     }
                     if (node.isProjectNode) break;
@@ -68,14 +68,16 @@ export default class ParseXer{
             const succTask = this.PROJECT[rel.proj_id].tasks.get(rel.task_id)
             this.PROJECT[rel.proj_id].addRelationship = new Relationship(rel, predTask, succTask)
         })
-        this.TASKRSRC?.forEach(rsrc => {
-            if (rsrc.target_cost !== 0 || rsrc.target_qty !== 0) {
-                const task = this.PROJECT[rsrc.proj_id].tasks.get(rsrc.task_id);
-                const account = this.#tables?.ACCOUNT?.rows[rsrc.acct_id]
-                const resType = this.#tables?.RSRC?.rows[rsrc.rsrc_id]
-                this.PROJECT[rsrc.proj_id].addResource = new Resource(rsrc, resType, task, account)
-            }
-        })
+        if ('RSRC' in this.#tables) {
+            this.TASKRSRC?.forEach(rsrc => {
+                if (rsrc.target_cost !== 0 || rsrc.target_qty !== 0) {
+                    const task = this.PROJECT[rsrc.proj_id].tasks.get(rsrc.task_id);
+                    const account = this.#tables?.ACCOUNT?.rows[rsrc.acct_id]
+                    const resType = this.#tables?.RSRC?.rows[rsrc.rsrc_id]
+                    this.PROJECT[rsrc.proj_id].addResource = new Resource(rsrc, resType, task, account)
+                }
+            })
+        }
         this.TASKMEMO?.forEach(memo => {
             const task = this.PROJECT[memo.proj_id].tasks.get(memo.task_id)
             const memoType = this?.MEMOTYPE[memo.memo_type_id]
@@ -92,6 +94,9 @@ export default class ParseXer{
     get TASKPRED() { return this.#tables?.TASKPRED?.rows }
     get TASKRSRC() { return this.#tables?.TASKRSRC?.rows }
     print() {console.log(this)}
+    get errors() {
+        return verifyXer(this.#tables).join('\n')
+    }
 }
 
 const setDataType = (col, val) => {
@@ -132,6 +137,38 @@ const parseTableObjects = (file) =>{
         })
         tables[name] = new XerTable(name, labels, rows)
     })
-    console.log(tables)
+    verifyXer(tables)
     return tables
+}
+
+const verifyXer = (tables) =>{
+    const requiredTables = ['CALENDAR', 'PROJECT', 'PROJWBS', 'TASK', 'TASKPRED']
+    const requiredTablePairs = {
+        TASKFIN: 'FINDATES',
+        TRSRCFIN: 'FINDATES',
+        TASKRSRC: 'RSRC',
+        TASKMEMO: 'MEMOTYPE',
+    }
+    let errors = []
+    for (let table of requiredTables) {
+        if (!(table in tables)) {
+            errors.push(`Missing ${table} Table`)
+        }
+    }
+
+    for (const [t1, t2] of Object.entries(requiredTablePairs)) {
+        if (t1 in tables && !(t2 in tables)) {
+            errors.push(`Missing ${t2} Table`)
+        }
+    }
+
+    for (const task of tables.TASK.rows) {
+        if (!(task.clndr_id in tables.CALENDAR.rows)) {
+            errors.push('Invalid/Missing Calender Assignement')
+            break
+        }
+    }
+
+    
+    return errors
 }

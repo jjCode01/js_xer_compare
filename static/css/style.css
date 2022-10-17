@@ -71,6 +71,7 @@ td{padding: 0.3em 0.6em;}
 .btm-border{border-bottom: solid 1px var(--gray-border);}
 span{padding: 0 0.4em;}
 .card{margin-top: 0.75em;}
+.error{color: firebrick; font-weight: bold;}
 @media print {
     body {overflow:visible;} 
     .card {page-break-before: auto }

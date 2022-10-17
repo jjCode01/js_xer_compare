@@ -682,7 +682,12 @@ analyzeButton.addEventListener("click", (e) => {
 })
 
 const isEmptyObj = obj => Object.keys(obj).length === 0;
-const checkIfReady = () => (!isEmptyObj(xerTables.previous) && !isEmptyObj(xerTables.current))
+const readyToGo = () => {
+    return (
+        !isEmptyObj(xerTables.previous) &&
+        !isEmptyObj(xerTables.current)
+    )
+}
 
 for (let i = 0; i < fileSelectors.length; i++) {
     fileSelectors[i].addEventListener("change", (e) => {
@@ -691,6 +696,7 @@ for (let i = 0; i < fileSelectors.length; i++) {
         reader.onload = (r) => {
             xerTables[e.target.name] = new ParseXer(r.target.result, e.target.files[0].name)
             updateProjList(xerTables[e.target.name].PROJECT, projSelector);
+            updateElText(`${e.target.name}-errors`, xerTables[e.target.name].errors)
             if (Object.keys(xerTables[e.target.name].PROJECT).length > 1){
                 projSelector.classList.remove("hidden")
             } else {
@@ -698,7 +704,7 @@ for (let i = 0; i < fileSelectors.length; i++) {
                     projSelector.classList.add("hidden")
                 }
             }
-            analyzeButton.disabled = !checkIfReady()
+            analyzeButton.disabled = (!readyToGo() || xerTables.current.errors || xerTables.previous.errors)
         };
         reader.readAsText(e.target.files[0], "cp1252");
     })
