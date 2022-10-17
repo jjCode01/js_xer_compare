@@ -106,15 +106,6 @@ function updateProjCard(name, value){
     }
 
     if (name === "current") {
-        document.getElementById("sched-progress").style.width = `${util.formatPercent(projects.current.schedPercentComp)}`
-        document.getElementById("sched-progress").ariaValueNow = `${util.formatPercent(projects.current.schedPercentComp)}`
-        document.getElementById("phys-progress").style.width = `${util.formatPercent(projects.current.physPercentComp)}`
-        document.getElementById("phys-progress").ariaValueNow = `${util.formatPercent(projects.current.physPercentComp)}`
-        if (projects.current.budgetCost) {
-            document.getElementById("cost-progress").style.width = `${util.formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
-            document.getElementById("cost-progress").ariaValueNow = `${util.formatPercent(projects.current.actualCost / projects.current.budgetCost)}`
-        }
-
         let ctxCostLoading = document.getElementById('costLoadingChart');
         let costLoadingChart = createPieChart(
             ctxCostLoading, 'Cost Loading',
@@ -135,6 +126,31 @@ function updateProjCard(name, value){
     if (name === "previous") {
         document.getElementById('title').innerText = `Schedule Comparison - ${projects.current.proj_short_name} vs ${projects.previous.proj_short_name}`
         document.getElementById('pageFooter').innerText = `Schedule Comparison - ${projects.current.proj_short_name} vs ${projects.previous.proj_short_name}`
+
+        const schedProgressDiff = projects.current.schedPercentComp - projects.previous.schedPercentComp
+        if (schedProgressDiff > 0) {
+            document.getElementById("sched-progress").style.width = `${util.formatPercent(projects.previous.schedPercentComp)}`
+            document.getElementById("var-sched-progress").style.width = `${util.formatPercent(schedProgressDiff)}`
+        }
+        else {
+            document.getElementById("sched-progress").style.width = `${util.formatPercent(projects.current.schedPercentComp)}`
+        }
+        document.getElementById("sched-progress").ariaValueNow = `${util.formatPercent(projects.current.schedPercentComp)}`
+        
+        const physicalProgressDiff = projects.current.physPercentComp - projects.previous.physPercentComp
+        if (physicalProgressDiff > 0 ){
+            document.getElementById("phys-progress").style.width = `${util.formatPercent(projects.previous.physPercentComp)}`
+            document.getElementById("var-phys-progress").style.width = `${util.formatPercent(physicalProgressDiff)}`
+        }
+        else {
+            document.getElementById("phys-progress").style.width = `${util.formatPercent(projects.current.physPercentComp)}`
+        }
+        document.getElementById("phys-progress").ariaValueNow = `${util.formatPercent(projects.current.physPercentComp)}`
+        if (projects.current.budgetCost) {
+            const currentCostPercent = projects.current.actualCost / projects.current.budgetCost
+            document.getElementById("cost-progress").style.width = `${util.formatPercent(currentCostPercent)}`
+            document.getElementById("cost-progress").ariaValueNow = `${util.formatPercent(currentCostPercent)}`
+        }
 
         const currCalendars = [...Object.values(xerTables.current.CALENDAR)]
         const prevCalendars = [...Object.values(xerTables.previous.CALENDAR)]
