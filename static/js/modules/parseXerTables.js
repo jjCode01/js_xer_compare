@@ -12,6 +12,7 @@ const tblKeyMap = {
     MEMOTYPE: 'memo_type_id',
     PROJECT: 'proj_id',
     RSRC: 'rsrc_id',
+    PROJWBS: 'wbs_id',
 }
 
 class XerTable {
@@ -24,15 +25,41 @@ class XerTable {
 
 export default class ParseXer{
     #tables
-    #accounts
     constructor(file, name) {
         this.name = name
         this.#tables = parseTableObjects(file)
-        this.#accounts = new Map()
         this.PROJWBS?.forEach(wbs => {
-            const proj = this.PROJECT[wbs.proj_id];
-            proj.addWbs = new WbsNode(wbs, proj)
+            if (!wbs.isProjectNode) {
+                wbs.parent = this.#tables.PROJWBS.rows[wbs.parent_wbs_id]
+            }
         })
+        this.PROJWBS?.forEach(wbs => {
+            if (wbs.isProjectNode) {
+                wbs.path = []
+            }
+            else {
+                let node = wbs
+                let path = [wbs.wbs_short_name]
+                while (true) {
+                    node = node.parent;
+                    if (!node) {
+                        console.log(oldNode)
+                        break
+                    }
+                    if (node.isProjectNode) break;
+                    if (node.path) {
+                        path = node.path.concat(path);
+                        break;
+                    }
+                    else {
+                        path.unshift(node.wbs_short_name)
+                    }
+                } 
+                wbs.path = path
+            }
+            this.PROJECT[wbs.proj_id].addWbs = wbs
+        })
+        
         this.TASK?.forEach(task => {
             this.PROJECT[task.proj_id].addTask = new Task(task, this.CALENDAR[task.clndr_id])
         })
@@ -41,9 +68,6 @@ export default class ParseXer{
             const succTask = this.PROJECT[rel.proj_id].tasks.get(rel.task_id)
             this.PROJECT[rel.proj_id].addRelationship = new Relationship(rel, predTask, succTask)
         })
-        // this.ACCOUNT?.forEach(acct => {
-        //     this.#accounts.set(acct.acct_id, acct)
-        // })
         this.TASKRSRC?.forEach(rsrc => {
             if (rsrc.target_cost !== 0 || rsrc.target_qty !== 0) {
                 const task = this.PROJECT[rsrc.proj_id].tasks.get(rsrc.task_id);
@@ -60,9 +84,8 @@ export default class ParseXer{
     }
     get CALENDAR() { return this.#tables?.CALENDAR.rows }
     get PROJECT() { return this.#tables?.PROJECT.rows }
-    get PROJWBS() { return this.#tables.PROJWBS.rows }
+    get PROJWBS() { return Object.values(this.#tables.PROJWBS.rows) }
     get RSRC() { return this.#tables?.RSRC?.rows }
-    // get ACCOUNT() { return this.#tables?.ACCOUNT?.rows }
     get MEMOTYPE() { return this.#tables?.MEMOTYPE?.rows }
     get TASK() { return this.#tables?.TASK?.rows }
     get TASKMEMO() { return this.#tables?.TASKMEMO?.rows }
@@ -82,6 +105,7 @@ const setDataType = (col, val) => {
 const setObjType = (tableName, obj) => {
     if (tableName === 'CALENDAR') return new Calendar(obj)
     if (tableName === 'PROJECT') return new Project(obj)
+    if (tableName === 'PROJWBS') return new WbsNode(obj)
     return obj
 }
 
@@ -99,7 +123,7 @@ const parseTableObjects = (file) =>{
     tablesArr.forEach(tbl => {
         const name = tbl.shift()
         const labels = tbl.shift().split('\t').slice(1)
-        const rows = tbl.map(row => {
+        const rows = tbl.filter(row => row && !row.startsWith('%E')).map(row => {
             const obj = row.split('\t').slice(1).reduce((col, val, i) => {
                 col[labels[i]] = setDataType(labels[i], val)
                 return col
@@ -108,5 +132,6 @@ const parseTableObjects = (file) =>{
         })
         tables[name] = new XerTable(name, labels, rows)
     })
+    console.log(tables)
     return tables
 }
