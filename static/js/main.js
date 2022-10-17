@@ -621,10 +621,10 @@ function updateProjCard(name, value){
 
 function updateProjList(projs, selector) {
     for (let i = selector.options.length - 1; i >= 0; i--) {selector.remove(i);}
-    for (const proj in projs) {
+    for (const proj of Object.values(projs).filter(p => p.export_flag === 'Y')) {
         let el = document.createElement("option");
-        el.textContent = `${projs[proj].proj_short_name} - ${projs[proj].name}`;
-        el.value = projs[proj].proj_id;
+        el.textContent = `${proj.proj_short_name} - ${proj.name}`;
+        el.value = proj.proj_id;
         selector.appendChild(el);
     }
 }
@@ -697,13 +697,14 @@ for (let i = 0; i < fileSelectors.length; i++) {
             xerTables[e.target.name] = new ParseXer(r.target.result, e.target.files[0].name)
             updateProjList(xerTables[e.target.name].PROJECT, projSelector);
             updateElText(`${e.target.name}-errors`, xerTables[e.target.name].errors)
-            if (Object.keys(xerTables[e.target.name].PROJECT).length > 1){
-                projSelector.classList.remove("hidden")
-            } else {
-                if (!projSelector.classList.contains("hidden")) {
-                    projSelector.classList.add("hidden")
-                }
-            }
+            projSelector.disabled = false
+            // if (Object.keys(xerTables[e.target.name].PROJECT).length > 1){
+            //     projSelector.classList.remove("hidden")
+            // } else {
+            //     if (!projSelector.classList.contains("hidden")) {
+            //         projSelector.classList.add("hidden")
+            //     }
+            // }
             analyzeButton.disabled = (!readyToGo() || xerTables.current.errors || xerTables.previous.errors)
         };
         reader.readAsText(e.target.files[0], "cp1252");

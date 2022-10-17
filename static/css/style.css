@@ -143,6 +143,13 @@ span{padding: 0 0.4em;}
 select, button, input[type="submit"], input::file-selector-button{
     padding: 0.3em 0.5em;
 }
+input[type="file"] {
+    min-width: 360px;
+}
+select {
+    display: block;
+    min-width: 360px;
+}
 
 @-webkit-keyframes progress-bar-stripes{0%{background-position-x:1rem}}
 @keyframes progress-bar-stripes{0%{background-position-x:1rem}}
