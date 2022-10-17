@@ -698,13 +698,6 @@ for (let i = 0; i < fileSelectors.length; i++) {
             updateProjList(xerTables[e.target.name].PROJECT, projSelector);
             updateElText(`${e.target.name}-errors`, xerTables[e.target.name].errors)
             projSelector.disabled = false
-            // if (Object.keys(xerTables[e.target.name].PROJECT).length > 1){
-            //     projSelector.classList.remove("hidden")
-            // } else {
-            //     if (!projSelector.classList.contains("hidden")) {
-            //         projSelector.classList.add("hidden")
-            //     }
-            // }
             analyzeButton.disabled = (!readyToGo() || xerTables.current.errors || xerTables.previous.errors)
         };
         reader.readAsText(e.target.files[0], "cp1252");

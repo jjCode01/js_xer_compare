@@ -37,7 +37,7 @@ export const formatAbsNum = num => {
 }
 
 export const formatVariance = (num) => {
-    if (isNaN(num)) return "N/A"
+    if (isNaN(num)) return "-"
     let sign = num === 0 ? "auto" : "always";
     return Intl.NumberFormat('en-US', {
         maximumFractionDigits: 1,

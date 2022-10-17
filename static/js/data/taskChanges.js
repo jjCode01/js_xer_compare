@@ -70,23 +70,23 @@ export let taskChanges = {
     ),
     start: new Change(
         "tk-start", "Revised Actual Starts",
-        [...cols, 'New Start', 'Old Start', 'Var'],
+        [...cols, 'New Actual Start', 'Old Actual Start', 'Var'],
         function() {
             return this.data.map((task, i) => [
-                ...row(task), formatDate(task.start, false), 
-                formatDate(this.prev[i].start, false), 
-                formatVariance(dateVariance(task.start, this.prev[i].start))
+                ...row(task), formatDate(task.act_start_date, false) ?? "-", 
+                formatDate(this.prev[i].act_start_date, false), 
+                formatVariance(dateVariance(task.act_start_date, this.prev[i].act_start_date))
             ])
         }
     ),
     finish: new Change(
         "tk-finish", "Revised Actual Finishes",
-        [...cols, 'New Finish', 'Old Finish', 'Var'],
+        [...cols, 'New Actual Finish', 'Old Actual Finish', 'Var'],
         function() {
             return this.data.map((task, i) => [
-                ...row(task), formatDate(task.finish, false), 
-                formatDate(this.prev[i].finish, false), 
-                formatVariance(dateVariance(task.finish, this.prev[i].finish))
+                ...row(task), formatDate(task.act_end_date, false) ?? "-", 
+                formatDate(this.prev[i].act_end_date, false), 
+                formatVariance(dateVariance(task.act_end_date, this.prev[i].act_end_date))
             ])
         }
     ),
