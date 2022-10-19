@@ -692,6 +692,8 @@ const readyToGo = () => {
     )
 }
 
+let errors = {current: "tbd", previous: "tbd"}
+
 for (let i = 0; i < fileSelectors.length; i++) {
     fileSelectors[i].addEventListener("change", (e) => {
         let reader = new FileReader();
@@ -699,9 +701,10 @@ for (let i = 0; i < fileSelectors.length; i++) {
         reader.onload = (r) => {
             xerTables[e.target.name] = new ParseXer(r.target.result, e.target.files[0].name)
             updateProjList(xerTables[e.target.name].PROJECT, projSelector);
-            updateElText(`${e.target.name}-errors`, xerTables[e.target.name].errors(projSelector.value))
+            errors[e.target.name] = xerTables[e.target.name].errors(projSelector.value)
+            updateElText(`${e.target.name}-errors`, errors[e.target.name])
             projSelector.disabled = false
-            analyzeButton.disabled = (!readyToGo() || xerTables.current.errors || xerTables.previous.errors)
+            analyzeButton.disabled = (!readyToGo() || !(errors.current === "") || !(errors.previous === ""))
         };
         reader.readAsText(e.target.files[0], "cp1252");
     })
