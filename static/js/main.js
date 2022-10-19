@@ -167,8 +167,8 @@ function updateProjCard(name, value){
                     {
                         label: 'Complete',
                         data: [
-                            projects.current.completed.length, // / projects.current.taskArray.length,
-                            projects.previous.completed.length, // / projects.previous.taskArray.length, 
+                            projects.current.completed.length,
+                            projects.previous.completed.length, 
                         ],
                         backgroundColor: [`rgba(${CHARTCOLOR.BLUE}, 0.9)`],
                         borderColor: [`rgba(${CHARTCOLOR.BLUE}, 1)`],
@@ -177,8 +177,8 @@ function updateProjCard(name, value){
                     {
                         label: 'In Progress',
                         data: [
-                            projects.current.inProgress.length, // / projects.current.taskArray.length,
-                            projects.previous.inProgress.length, // / projects.previous.taskArray.length,
+                            projects.current.inProgress.length,
+                            projects.previous.inProgress.length,
                         ],
                         backgroundColor: [`rgba(${CHARTCOLOR.GREEN}, 0.9)`],
                         borderColor: [`rgba(${CHARTCOLOR.GREEN}, 1)`], 
@@ -187,8 +187,8 @@ function updateProjCard(name, value){
                     {
                         label: 'Not Started',
                         data: [
-                            projects.current.notStarted.length, // / projects.current.taskArray.length, 
-                            projects.previous.notStarted.length, // / projects.previous.taskArray.length,
+                            projects.current.notStarted.length,
+                            projects.previous.notStarted.length,
 
                         ],
                         backgroundColor: [`rgba(${CHARTCOLOR.RED}, 0.9)`],
@@ -367,17 +367,19 @@ function updateProjCard(name, value){
         updateElements(resourceChanges)
 
 	    const hasCalendar = (cal, table) => {
-            if (!(cal.type === 'Project')) return (cal.clndr_id in table.CALENDAR)
             for (let c in table.CALENDAR) {
-                if (table.CALENDAR[c].id === cal.id) return true
+                if (table.CALENDAR[c].type === cal.type && table.CALENDAR[c].clndr_name === cal.clndr_name) {
+                    return true;
+                }
             }
             return false
         }
         const getCalendar = (cal, table) => {
             if (hasCalendar(cal, table)) {
-                if (!(cal.type === 'Project')) return table.CALENDAR[cal.clndr_id]
                 for (let c in table.CALENDAR) {
-                    if (table.CALENDAR[c].id === cal.id) return table.CALENDAR[c]
+                    if (table.CALENDAR[c].type === cal.type && table.CALENDAR[c].clndr_name === cal.clndr_name) {
+                        return table.CALENDAR[c];
+                    }
                 }
             }
             return
@@ -413,6 +415,7 @@ function updateProjCard(name, value){
 
             for (let e in cal.exceptions) {
                 if (!(e in prevCal.exceptions)) {
+                    console.log(cal.exceptions[e])
                     calendarChanges.addedException.add = {
                         curr: {
                             clndr_name: cal.clndr_name, 
@@ -696,7 +699,7 @@ for (let i = 0; i < fileSelectors.length; i++) {
         reader.onload = (r) => {
             xerTables[e.target.name] = new ParseXer(r.target.result, e.target.files[0].name)
             updateProjList(xerTables[e.target.name].PROJECT, projSelector);
-            updateElText(`${e.target.name}-errors`, xerTables[e.target.name].errors)
+            updateElText(`${e.target.name}-errors`, xerTables[e.target.name].errors(projSelector.value))
             projSelector.disabled = false
             analyzeButton.disabled = (!readyToGo() || xerTables.current.errors || xerTables.previous.errors)
         };

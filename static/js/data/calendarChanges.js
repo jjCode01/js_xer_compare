@@ -38,14 +38,14 @@ export let calendarChanges = {
         "cal-added-except", "Added Exception (Work) Days",
         ['Calendar Name', 'Type', 'Weekday', 'Date'],
         function() {
-            return this.data.map(cal => [cal.clndr_name, cal.type, getWeekday(cal.exc), formatDate(cal.exc)])
+            return this.data.map(cal => [cal.clndr_name, cal.type, getWeekday(cal.exc.date), formatDate(cal.exc.date)])
         }
     ),
     deletedException: new Change(
         "cal-deleted-except", "Deleted Exception (Work) Days",
         ['Calendar Name', 'Type', 'Weekday', 'Date'],
         function() {
-            return this.data.map(cal => [cal.clndr_name, cal.type, getWeekday(cal.exc), formatDate(cal.exc)])
+            return this.data.map(cal => [cal.clndr_name, cal.type, getWeekday(cal.exc.date), formatDate(cal.exc.date)])
         }
     ),
 }

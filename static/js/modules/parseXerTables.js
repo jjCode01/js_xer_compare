@@ -94,8 +94,8 @@ export default class ParseXer{
     get TASKPRED() { return this.#tables?.TASKPRED?.rows }
     get TASKRSRC() { return this.#tables?.TASKRSRC?.rows }
     print() {console.log(this)}
-    get errors() {
-        return verifyXer(this.#tables).join('\n')
+    errors = (proj_id) => {
+        return verifyXer(this.#tables, proj_id).join('\n')
     }
 }
 
@@ -141,7 +141,7 @@ const parseTableObjects = (file) =>{
     return tables
 }
 
-const verifyXer = (tables) =>{
+const verifyXer = (tables, proj_id) =>{
     const requiredTables = ['CALENDAR', 'PROJECT', 'PROJWBS', 'TASK', 'TASKPRED']
     const requiredTablePairs = {
         TASKFIN: 'FINDATES',
@@ -163,8 +163,8 @@ const verifyXer = (tables) =>{
     }
 
     for (const task of tables.TASK.rows) {
-        if (!(task.clndr_id in tables.CALENDAR.rows)) {
-            errors.push('Invalid/Missing Calender Assignement')
+        if (task.proj_id === proj_id && !(task.clndr_id in tables.CALENDAR.rows)) {
+            errors.push('Missing entries in CALENDAR table')
             break
         }
     }

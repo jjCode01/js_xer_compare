@@ -59,7 +59,7 @@ export default class Task {
         this.secondConstraint = CONSTRAINTTYPES[this.cstr_type2];
         this.percent = calcPercent(this);
         this.calendar = calendar;
-	    this.calendar.assignments += 1;
+        if (this.calendar) this.calendar.assignments += 1;
         this.wbs = undefined;
         this.wbsStruct = [this.wbs];
     }
