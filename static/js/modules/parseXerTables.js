@@ -137,7 +137,6 @@ const parseTableObjects = (file) =>{
         })
         tables[name] = new XerTable(name, labels, rows)
     })
-    verifyXer(tables)
     return tables
 }
 
@@ -156,9 +155,9 @@ const verifyXer = (tables, proj_id) =>{
         }
     }
 
-    for (const [t1, t2] of Object.entries(requiredTablePairs)) {
-        if (t1 in tables && !(t2 in tables)) {
-            errors.push(`Missing ${t2} Table`)
+    for (const [tbl1, tbl2] of Object.entries(requiredTablePairs)) {
+        if (tbl1 in tables && !(tbl2 in tables)) {
+            errors.push(`Missing ${tbl2} Table`)
         }
     }
 
@@ -168,7 +167,6 @@ const verifyXer = (tables, proj_id) =>{
             break
         }
     }
-
     
     return errors
 }

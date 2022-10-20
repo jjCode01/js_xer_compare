@@ -49,7 +49,7 @@ export default class Task {
         this.resources = [];
         this.predecessors = [];
         this.successors = [];
-        this.wbsMap = [];
+        // this.wbsMap = [];
         this.memos = {};
         this.start = this.act_start_date ?? this.early_start_date;
         this.finish = this.act_end_date ?? this.early_end_date;
@@ -61,7 +61,7 @@ export default class Task {
         this.calendar = calendar;
         if (this.calendar) this.calendar.assignments += 1;
         this.wbs = undefined;
-        this.wbsStruct = [this.wbs];
+        // this.wbsStruct = [this.wbs];
     }
     get budgetCost() {return this.resources.reduce((a, r) => a + r.target_cost, 0.0)}
     get actualCost() {return this.resources.reduce((a, r) => a + r.act_reg_cost + r.act_ot_cost, 0.0)}
