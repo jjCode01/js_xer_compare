@@ -43,10 +43,7 @@ export default class ParseXer{
                 let path = [wbs.wbs_short_name]
                 while (true) {
                     node = node.parent;
-                    if (!node) {
-                        break
-                    }
-                    if (node.isProjectNode) break;
+                    if (!node || node.isProjectNode) break;
                     if (node.path) {
                         path = node.path.concat(path);
                         break;
