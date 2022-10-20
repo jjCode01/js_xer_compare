@@ -8,6 +8,8 @@ const parseMemo = memo => {
     memoStr = memoStr.replace(/<!*\/*[A-Z]+.*?>/g, '')
     memoStr = memoStr.replace(/^[^\S\r\n]+(?=\S)/gm, '') // trim leading spaces
     memoStr = memoStr.replace(/&nbsp;\s*/g, ' ') // replace non-breakable spaces
+    memoStr = memoStr.replace(/&amp;\s*/g, '&') // amper sign
+
     return memoStr
 }
 
