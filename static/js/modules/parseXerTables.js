@@ -100,7 +100,7 @@ export default class ParseXer{
 }
 
 const setDataType = (col, val) => {
-    if (!val) return;
+    if (!val || !col) return;
     if (/.+_date2*/.test(col)) return new Date(val.replace(' ', 'T'))
     if (col.endsWith('_num')) return parseInt(val);
     if (/.+_(cost|qty|cnt)/.test(col)) return parseFloat(val)
@@ -128,7 +128,7 @@ const parseTableObjects = (file) =>{
     tablesArr.forEach(tbl => {
         const name = tbl.shift()
         const labels = tbl.shift().split('\t').slice(1)
-        const rows = tbl.filter(row => row && !row.startsWith('%E')).map(row => {
+        const rows = tbl.filter(row => row && row.startsWith('%R')).map(row => {
             const obj = row.split('\t').slice(1).reduce((col, val, i) => {
                 col[labels[i]] = setDataType(labels[i], val)
                 return col
@@ -142,12 +142,17 @@ const parseTableObjects = (file) =>{
 }
 
 const verifyXer = (tables, proj_id) =>{
-    const requiredTables = ['CALENDAR', 'PROJECT', 'PROJWBS', 'TASK', 'TASKPRED']
+    const requiredTables = ['CALENDAR', 'PROJECT', 'PROJWBS', 'TASK', 'TASKPRED', 'SCHEDOPTIONS']
     const requiredTablePairs = {
         TASKFIN: 'FINDATES',
         TRSRCFIN: 'FINDATES',
         TASKRSRC: 'RSRC',
         TASKMEMO: 'MEMOTYPE',
+        ACTVCODE: 'ACTVTYPE',
+        TASKACTV: 'ACTVCODE',
+        PCATVAL: 'PCATTYPE',
+        PROJPCAT: 'PCATVAL',
+        UDFVALUE: 'UDFTYPE',
     }
     let errors = []
     for (let table of requiredTables) {
